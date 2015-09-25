@@ -1,11 +1,3 @@
-//*****************************************************************************
-//
-// bl_main.c - Simple ethercat slave example .
-//
-//
-//*****************************************************************************
-
-
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -28,11 +20,16 @@
 #include <pins.h>
 
 #include "soes/soes.h"
+#include "tiva-morser/morse.h"
 
 void ConfigureDevice(void);
 
 void MyReinitFunc(void) { ConfigureDevice(); }
 
+struct morser m;
+enum OUTPUT res;
+bool sending;
+char * morser_string = "boot";
 
 //*****************************************************************************
 //
@@ -54,6 +51,9 @@ void ConfigureUART(void)
     UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
     // Initialize the UART for console I/O.
     UARTStdioConfig(0, 115200, 16000000);
+
+    UARTprintf("%s\n",__FUNCTION__);
+
 }
 
 //*****************************************************************************
@@ -96,6 +96,7 @@ void ConfigureEcatPDI (void)
     //GPIOIntEnable(SPI_ECAT_SSI_PORT, SPI_ECAT_IRQ_PIN);
     //ROM_IntEnable(INT_GPIOB);
 
+    UARTprintf("%s\n",__FUNCTION__);
 
 }
 
@@ -108,17 +109,71 @@ void ConfigureLed(void)
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
 
-    int toggle_led = 3;
-	while ( toggle_led-- ) {
-		GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3,  GPIO_PIN_3);
-		SysCtlDelay(SysCtlClockGet() / 10 / 3);
-		GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3,  0);
-		SysCtlDelay(SysCtlClockGet() / 10 / 3);
-	}
+	UARTprintf("%s\n",__FUNCTION__);
 
 }
 
+#if 0
+void ConfigureTimer(void)
+{
+    // Enable peripheral TIMER0.
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+    // Configure the two 32-bit periodic timer.
+    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
+    // 100 ms period
+    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet()/10);
+    // Setup the interrupts for the timer timeouts.
+    IntEnable(INT_TIMER0A);
+    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    // Enable the timer.
+    TimerEnable(TIMER0_BASE, TIMER_A);
 
+    UARTprintf("%s\n",__FUNCTION__);
+}
+
+void Timer0AIntHandler(void) {
+
+    static uint32_t timer0_cnt;
+
+    // Clear the timer interrupt.
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+
+    timer0_cnt++;
+
+}
+#endif
+
+void do_morse_led(void) {
+
+    static volatile uint32_t  led_status;
+
+    if (sending) {
+        res = tick(&m);
+        switch(res) {
+          case HIGH:
+        	  led_status = 1;
+			  break;
+          case LOW:
+        	  led_status = 0;
+			  break;
+          case END:
+        	  led_status = 0;
+			  sending = false;
+            break;
+        }
+    } else {
+	   //if ( (timer0_cnt % 10) == 0 ) {
+			// toggle
+			sending = true;
+			init_morser(&m, morser_string);
+			//UARTprintf("init morser\n");
+		//}
+    }
+    /////////////////////////////////////////////////////////////////
+
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, led_status << 3 );
+
+}
 //*****************************************************************************
 //
 //
@@ -127,16 +182,20 @@ void ConfigureLed(void)
 
 void ConfigureDevice(void)
 {
-    // Set the clocking to run directly from the crystal.
+	sending = false;
+
+	// Set the clocking to run directly from the crystal.
     SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
     // Set up the serial console to use for displaying messages.  This is
     // just for this example program and is not needed for SSI operation.
     ConfigureUART();
-
     ConfigureLed();
     // Set up ET1100 PDI interface 
     ConfigureEcatPDI();
+    //
+    //ConfigureTimer();
+
     // Enable processor interrupts.
     IntMasterEnable();
     //
@@ -146,12 +205,21 @@ void ConfigureDevice(void)
 
 void Updater(void) {
 
+	static uint32_t loop_cnt;
+
     UARTprintf("UpdaterECat\n");
 
     while (1) {
 
+    	loop_cnt ++;
+
         soes_loop();
-        
+
+        if ( ! (loop_cnt % 100) ) {
+        	do_morse_led();
+        }
+
+        SysCtlDelay(SysCtlClockGet() / 10000);
         
     }
 

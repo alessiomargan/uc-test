@@ -11,12 +11,19 @@
 int par_1;
 int par_2;
 
+rx_pdo_t          rx_pdo;
+tx_pdo_t          tx_pdo;
+
+
+esc_cfg_t 	esc_config = { 0, 0 };
+
+
 /**
  */
 static void jump_to_bootloader(void) {
 
     // disable periphearals irq ....
-    disable_peripheral_irq();
+	disable_peripheral_irq();
 
     DPRINT ("Jump to bootloader\n");
     //
@@ -112,13 +119,24 @@ void pre_state_change_hook (uint8 * as, uint8 * an)
  */
 void post_state_change_hook (uint8 * as, uint8 * an)
 {
+    DPRINT ("post_state_change_hook 0x%02X %d\n", *as, *an);
     /* Add specific step change hooks here */
     if ( (*as == INIT_TO_BOOT) && (*an & ESCerror ) == 0 ) {
 
+    	jump_to_bootloader();
     }
 
-    DPRINT ("post_state_change_hook 0x%02X %d\n", *as, *an);
 }
+
+void setup_esc_configs(void) {
+
+	/* setup pre-post state change hooks */
+	esc_config.pre_state_change_hook  = pre_state_change_hook;
+	esc_config.post_state_change_hook = post_state_change_hook;
+	ESC_config ((esc_cfg_t *)&esc_config);
+
+}
+
 
 /**
  *

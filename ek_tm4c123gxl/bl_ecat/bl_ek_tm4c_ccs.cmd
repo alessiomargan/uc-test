@@ -55,6 +55,7 @@ SECTIONS
         .const
         .data
         .cinit
+        .vtable
     } load = FLASH, run = 0x20000000, LOAD_START(init_load), RUN_START(init_run), SIZE(init_size)
 
     GROUP

@@ -37,9 +37,12 @@
 
 void disable_peripheral_irq(void)
 {
-    IntDisable(INT_PWM1_1);
 
-    //ROM_IntMasterDisable();
+	IntDisable(INT_PWM1_1);
+    IntDisable(INT_ADC0SS2);
+    IntDisable(INT_TIMER0A);
+    IntDisable(INT_GPIOB);
+
 }
 
 

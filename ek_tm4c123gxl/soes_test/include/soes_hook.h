@@ -41,8 +41,7 @@ extern rx_pdo_t rx_pdo;
 extern int par_1;
 extern int par_2;
 
-void pre_state_change_hook (uint8_t * as, uint8_t * an);
-void post_state_change_hook (uint8_t * as, uint8_t * an);
+void setup_esc_configs(void);
 
 void ecat_process_pdo(void);
 
