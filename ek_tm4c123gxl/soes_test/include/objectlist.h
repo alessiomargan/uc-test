@@ -3,27 +3,6 @@
 
 #include "soes_hook.h"
 
-typedef struct PACKED
-{
-   uint16 subindex;
-   uint16 datatype;
-   uint16 bitlength;
-   uint16 access;
-   char const *name;
-   uint32 value;
-   void *data;
-} _objd;
-
-typedef struct PACKED
-{
-   uint16 index;
-   uint16 objtype;
-   uint8 maxsub;
-   uint8 pad1;
-   char const *name;
-   _objd const *objdesc;
-} _objectlist;
-
 #define nil 0
 
 #define OTYPE_DOMAIN            0x0002
