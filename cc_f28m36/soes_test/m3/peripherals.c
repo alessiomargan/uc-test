@@ -111,6 +111,8 @@ void ConfigureLed(void)
 {
     // Enable the GPIO port that is used for the on-board LED.
     SysCtlPeripheralEnable(LED_1_PERIPH);
+    SysCtlPeripheralEnable(LED_0_PERIPH);
+
     // Enable the GPIO pins for the LED (R PF1 - B PF2 - G PF3).
     GPIOPinTypeGPIOOutput(LED_1_BASE, LED_1_PIN);
     //GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);

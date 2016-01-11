@@ -15,13 +15,13 @@
 #include "inc/hw_gpio.h"
 #include "inc/hw_types.h"
 #include "inc/hw_sysctl.h"
-//#include "board_drivers/set_pinout_f28m36x.h"
 #include "driverlib/debug.h"
 #include "driverlib/flash.h"
 #include "driverlib/ipc.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
+#include "driverlib/ram.h"
 
 #include <utils/uartstdio.h>
 
@@ -66,16 +66,21 @@ main(void)
                          SYSCTL_XCLKDIV_4);
 
 #ifdef _FLASH
-// Copy time critical code and Flash setup code to RAM
-// This includes the following functions:  InitFlash();
-// The  RamfuncsLoadStart, RamfuncsLoadSize, and RamfuncsRunStart
-// symbols are created by the linker. Refer to the device .cmd file.
+    // Copy time critical code and Flash setup code to RAM
+    // This includes the following functions:  InitFlash();
+    // The  RamfuncsLoadStart, RamfuncsLoadSize, and RamfuncsRunStart
+    // symbols are created by the linker. Refer to the device .cmd file.
     memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (size_t)&RamfuncsLoadSize);
 
-// Call Flash Initialization to setup flash waitstates
-// This function must reside in RAM
+    // Call Flash Initialization to setup flash waitstates
+    // This function must reside in RAM
     FlashInit();
 #endif
+
+    // assign S0 and S1 of the shared ram for use by the c28
+    // Details of how c28 uses these memory sections is defined
+    // in the c28 linker file.(28M35H52C1_RAM_lnk.cmd)
+    RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_C28MASTER);
 
 #ifdef _STANDALONE
 #ifdef _FLASH
@@ -87,14 +92,19 @@ main(void)
 #endif
 #endif
 
+    // MWare/boards_drivers
+    //PinoutSet();
+
     ConfigureUART();
     ConfigureLed();
     ConfigureEcatPDI();
     ConfigureTimer();
 
-    // Enable clock supply for LED GPIOs
-    SysCtlPeripheralEnable(LED_0_PERIPH);
-    // Give C28 control of Port C pin 6
+    // Enable Peripherals
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    // Give C28 Control of Port C
+    GPIOPinConfigureCoreSelect(GPIO_PORTC_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
+    // Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
     // Disable clock supply for the watchdog modules
