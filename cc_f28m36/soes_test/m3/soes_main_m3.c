@@ -23,12 +23,13 @@
 #include "driverlib/gpio.h"
 #include "driverlib/ram.h"
 
-#include <utils/uartstdio.h>
+#include "utils/uartstdio.h"
 
 #include <ethercat.h>
 #include <soes/soes.h>
 
 #include <pins.h>
+#include <shared_ram.h>
 #include <peripherals.h>
 
 #ifdef _FLASH
@@ -50,10 +51,21 @@ __error__(char *pcFilename, unsigned long ulLine)
 #endif
 
 //*****************************************************************************
-// Blink LED3
+//
+//
+//
 //*****************************************************************************
-int
-main(void)
+
+m3_rw_data_t	m3_rw_data;
+c28_rw_data_t	c28_ro_data;
+
+// map to RAM S2
+#pragma DATA_SECTION(m3_rw_data,"SHARERAMS2");
+// map to RAM S0
+#pragma DATA_SECTION(c28_ro_data,"SHARERAMS0");
+
+
+int main(void)
 {
     volatile unsigned long ulLoop;
 

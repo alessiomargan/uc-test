@@ -14,10 +14,6 @@ int par_2;
 rx_pdo_t          rx_pdo;
 tx_pdo_t          tx_pdo;
 
-// map to RAM S2
-#pragma DATA_SECTION(rx_pdo,"SHARERAMS2");
-#pragma DATA_SECTION(tx_pdo,"SHARERAMS2");
-
 
 esc_cfg_t 	esc_config = { 0, 0 };
 

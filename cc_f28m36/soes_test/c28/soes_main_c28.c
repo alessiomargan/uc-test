@@ -19,6 +19,7 @@
 
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
 #include <string.h>
+#include "shared_ram.h"
 
 
 #ifdef _FLASH
@@ -29,6 +30,16 @@ extern Uint16 RamfuncsRunStart;
 #endif
 
 extern void Configure_C28_Timer();
+extern void Configure_C28_Gpio();
+
+m3_rw_data_t	m3_ro_data;
+c28_rw_data_t	c28_rw_data;
+
+// map to RAM S2
+#pragma DATA_SECTION(m3_ro_data,"SHARERAMS2");
+// map to RAM S0
+#pragma DATA_SECTION(c28_rw_data,"SHARERAMS0");
+
 
 void main(void)
 {
@@ -42,13 +53,8 @@ void main(void)
 // Step 2. Initialize GPIO:
 // This example function is found in the F28M36x_Gpio.c file and
 // illustrates how to set the GPIO to it's default state.
-    InitGpio(); // Skipped for this example
-
-    EALLOW;
-    LED_0_DIR_REG = 1;
-    GpioCtrlRegs.GPCDIR.bit.GPIO70 = 1;
-    EDIS;
-    LED_0_DAT_REG = 1;// turn off LED
+    InitGpio();
+    Configure_C28_Gpio();
 
 // Step 3. Clear all interrupts and initialize PIE vector table:
 // Disable CPU interrupts
@@ -83,7 +89,6 @@ void main(void)
 // The shell ISR routines are found in F28M36x_DefaultIsr.c.
 // This function is found in F28M36x_PieVect.c.
     InitPieVectTable();
-
     Configure_C28_Timer();
 
 // Enable global Interrupts and higher priority real-time debug events:
@@ -91,29 +96,8 @@ void main(void)
     ERTM;  // Enable Global realtime interrupt DBGM
 
 // Step 6. IDLE loop. Just sit and loop forever (optional):
-    for(;;)
-    {
-        //
-        // Turn on LED
-        //
-    	LED_0_DAT_REG = 0;
-        //
-        // Delay for a bit.
-        //
-        for(delay = 0; delay < 2000000; delay++)
-        {
-        }
-
-        //
-        // Turn off LED
-        //
-        LED_0_DAT_REG = 1;
-        //
-        // Delay for a bit.
-        //
-        for(delay = 0; delay < 2000000; delay++)
-        {
-        }
+    for(;;) {
+    	// loop
     }
 }
 

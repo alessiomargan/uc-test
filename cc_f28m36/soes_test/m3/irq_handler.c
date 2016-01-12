@@ -19,12 +19,14 @@
 #include "pins.h"
 #include "soes_hook.h"
 #include "peripherals.h"
-//#include "pwm_ctrl.h"
+#include "shared_ram.h"
 
 
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
+extern m3_rw_data_t		m3_rw_data;
+extern c28_rw_data_t	c28_ro_data;
 
 /**
  * 
@@ -69,6 +71,8 @@ void Timer0AIntHandler(void) {
     if ( (timer0_cnt % 10) == 0 ) {
         soes_loop();
     }
+
+    m3_rw_data.v_int32++;
 
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
