@@ -35,3 +35,33 @@ __interrupt void cpu_timer2_isr(void)
 	// The CPU acknowledges the interrupt.
 	EDIS;
 }
+
+// -----------------------------------------------------------
+// PIE Group 1 - MUXed into CPU INT1
+// -----------------------------------------------------------
+
+// INT1.4
+__interrupt void xint1_isr(void)
+{
+    // Insert ISR Code here
+    // To receive more interrupts from this PIE group, acknowledge this
+    // interrupt
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+
+
+}
+// -----------------------------------------------------------
+// PIE Group 3 - MUXed into CPU INT3
+// -----------------------------------------------------------
+
+// INT 3.1
+__interrupt void epwm1_isr(void)     // EPWM-1
+{
+    // Insert ISR Code here
+	// Clear INT flag for this timer
+	EPwm1Regs.ETCLR.bit.INT = 1;
+    // To receive more interrupts from this PIE group, acknowledge this interrupt
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+
+}
+

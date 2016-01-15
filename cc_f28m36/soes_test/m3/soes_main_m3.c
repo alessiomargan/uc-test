@@ -112,11 +112,15 @@ int main(void)
     ConfigureEcatPDI();
     ConfigureTimer();
 
-    // Enable Peripherals
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    // Enable C28 Peripherals
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA); // ePWM
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC); //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH); //
     // Give C28 Control of Port C
-    GPIOPinConfigureCoreSelect(GPIO_PORTC_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
-    // Give C28 control of LED_0 Port E pin 7
+	GPIOPinConfigureCoreSelect(GPIO_PORTA_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
+	GPIOPinConfigureCoreSelect(GPIO_PORTC_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
+	GPIOPinConfigureCoreSelect(GPIO_PORTH_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
+	    // Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
     // Disable clock supply for the watchdog modules

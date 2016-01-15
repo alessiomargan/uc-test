@@ -55,10 +55,10 @@ PAGE 0:    /* Program Memory */
    FLASHH      : origin = 0x118000, length = 0x008000     /* on-chip FLASH */
    FLASHG      : origin = 0x120000, length = 0x008000     /* on-chip FLASH */
    FLASHF      : origin = 0x128000, length = 0x008000     /* on-chip FLASH */
-   FLASHE       : origin = 0x130000, length = 0x008000      /* on-chip FLASH */
-   FLASHD      : origin = 0x138000, length = 0x002000      /* on-chip FLASH */
-   FLASHC      : origin = 0x13A000, length = 0x002000      /* on-chip FLASH */
-   FLASHA      : origin = 0x13E000, length = 0x001F80      /* on-chip FLASH */
+   FLASHE      : origin = 0x130000, length = 0x008000     /* on-chip FLASH */
+   FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
+   FLASHC      : origin = 0x13A000, length = 0x002000     /* on-chip FLASH */
+   FLASHA      : origin = 0x13E000, length = 0x001F80     /* on-chip FLASH */
    
    CSM_RSVD    : origin = 0x13FF80, length = 0x000070     /* Part of FLASHA.  Program with all 0x0000 when CSM is in use. */
    BEGIN       : origin = 0x13FFF0, length = 0x000002     /* Part of FLASHA.  Used for "boot to Flash" bootloader mode. */

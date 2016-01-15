@@ -113,9 +113,10 @@ void ConfigureLed(void)
     SysCtlPeripheralEnable(LED_1_PERIPH);
     SysCtlPeripheralEnable(LED_0_PERIPH);
 
-    // Enable the GPIO pins for the LED (R PF1 - B PF2 - G PF3).
+    // control card led1
     GPIOPinTypeGPIOOutput(LED_1_BASE, LED_1_PIN);
-    //GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
+
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_7);
     //GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
 
     UARTprintf("%s\n",__FUNCTION__);

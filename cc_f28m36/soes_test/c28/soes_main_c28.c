@@ -29,8 +29,10 @@ extern Uint16 RamfuncsLoadSize;
 extern Uint16 RamfuncsRunStart;
 #endif
 
+extern void Configure_Pie_Vector();
 extern void Configure_C28_Timer();
 extern void Configure_C28_Gpio();
+extern void Configure_C28_ePWM();
 
 m3_rw_data_t	m3_ro_data;
 c28_rw_data_t	c28_rw_data;
@@ -54,7 +56,6 @@ void main(void)
 // This example function is found in the F28M36x_Gpio.c file and
 // illustrates how to set the GPIO to it's default state.
     InitGpio();
-    Configure_C28_Gpio();
 
 // Step 3. Clear all interrupts and initialize PIE vector table:
 // Disable CPU interrupts
@@ -89,7 +90,12 @@ void main(void)
 // The shell ISR routines are found in F28M36x_DefaultIsr.c.
 // This function is found in F28M36x_PieVect.c.
     InitPieVectTable();
+
+    Configure_Pie_Vector();
+
+    Configure_C28_Gpio();
     Configure_C28_Timer();
+    Configure_C28_ePWM();
 
 // Enable global Interrupts and higher priority real-time debug events:
     EINT;  // Enable Global interrupt INTM

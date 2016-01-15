@@ -28,10 +28,17 @@ volatile long pwm_irq_cnt = 0;
 extern m3_rw_data_t		m3_rw_data;
 extern c28_rw_data_t	c28_ro_data;
 
+void M3_wr_shared() {
+
+    m3_rw_data.v_int16++;
+    m3_rw_data.v_int32++;
+    m3_rw_data.v_uint64++;
+    m3_rw_data.v_float = 0.12345f;
+
+}
+
 /**
  * 
- *
- * @author amargan (7/4/2014)
  */
 void GPIOGIntHandler(void) {
 
@@ -39,18 +46,16 @@ void GPIOGIntHandler(void) {
 	GPIOPinIntClear(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 	ecat_irq_cnt++;
 
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, GPIO_PIN_7);
 
     ecat_process_pdo();
 
     //UARTprintf("PDI irq %d\n", ecat_irq_cnt );
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, 0);
 }
 
 /**
  * 
- *
- * @author amargan (7/4/2014)
  */
 void Timer0AIntHandler(void) {
 
@@ -72,7 +77,8 @@ void Timer0AIntHandler(void) {
         soes_loop();
     }
 
-    m3_rw_data.v_int32++;
+    //
+    M3_wr_shared();
 
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
