@@ -19,7 +19,7 @@
 #include <driverlib/ssi.h>
 #include <driverlib/timer.h>
 #include <driverlib/uart.h>
-#include <driverlib/watchdog.h>
+#include "driverlib/watchdog.h"
 
 #include <utils/uartstdio.h>
 
@@ -30,18 +30,8 @@
 #include "soes/utypes.h"
 #include "soes/esc.h"
 
-extern void GPIOGIntHandler(void);
-extern void Timer0AIntHandler(void);
 
-void disable_peripheral_irq(void)
-{
-
-	//IntDisable(INT_PWM1_1);
-    IntDisable(INT_TIMER0A);
-    IntDisable(INT_GPIOB);
-
-}
-
+#define DPRINT(...) UARTprintf("btl: "__VA_ARGS__)
 
 /**
  * This function sets up UART0 to be used for a console to display information
@@ -56,6 +46,8 @@ void ConfigureUART(void)
     GPIOPinConfigure(GPIO_PE5_U0TX);
     GPIOPinTypeUART(GPIO_PORTE_BASE, GPIO_PIN_4 | GPIO_PIN_5);
     UARTStdioInit(0);
+    DPRINT("************************\n");
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /**
@@ -95,11 +87,12 @@ void ConfigureEcatPDI (void)
     // Configure the SPI INT pin as interrupt on falling edge.
     GPIOIntTypeSet(ECAT_GPIO_PORTBASE, ECAT_IRQ, GPIO_FALLING_EDGE);
 
-    GPIOPinIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
-    IntRegister(INT_GPIOG, GPIOGIntHandler);
-    IntEnable(INT_GPIOG);
+    // NO IRQ
+    //GPIOPinIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
+    //IntRegister(INT_GPIOG, GPIOGIntHandler);
+    //IntEnable(INT_GPIOG);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 
 }
 
@@ -120,31 +113,11 @@ void ConfigureLed(void)
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_7);
     //GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0);
+
+    DPRINT("%s\n",__FUNCTION__);
 }
 
-/**
- *
- *
- * @author amargan (7/4/2014)
- */
-void ConfigureTimer(void)
-{
-    // Enable peripheral TIMER0.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-    // Configure the two 32-bit periodic timer.
-    TimerConfigure(TIMER0_BASE, TIMER_CFG_32_BIT_PER);
-    // 1ms period
-    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet(SYSTEM_CLOCK_SPEED)/1000);
-    // Setup the interrupts for the timer timeouts.
-    IntEnable(INT_TIMER0A);
-    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-    IntRegister(INT_TIMER0A, Timer0AIntHandler);
-    // Enable the timer.
-    TimerEnable(TIMER0_BASE, TIMER_A);
-
-    UARTprintf("%s\n",__FUNCTION__);
-}
 
 void Watchdog0Reset(void)
 {
@@ -157,10 +130,5 @@ void Watchdog0Reset(void)
 	WatchdogEnable(WATCHDOG0_BASE);
 	// Lock subsequent writes to watchdog configuration.
 	WatchdogLock(WATCHDOG0_BASE);
-
-}
-
-
-void read_sensors(void) {
 
 }

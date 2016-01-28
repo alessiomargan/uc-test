@@ -7,7 +7,5 @@ void ConfigureLed(void);
 void ConfigureTimer(void);
 void Watchdog0Reset(void);
 
-void disable_peripheral_irq(void);
-void read_sensors(void);
 
 #endif

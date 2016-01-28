@@ -4,9 +4,11 @@
 #include <soes/esc_foe.h>
 #include <soes/soes.h>
 
+#include "peripherals.h"
 #include "soes_hook.h"
 #include "osal.h"
 
+#define DPRINT(...)
 
 int par_1;
 int par_2;
@@ -14,24 +16,20 @@ int par_2;
 rx_pdo_t          rx_pdo;
 tx_pdo_t          tx_pdo;
 
-
 esc_cfg_t 	esc_config = { 0, 0 };
 
+extern int main(void);
+#pragma DATA_SECTION(jumper_to_app,"APP_START_ADDR");
+uint32_t volatile * const jumper_to_app = (uint32_t)&main;
 
 /**
  */
 static void jump_to_bootloader(void) {
 
-    // disable periphearals irq ....
-	disable_peripheral_irq();
-
     DPRINT ("Jump to bootloader\n");
-    //
-    // Return control to the boot loader.  This is a call to the SVC
-    // handler in the boot loader.
-    //
-    (*((void (*)(void))(*(uint32_t *)0x2c)))();
 
+    // Return control to the boot loader.
+    Watchdog0Reset();
 }
 
 

@@ -8,6 +8,7 @@
 //             http://www.ti.com/ ALL RIGHTS RESERVED $
 //###########################################################################
 #include <string.h>
+#include <stdbool.h>
 
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
@@ -28,9 +29,15 @@
 #include <ethercat.h>
 #include <soes/soes.h>
 
-#include <pins.h>
-#include <shared_ram.h>
-#include <peripherals.h>
+#include "pins.h"
+#include "bl_config.h"
+#include "shared_ram.h"
+#include "peripherals.h"
+#include "soes_hook.h"
+#include "tiva-morser/morse.h"
+
+#define DPRINT(...) UARTprintf("btl: "__VA_ARGS__)
+
 
 #ifdef _FLASH
 // These are defined by the linker (see device linker command file)
@@ -38,6 +45,8 @@ extern unsigned long RamfuncsLoadStart;
 extern unsigned long RamfuncsRunStart;
 extern unsigned long RamfuncsLoadSize;
 #endif
+
+extern void Configure_flashAPI(void);
 
 //*****************************************************************************
 // The error routine that is called if the driver library encounters an error.
@@ -56,21 +65,55 @@ __error__(char *pcFilename, unsigned long ulLine)
 //
 //*****************************************************************************
 
-// map to RAM S2
-#pragma DATA_SECTION(m3_rw_data,"SHARERAMS2");
 m3_rw_data_t	m3_rw_data;
-
-// map to RAM S0
-#pragma DATA_SECTION(c28_ro_data,"SHARERAMS0");
 c28_rw_data_t	c28_ro_data;
 
+// map to RAM S2
+#pragma DATA_SECTION(m3_rw_data,"SHARERAMS2");
+// map to RAM S0
+#pragma DATA_SECTION(c28_ro_data,"SHARERAMS0");
 
-//#pragma CODE_SECTION(main,"main_app");
+struct morser m;
+enum OUTPUT res;
+bool sending;
+char * morser_string = "boot";
+
+#pragma CODE_SECTION(do_morse_led,"ramfuncs");
+void do_morse_led(void) {
+
+    static volatile uint32_t  led_status;
+
+    if (sending) {
+        res = tick(&m);
+        switch(res) {
+          case HIGH:
+        	  led_status = 1;
+			  break;
+          case LOW:
+        	  led_status = 0;
+			  break;
+          case END:
+        	  led_status = 0;
+			  sending = false;
+            break;
+        }
+    } else {
+	   //if ( (timer0_cnt % 10) == 0 ) {
+			// toggle
+			sending = true;
+			init_morser(&m, morser_string);
+			//UARTprintf("init morser\n");
+		//}
+    }
+    /////////////////////////////////////////////////////////////////
+
+    GPIOPinWrite(LED_1_BASE, LED_1_PIN, led_status << 2 );
+
+}
+
 int main(void)
 {
     volatile unsigned long ulLoop;
-
-    //ptr_f();
 
     // Disable Protection
     HWREG(SYSCTL_MWRALLOW) =  0xA5A5A5A5;
@@ -80,7 +123,6 @@ int main(void)
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
                          SYSCTL_XCLKDIV_4);
 
-#ifdef _FLASH
     // Copy time critical code and Flash setup code to RAM
     // This includes the following functions:  InitFlash();
     // The  RamfuncsLoadStart, RamfuncsLoadSize, and RamfuncsRunStart
@@ -90,7 +132,6 @@ int main(void)
     // Call Flash Initialization to setup flash waitstates
     // This function must reside in RAM
     FlashInit();
-#endif
 
     // assign S0 and S1 of the shared ram for use by the c28
     // Details of how c28 uses these memory sections is defined
@@ -98,51 +139,56 @@ int main(void)
     RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_C28MASTER);
 
 #ifdef _STANDALONE
-#ifdef _FLASH
     //  Send boot command to allow the C28 application to begin execution
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-#else
-    //  Send boot command to allow the C28 application to begin execution
-    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_RAM);
-#endif
 #endif
 
-    // MWare/boards_drivers
-    //PinoutSet();
-
+    //
     ConfigureUART();
     ConfigureLed();
     ConfigureEcatPDI();
-    ConfigureTimer();
+    Configure_flashAPI();
 
-    // Enable C28 Peripherals
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA); // ePWM
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC); //
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH); //
-    // Give C28 Control of Port C
-	GPIOPinConfigureCoreSelect(GPIO_PORTA_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
-	GPIOPinConfigureCoreSelect(GPIO_PORTC_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
-	GPIOPinConfigureCoreSelect(GPIO_PORTH_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
 	// Give C28 control of LED_0 Port E pin 7
-    GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
+    //GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
-    // enable dog0
     SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
-
-    //The hardware priority mechanism will only look at the upper N bits of the priority level
-    //where N is 3 for the Concerto family
-    IntPrioritySet(INT_TIMER0A, 0x5);
-    IntPrioritySet(INT_GPIOG,   0x5);
 
     // Enable processor interrupts.
     IntMasterEnable();
 
+    // ecat initialization
 	soes_init();
 
-	// Loop forever while the timers run.
-    while (1) {
-            // do nothing .. just loop
+	// only for test .. erase flash using SDO
+	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
+		if ( ! erase_prog_flash() ) {
+			DPRINT("Fail erase flash\n");
+		}
+	}
+
+	gFlash_crc = *(uint32_t*)(APP_CRC_ADDRESS);
+	DPRINT("app _c_int00 0x%X\n", *(uint32_t*)(APP_START_ADDR));
+	// jump to app if
+	// - et1000 GPO3 is LOW
+	// - app CRC is valid
+	if ( test_jump_to_app() ) {
+	   	jump_to_app();
+	}
+
+	while (1) {
+
+		ulLoop ++;
+
+		soes_loop();
+
+		if ( ! (ulLoop % 100) ) {
+			do_morse_led();
+		}
+
+		SysCtlDelay(SysCtlClockGet(SYSTEM_CLOCK_SPEED) / 10000);
+
 	}
 }
 

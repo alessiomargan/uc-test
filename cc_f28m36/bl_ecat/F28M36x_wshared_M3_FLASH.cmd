@@ -47,8 +47,8 @@ MEMORY
     RESETISR (RX)   : origin = 0x00200030, length = 0x0008   /* Reset ISR is mapped to boot to Flash location */
     INTVECS (RX)    : origin = 0x00201000, length = 0x0258
     
-    //FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8   /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
-    //FLASH_M (RX)    : origin = 0x00208000, length = 0x8000   /* Bootloader */
+    FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8   /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
+    FLASH_M (RX)    : origin = 0x00208000, length = 0x8000   /* Bootloader */
     //FLASH_L (RX)    : origin = 0x00210000, length = 0x8000
     //!!FLASH_K (RX)    : origin = 0x00218000, length = 0x8000
     FLS_E_CRC (RX)  : origin = 0x00218000, length = 0x0004   /* App crc */
@@ -108,10 +108,10 @@ SECTIONS
 {
     .intvecs:   > INTVECS, ALIGN(8)
     .resetisr:  > RESETISR, ALIGN(8)
-    .text   :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .const  :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .cinit  :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .pinit  :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
+    .text   :   >> FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
+    .const  :   >> FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
+    .cinit  :   > FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
+    .pinit  :   > FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
 
     .vtable :   >  C0 | C1 | C2 | C3
     .data   :   >  C2 | C3
@@ -119,26 +119,31 @@ SECTIONS
     .sysmem :   >  C0 | C1 | C2 | C3
     .stack  :   >  C0 | C1 | C2 | C3
     
-    .TI.crctab : > FLASH_E, ALIGN(8)
+    .TI.crctab : > FLASH_N | FLASH_M, ALIGN(8)
     
     .z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
     .z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)
     .z2secvalues  :   >  CSM_ECSL_Z2, ALIGN(8)
     .z2_csm_rsvd  :   >  CSM_RSVD_Z2, ALIGN(8)
     
-    ramfuncs            : LOAD = FLASH_E,
-                           RUN = C0,
-                           LOAD_START(RamfuncsLoadStart),
-                           LOAD_SIZE(RamfuncsLoadSize),
-                           LOAD_END(RamfuncsLoadEnd),
-                           RUN_START(RamfuncsRunStart),
-                           RUN_SIZE(RamfuncsRunSize),
-                           RUN_END(RamfuncsRunEnd),
-                           crc_table(AppCrc, algorithm=CRC32_PRIME),
-                           PAGE = 0, ALIGN(8)
-                           
-    APP_START_ADDR : > APP_START
-	FLS_APP_CRC : > FLS_E_CRC
+    GROUP
+     {
+       ramfuncs
+       {
+         -l F021_API_CortexM3_LE.lib
+       }
+     }                       LOAD = FLASH_N | FLASH_M,
+                             RUN = C0,
+                             LOAD_START(RamfuncsLoadStart),
+                             LOAD_SIZE(RamfuncsLoadSize),
+                             LOAD_END(RamfuncsLoadEnd),
+                             RUN_START(RamfuncsRunStart),
+                             RUN_SIZE(RamfuncsRunSize),
+                             RUN_END(RamfuncsRunEnd),
+                             crc_table(AppCrc, algorithm=CRC32_PRIME),
+                             PAGE = 0, ALIGN(8)
+ 
+ 	FLS_APP_CRC : > FLS_E_CRC
 
     SHARERAMS0  : > S0
     SHARERAMS1  : > S1
@@ -158,6 +163,5 @@ SECTIONS
         PUTREADIDX : TYPE = DSECT
     }    
 }
-
 
 __STACK_TOP = __stack + 256;
