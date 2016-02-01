@@ -1,7 +1,8 @@
 #ifndef __BL_CONFIG_H__
 #define __BL_CONFIG_H__
 
-#define CTRL_CMD_ERASE			0x00EE
+#define FLASH_CMD_ERASE_M3		0x00E1
+#define FLASH_CMD_ERASE_C28		0x00E2
 #define CTRL_CMD_DONE			0x7800
 #define CTRL_CMD_ERROR			0xAA00
 

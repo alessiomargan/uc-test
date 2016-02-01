@@ -93,8 +93,8 @@ PAGE 1 :   /* Data Memory */
    RAMS6       : origin = 0x012000, length = 0x001000     /* on-chip Shared RAM block S6 */
    RAMS7       : origin = 0x013000, length = 0x001000     /* on-chip Shared RAM block S7 */
 
-   CTOMRAM     : origin = 0x03F800, length = 0x000380     /* C28 to M3 Message RAM */
-   MTOCRAM     : origin = 0x03FC00, length = 0x000380     /* M3 to C28 Message RAM */
+   CTOMRAM     : origin = 0x03F800, length = 0x000400     /* C28 to M3 Message RAM */
+   MTOCRAM     : origin = 0x03FC00, length = 0x000400     /* M3 to C28 Message RAM */
    
    FLASHB      : origin = 0x13C000, length = 0x002000     /* on-chip FLASH */
 }
@@ -114,7 +114,8 @@ SECTIONS
    .pinit              : > FLASHA,     PAGE = 0, ALIGN(4)
    .text               : > FLASHA      PAGE = 0, ALIGN(4)
    codestart           : > BEGIN       PAGE = 0, ALIGN(4)
-   ramfuncs            : LOAD = FLASHD,
+
+   ramfuncs            : LOAD = FLASHA,
                          RUN = RAML0,
                          LOAD_START(_RamfuncsLoadStart),
                          LOAD_SIZE(_RamfuncsLoadSize),
@@ -129,19 +130,6 @@ SECTIONS
    csmpasswds          : > CSM_PWL_P0  PAGE = 0, ALIGN(4)
    csm_rsvd            : > CSM_RSVD    PAGE = 0, ALIGN(4)
 
-#ifdef __TI_COMPILER_VERSION
-   #if __TI_COMPILER_VERSION >= 15009000
-    .TI.ramfunc : {} LOAD = FLASHD,
-                         RUN = RAML0,
-                         LOAD_START(_RamfuncsLoadStart),
-                         LOAD_SIZE(_RamfuncsLoadSize),
-                         LOAD_END(_RamfuncsLoadEnd),
-                         RUN_START(_RamfuncsRunStart),
-                         RUN_SIZE(_RamfuncsRunSize),
-                         RUN_END(_RamfuncsRunEnd),
-                         PAGE = 0, ALIGN(4)
-   #endif
-#endif
    
    /* The following section definitions are required when using the IPC API Drivers */ 
    GROUP : > CTOMRAM, PAGE = 1 
@@ -175,10 +163,11 @@ SECTIONS
    /* Allocate FPU math areas: */
    FPUmathTables       : > FPUTABLES,  PAGE = 0, TYPE = NOLOAD
 
-   SHARERAMS0          : > RAMS0,      PAGE = 1
-   SHARERAMS1          : > RAMS1,      PAGE = 1
-   SHARERAMS2          : > RAMS2,      PAGE = 1
-   
+   RAM_S0  : > RAMS0,      PAGE = 1
+   RAM_S1  : > RAMS1,      PAGE = 1
+   RAM_S4  : > RAMS4,      PAGE = 1
+   RAM_S5  : > RAMS5,      PAGE = 1
+
    DMARAML2           : > RAML2,       PAGE = 1
    DMARAML3           : > RAML3,       PAGE = 1
 

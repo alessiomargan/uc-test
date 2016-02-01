@@ -30,11 +30,11 @@
 #endif  /* ESC_DEBUG */
 
 
-esc_cfg_t 	esc_config = { 0, 0 };
-foe_cfg_t 	foe_config = { 0, 0 };
+esc_cfg_t 	gESC_config = { 0, 0 };
+foe_cfg_t 	gFOE_config = { 0, 0, 0, 0, 0 };
 uint8		foe_buffer[256];
 
-extern foe_writefile_cfg_t      firmware_foe_files[];
+extern foe_writefile_cfg_t      gFOE_firmware_files[];
 
 uint16 	gFlash_cmd;
 uint16 	gFlash_cmd_ack;
@@ -73,24 +73,36 @@ bool test_jump_to_app(void)
 	return ( ! gET1100_boot_pin && gCrc_ok);
 }
 
+void handle_sdo_0x8001_01(void)
+{
+	bool	success = false;
 
-void handle_sdo_x8001(uint8 subindex) {
-
-	bool	success;
-
-	switch ( subindex ) {
-		case 1:
-			if ( gFlash_cmd == CTRL_CMD_ERASE ) {
-				success = erase_prog_flash();
-				if ( ! success ) {
-					// fail
-					gFlash_cmd_ack = (CTRL_CMD_ERROR | (CTRL_CMD_ERASE & 0x00FF));
-				} else {
-					gFlash_cmd_ack = (CTRL_CMD_DONE  | (CTRL_CMD_ERASE & 0x00FF));
-				}
-			}
+	switch (gFlash_cmd) {
+		case FLASH_CMD_ERASE_M3 :
+			success = erase_m3_app_flash();
 			break;
+		case FLASH_CMD_ERASE_C28 :
+			success = erase_c28_app_flash();
+			break;
+		default :
+			break;
+	}
 
+	if ( ! success ) {
+		gFlash_cmd_ack = (CTRL_CMD_ERROR | (gFlash_cmd & 0x00FF));
+	} else {
+		gFlash_cmd_ack = (CTRL_CMD_DONE  | (gFlash_cmd & 0x00FF));
+	}
+
+}
+
+void handle_sdo_0x8001(uint8 subindex)
+{
+	switch ( subindex ) {
+		// 0x8001:01 flash_cmd
+		case 1:
+			handle_sdo_0x8001_01();
+			break;
 		default:
 			break;
 	}
@@ -108,7 +120,7 @@ void ESC_objecthandler (uint16 index, uint8 subindex)
     switch ( index ) {
     	case 0x8001:
 		{
-			handle_sdo_x8001(subindex);
+			handle_sdo_0x8001(subindex);
 			break;
 		}
         default:
@@ -158,13 +170,13 @@ void post_state_change_hook (uint8 * as, uint8 * an)
 void setup_esc_configs(void)
 {
 	/* setup pre-post state change hooks */
-	esc_config.pre_state_change_hook  = pre_state_change_hook;
-	esc_config.post_state_change_hook = post_state_change_hook;
-	ESC_config ((esc_cfg_t *)&esc_config);
+	gESC_config.pre_state_change_hook  = pre_state_change_hook;
+	gESC_config.post_state_change_hook = post_state_change_hook;
+	ESC_config ((esc_cfg_t *)&gESC_config);
 
 	/* setup application foe_file structs */
 	int file_cnt = 0;
-	foe_writefile_cfg_t * tmp_foe_files = firmware_foe_files;
+	foe_writefile_cfg_t * tmp_foe_files = gFOE_firmware_files;
 
 	while ( tmp_foe_files->name != 0 ) {
 		DPRINT ("foe_file %s\n", tmp_foe_files->name);
@@ -173,17 +185,17 @@ void setup_esc_configs(void)
 	}
 
 	/** Allocate static in caller func to fit buffer_size */
-	foe_config.fbuffer = foe_buffer;
+	gFOE_config.fbuffer = foe_buffer;
 	/** Write this to fill-up, ex. 0xFF for "non write" */
-	foe_config.empty_write = 0xFF;
+	gFOE_config.empty_write = 0xFF;
 	/** Buffer size before we flush to destination */
-	foe_config.buffer_size = sizeof(foe_buffer);
+	gFOE_config.buffer_size = sizeof(foe_buffer);
 	/** Number of files used in firmware update */
-	foe_config.n_files = file_cnt;
+	gFOE_config.n_files = file_cnt;
 	/** Pointer to files configured to be used by FoE */
-	foe_config.files = firmware_foe_files;
+	gFOE_config.files = gFOE_firmware_files;
 
-	FOE_config(&foe_config, firmware_foe_files);
+	FOE_config(&gFOE_config, gFOE_firmware_files);
 
 	DPRINT ("config %d foe_file(s)\n", file_cnt);
 

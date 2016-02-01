@@ -23,7 +23,9 @@
 #define _16KSector_u32length 	0x1000
 #define _64KSector_u32length   	0x4000
 
-extern foe_cfg_t 	foe_config;
+extern foe_cfg_t 	gFOE_config;
+
+//////////////////////////////////////////////////////////////////////////////////////////
 
 Fapi_StatusType Fapi_serviceWatchdogTimer(void)
 {
@@ -48,6 +50,7 @@ Fapi_StatusType Fapi_setupBankSectorEnable(void)
 
    return(Fapi_Status_Success);
 }
+//////////////////////////////////////////////////////////////////////////////////////////
 
 
 #pragma CODE_SECTION(Example_Error,"ramfuncs");
@@ -128,8 +131,8 @@ void Configure_flashAPI(void) {
 	FlashLeavePump();
 }
 
-#pragma CODE_SECTION(erase_prog_flash,"ramfuncs");
-bool erase_prog_flash() {
+#pragma CODE_SECTION(erase_m3_app_flash,"ramfuncs");
+bool erase_m3_app_flash() {
 
 	Fapi_StatusType            oReturnCheck;
     Fapi_FlashStatusWordType   oFlashStatusWord;
@@ -161,6 +164,12 @@ bool erase_prog_flash() {
 
     return (oReturnCheck == Fapi_Status_Success);
 
+}
+
+#pragma CODE_SECTION(erase_c28_app_flash,"ramfuncs");
+bool erase_c28_app_flash() {
+
+	return true;
 }
 
 
@@ -231,7 +240,7 @@ Fapi_StatusType write_flash(uint32_t ui32FlashAddr, uint8_t * buffer, uint32_t s
 uint32_t foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data) {
 
     uint32_t ui32FlashAddr;
-    uint32_t bytestowrite = foe_config.buffer_size;
+    uint32_t bytestowrite = gFOE_config.buffer_size;
 
     // What address are we about to program to?
 	ui32FlashAddr = writefile_cfg->address_offset + writefile_cfg->dest_start_address;
@@ -252,7 +261,7 @@ uint32 foe_write_shared_RAM(foe_writefile_cfg_t * writefile_cfg, uint8 * data) {
 
     // What address are we about to program to?
 	ui32FlashAddr = writefile_cfg->address_offset + writefile_cfg->dest_start_address;
-    DPRINT("write FlashAddr 0x%04X with %d bytes\n", ui32FlashAddr, foe_config.buffer_size);
+    DPRINT("write FlashAddr 0x%04X with %d bytes\n", ui32FlashAddr, gFOE_config.buffer_size);
 
     //
 

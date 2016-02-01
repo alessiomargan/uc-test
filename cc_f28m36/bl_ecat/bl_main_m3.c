@@ -16,6 +16,8 @@
 #include "inc/hw_gpio.h"
 #include "inc/hw_types.h"
 #include "inc/hw_sysctl.h"
+#include "inc/hw_ram.h"
+#include "inc/hw_ipc.h"
 #include "driverlib/debug.h"
 #include "driverlib/flash.h"
 #include "driverlib/ipc.h"
@@ -23,6 +25,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
 #include "driverlib/ram.h"
+#include "driverlib/ipc.h"
 
 #include "utils/uartstdio.h"
 
@@ -68,10 +71,10 @@ __error__(char *pcFilename, unsigned long ulLine)
 m3_rw_data_t	m3_rw_data;
 c28_rw_data_t	c28_ro_data;
 
-// map to RAM S2
-#pragma DATA_SECTION(m3_rw_data,"SHARERAMS2");
-// map to RAM S0
-#pragma DATA_SECTION(c28_ro_data,"SHARERAMS0");
+// map to RAM S1
+#pragma DATA_SECTION(m3_rw_data,"RAM_S1");
+// map to RAM S5
+#pragma DATA_SECTION(c28_ro_data,"RAM_S5");
 
 struct morser m;
 enum OUTPUT res;
@@ -113,7 +116,8 @@ void do_morse_led(void) {
 
 int main(void)
 {
-    volatile unsigned long ulLoop;
+    volatile unsigned long 	ulLoop;
+    unsigned long *			pulMsgRam;
 
     // Disable Protection
     HWREG(SYSCTL_MWRALLOW) =  0xA5A5A5A5;
@@ -133,15 +137,10 @@ int main(void)
     // This function must reside in RAM
     FlashInit();
 
-    // assign S0 and S1 of the shared ram for use by the c28
-    // Details of how c28 uses these memory sections is defined
-    // in the c28 linker file.(28M35H52C1_RAM_lnk.cmd)
-    RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_C28MASTER);
-
-#ifdef _STANDALONE
-    //  Send boot command to allow the C28 application to begin execution
-    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-#endif
+    // assign S0 and S1 of the shared ram for use by the M3
+    RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_M3MASTER);
+    // assign S4 and S5 of the shared ram for use by the C28
+    RAMMReqSharedMemAccess((S4_ACCESS | S5_ACCESS), SX_C28MASTER);
 
     //
     ConfigureUART();
@@ -150,7 +149,30 @@ int main(void)
     Configure_flashAPI();
 
 	// Give C28 control of LED_0 Port E pin 7
-    //GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
+    GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
+
+    // Initialize S0 S1 RAM
+    HWREG(RAM_CONFIG_BASE + RAM_O_MSXRTESTINIT1) |= 0x5;
+    while((HWREG(RAM_CONFIG_BASE + RAM_O_MSXRINITDONE1)&0x5) != 0x5)  {  }
+    // MTOC_MSG_RAM Test and Initialization
+    HWREG(RAM_CONFIG_BASE + RAM_O_MTOCCRTESTINIT1) |= 0x1;
+    while((HWREG(RAM_CONFIG_BASE + RAM_O_MTOCRINITDONE)&0x1) != 0x1)  {  }
+
+    //  Disable writes to protected registers.
+    //HWREG(SYSCTL_MWRALLOW) = 0;
+
+    // Initialize ipc variables.
+    pulMsgRam = (void *)0x2007F400;
+
+
+#ifdef _STANDALONE
+    //  Send boot command to allow the C28 application to begin execution
+    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
+
+    // Spin here until C28 is ready
+    while (!IPCCtoMFlagBusy(IPC_FLAG17)) ;
+    IPCCtoMFlagAcknowledge(IPC_FLAG17);
+#endif
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
@@ -158,18 +180,23 @@ int main(void)
     // Enable processor interrupts.
     IntMasterEnable();
 
+
+    /////////////////////////////////////////////////////////////////
+    //
+    /////////////////////////////////////////////////////////////////
+
     // ecat initialization
 	soes_init();
 
 	// only for test .. erase flash using SDO
 	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
-		if ( ! erase_prog_flash() ) {
+		if ( ! erase_m3_app_flash() ) {
 			DPRINT("Fail erase flash\n");
 		}
 	}
 
 	gFlash_crc = *(uint32_t*)(APP_CRC_ADDRESS);
-	DPRINT("app _c_int00 0x%X\n", *(uint32_t*)(APP_START_ADDR));
+	DPRINT("app main 0x%X\n", *(uint32_t*)(APP_START_ADDR));
 	// jump to app if
 	// - et1000 GPO3 is LOW
 	// - app CRC is valid

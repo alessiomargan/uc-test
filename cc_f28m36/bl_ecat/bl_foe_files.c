@@ -6,7 +6,7 @@ extern uint32 foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8 * data)
 extern uint32 foe_write_shared_RAM(foe_writefile_cfg_t * writefile_cfg, uint8 * data);
 extern void write_app_crc(void);
 
-foe_writefile_cfg_t      firmware_foe_files[] = {
+foe_writefile_cfg_t      gFOE_firmware_files[] = {
     {
     		.name =					"soes_m3.bin",
 			.max_data = 			FLASH_APP_SIZE, 	// sector size ?!?

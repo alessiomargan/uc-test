@@ -38,9 +38,9 @@ m3_rw_data_t	m3_ro_data;
 c28_rw_data_t	c28_rw_data;
 
 // map to RAM S2
-#pragma DATA_SECTION(m3_ro_data,"SHARERAMS2");
+#pragma DATA_SECTION(m3_ro_data,"RAM_S1");
 // map to RAM S0
-#pragma DATA_SECTION(c28_rw_data,"SHARERAMS0");
+#pragma DATA_SECTION(c28_rw_data,"RAM_S5");
 
 
 void main(void)

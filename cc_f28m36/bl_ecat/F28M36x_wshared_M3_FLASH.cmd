@@ -145,9 +145,10 @@ SECTIONS
  
  	FLS_APP_CRC : > FLS_E_CRC
 
-    SHARERAMS0  : > S0
-    SHARERAMS1  : > S1
-    SHARERAMS2  : > S2
+    RAM_S0  : > S0
+    RAM_S1  : > S1
+    RAM_S4  : > S4
+    RAM_S5  : > S5
  
     GROUP : > MTOCRAM
     {

@@ -56,14 +56,13 @@ __error__(char *pcFilename, unsigned long ulLine)
 //
 //*****************************************************************************
 
-// map to RAM S2
-#pragma DATA_SECTION(m3_rw_data,"SHARERAMS2");
 m3_rw_data_t	m3_rw_data;
-
-// map to RAM S0
-#pragma DATA_SECTION(c28_ro_data,"SHARERAMS0");
 c28_rw_data_t	c28_ro_data;
 
+// map to RAM S1
+#pragma DATA_SECTION(m3_rw_data,"RAM_S1");
+// map to RAM S5
+#pragma DATA_SECTION(c28_ro_data,"RAM_S5");
 
 //#pragma CODE_SECTION(main,"main_app");
 int main(void)
