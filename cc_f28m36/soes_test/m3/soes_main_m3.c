@@ -15,6 +15,8 @@
 #include "inc/hw_gpio.h"
 #include "inc/hw_types.h"
 #include "inc/hw_sysctl.h"
+#include "inc/hw_ram.h"
+#include "inc/hw_ipc.h"
 #include "driverlib/debug.h"
 #include "driverlib/flash.h"
 #include "driverlib/ipc.h"
@@ -59,17 +61,15 @@ __error__(char *pcFilename, unsigned long ulLine)
 m3_rw_data_t	m3_rw_data;
 c28_rw_data_t	c28_ro_data;
 
-// map to RAM S1
-#pragma DATA_SECTION(m3_rw_data,"RAM_S1");
-// map to RAM S5
-#pragma DATA_SECTION(c28_ro_data,"RAM_S5");
+// map to RAM S0
+#pragma DATA_SECTION(m3_rw_data,"RAM_S0");
+// map to RAM S4
+#pragma DATA_SECTION(c28_ro_data,"RAM_S4");
 
 //#pragma CODE_SECTION(main,"main_app");
 int main(void)
 {
     volatile unsigned long ulLoop;
-
-    //ptr_f();
 
     // Disable Protection
     HWREG(SYSCTL_MWRALLOW) =  0xA5A5A5A5;
@@ -91,10 +91,18 @@ int main(void)
     FlashInit();
 #endif
 
-    // assign S0 and S1 of the shared ram for use by the c28
-    // Details of how c28 uses these memory sections is defined
-    // in the c28 linker file.(28M35H52C1_RAM_lnk.cmd)
-    RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_C28MASTER);
+    // assign S0 and S1 of the shared ram for use by the M3
+    RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_M3MASTER);
+    // assign S4 and S5 of the shared ram for use by the C28
+    RAMMReqSharedMemAccess((S4_ACCESS | S5_ACCESS), SX_C28MASTER);
+
+    // Initialize S0 S1 RAM
+    HWREG(RAM_CONFIG_BASE + RAM_O_MSXRTESTINIT1) |= 0x5;
+    while((HWREG(RAM_CONFIG_BASE + RAM_O_MSXRINITDONE1)&0x5) != 0x5)  {  }
+    // MTOC_MSG_RAM Test and Initialization
+    HWREG(RAM_CONFIG_BASE + RAM_O_MTOCCRTESTINIT1) |= 0x1;
+    while((HWREG(RAM_CONFIG_BASE + RAM_O_MTOCRINITDONE)&0x1) != 0x1)  {  }
+
 
 #ifdef _STANDALONE
 #ifdef _FLASH
@@ -104,6 +112,10 @@ int main(void)
     //  Send boot command to allow the C28 application to begin execution
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_RAM);
 #endif
+    // Spin here until C28 is ready
+    while (!IPCCtoMFlagBusy(IPC_FLAG17));
+    IPCCtoMFlagAcknowledge(IPC_FLAG17);
+
 #endif
 
     // MWare/boards_drivers

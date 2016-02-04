@@ -32,6 +32,8 @@
 
 esc_cfg_t 	gESC_config = { 0, 0 };
 foe_cfg_t 	gFOE_config = { 0, 0, 0, 0, 0 };
+
+#pragma DATA_SECTION(foe_buffer,"RAM_S1");
 uint8		foe_buffer[256];
 
 extern foe_writefile_cfg_t      gFOE_firmware_files[];
@@ -179,7 +181,7 @@ void setup_esc_configs(void)
 	foe_writefile_cfg_t * tmp_foe_files = gFOE_firmware_files;
 
 	while ( tmp_foe_files->name != 0 ) {
-		DPRINT ("foe_file %s\n", tmp_foe_files->name);
+		OSAL_PRINT ("foe_file %s\n", tmp_foe_files->name);
 		tmp_foe_files ++;
 		file_cnt ++;
 	}
@@ -197,7 +199,7 @@ void setup_esc_configs(void)
 
 	FOE_config(&gFOE_config, gFOE_firmware_files);
 
-	DPRINT ("config %d foe_file(s)\n", file_cnt);
+	OSAL_PRINT ("config %d foe_file(s)\n", file_cnt);
 
 }
 

@@ -10,6 +10,7 @@
 #include "bl_config.h"
 #include "soes_hook.h"
 #include "soes/esc_foe.h"
+#include "shared_ram.h"
 
 #define FLASH_DEBUG
 #ifdef FLASH_DEBUG
@@ -25,32 +26,6 @@
 
 extern foe_cfg_t 	gFOE_config;
 
-//////////////////////////////////////////////////////////////////////////////////////////
-
-Fapi_StatusType Fapi_serviceWatchdogTimer(void)
-{
-   /* User to add their own watchdog servicing code here */
-   return(Fapi_Status_Success);
-}
-
-Fapi_StatusType Fapi_setupEepromSectorEnable(void)
-{
-   Fapi_GlobalInit.m_poFlashControlRegisters->Fbse.u32Register = 0xFFFF;   /* Value must be 0xFFFF to enable erase and programming of the EEPROM bank, 0 to disable */
-   FAPI_WRITE_LOCKED_FSM_REGISTER(Fapi_GlobalInit.m_poFlashControlRegisters->FsmSector.u32Register, 0x0U); /* Enables sectors 32-63 for bank and sector erase */
-   FAPI_WRITE_LOCKED_FSM_REGISTER(Fapi_GlobalInit.m_poFlashControlRegisters->FsmSector1.u32Register, 0x0U); /* Enables sectors 0-31 for bank and sector erase */
-   FAPI_WRITE_LOCKED_FSM_REGISTER(Fapi_GlobalInit.m_poFlashControlRegisters->FsmSector2.u32Register, 0x0U); /* Enables sectors 32-63 for bank and sector erase */
-
-   return(Fapi_Status_Success);
-}
-
-Fapi_StatusType Fapi_setupBankSectorEnable(void)
-{
-   Fapi_GlobalInit.m_poFlashControlRegisters->Fbse.u32Register = 0xFFFF;                  /* Enable sectors 0-15 for erase and programming */
-   FAPI_WRITE_LOCKED_FSM_REGISTER(Fapi_GlobalInit.m_poFlashControlRegisters->FsmSector.u32Register, 0x0U);
-
-   return(Fapi_Status_Success);
-}
-//////////////////////////////////////////////////////////////////////////////////////////
 
 
 #pragma CODE_SECTION(Example_Error,"ramfuncs");
@@ -169,7 +144,7 @@ bool erase_m3_app_flash() {
 #pragma CODE_SECTION(erase_c28_app_flash,"ramfuncs");
 bool erase_c28_app_flash() {
 
-	return true;
+	return (ipc_c28_service(FN_ERASE_FLASH) == FN_ERASE_FLASH);
 }
 
 
@@ -244,10 +219,10 @@ uint32_t foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data) {
 
     // What address are we about to program to?
 	ui32FlashAddr = writefile_cfg->address_offset + writefile_cfg->dest_start_address;
-    DPRINT("write FlashAddr 0x%04X with %d bytes\n", ui32FlashAddr, bytestowrite);
+    DPRINT("foe_write_flash FlashAddr 0x%04X with %d bytes\n", ui32FlashAddr, bytestowrite);
 
     if ( write_flash(ui32FlashAddr, data, bytestowrite) != Fapi_Status_Success ) {
-		DPRINT("FAIL foe_write_flash write FlashAddr 0x%04X with %d bytes\n",
+		DPRINT("FAIL foe_write_flash FlashAddr 0x%04X with %d bytes\n",
 				ui32FlashAddr, bytestowrite);
 		return bytestowrite;
 	}
@@ -257,13 +232,18 @@ uint32_t foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data) {
 #pragma CODE_SECTION(foe_write_shared_RAM,"ramfuncs");
 uint32 foe_write_shared_RAM(foe_writefile_cfg_t * writefile_cfg, uint8 * data) {
 
-    uint32_t ui32FlashAddr;
+	uint32_t ui32FlashAddr;
+	uint32_t bytestowrite = gFOE_config.buffer_size;
 
-    // What address are we about to program to?
+	// What address are we about to program to?
 	ui32FlashAddr = writefile_cfg->address_offset + writefile_cfg->dest_start_address;
-    DPRINT("write FlashAddr 0x%04X with %d bytes\n", ui32FlashAddr, gFOE_config.buffer_size);
+	DPRINT("foe_write_shared_RAM FlashAddr 0x%04X with %d bytes\n", ui32FlashAddr, bytestowrite);
 
-    //
+	if ( ipc_c28_service(FN_FOE_BUFF) != FN_FOE_BUFF ) {
+		DPRINT("FAIL foe_write_shared_RAM FlashAddr 0x%04X with %d bytes\n",
+				ui32FlashAddr, bytestowrite);
+		return bytestowrite;
+	}
 
 	return 0;
 }

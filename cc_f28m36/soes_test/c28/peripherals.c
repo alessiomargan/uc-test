@@ -1,5 +1,8 @@
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
+#include "F28M36x_Ipc_drivers.h"
 #include "definitions.h"
+
+#include "shared_ram.h"
 
 #define C28_FREQ    150         //CPU frequency in MHz
 
@@ -8,6 +11,37 @@ extern void cpu_timer1_isr(void);
 extern void cpu_timer2_isr(void);
 extern void epwm1_isr(void);
 extern void xint1_isr(void);
+extern void MtoCIPC1IntHandler(void);
+extern void MtoCIPC2IntHandler(void);
+
+extern tIpcController  	g_sIpcController1;
+extern tIpcController  	g_sIpcController2;
+
+Uint32 *pulMsgRam;
+
+Uint32 bootloaderServiceResult;
+
+extern Uint16 foe_buffer[128];
+
+void bootloaderService(Uint32 param)
+{
+
+	switch (param) {
+
+	case FN_ERASE_FLASH :
+		bootloaderServiceResult = FN_ERASE_FLASH;
+		break;
+	case FN_FOE_BUFF :
+
+		bootloaderServiceResult = FN_FOE_BUFF;
+		break;
+	default:
+		bootloaderServiceResult = FN_ERROR;
+		break;
+
+	}
+
+}
 
 void Configure_Pie_Vector(void)
 {
@@ -23,7 +57,34 @@ void Configure_Pie_Vector(void)
 
     PieVectTable.XINT1 = &xint1_isr;
 
+    PieVectTable.MTOCIPC_INT1 = &MtoCIPC1IntHandler;
+    PieVectTable.MTOCIPC_INT2 = &MtoCIPC2IntHandler;
+
 	EDIS;    // This is needed to disable write to EALLOW protected registers
+
+}
+
+void Configure_C28_Ipc(void)
+{
+	IPCCInitialize (&g_sIpcController1, IPC_INT1, IPC_INT1);
+	IPCCInitialize (&g_sIpcController2, IPC_INT2, IPC_INT2);
+
+	// Enable CPU INT1 which is connected to MTOCIPC INT1-4:
+	IER |= M_INT11;
+
+	PieCtrlRegs.PIEIER11.bit.INTx1 = 1; // MTOCIPC INT1
+	PieCtrlRegs.PIEIER11.bit.INTx2 = 1; // MTOCIPC INT2
+
+
+	// Point array to address in CTOM MSGRAM for passing variable locations
+	pulMsgRam = (void *)0x0003FBF4;
+	// Write addresses of variables where words should be written to pulMsgRam
+	// array.
+	// 0 = Bootloader Service function.
+	// 1 = Address of 16-bit Bootloader Service result
+	// executed
+	pulMsgRam[0] = (unsigned long)&bootloaderService;
+	pulMsgRam[1] = (unsigned long)&bootloaderServiceResult;
 
 }
 

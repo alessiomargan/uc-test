@@ -68,13 +68,13 @@ __error__(char *pcFilename, unsigned long ulLine)
 //
 //*****************************************************************************
 
+// map to RAM S0
+#pragma DATA_SECTION(m3_rw_data,"RAM_S0");
 m3_rw_data_t	m3_rw_data;
+// map to RAM S4
+#pragma DATA_SECTION(c28_ro_data,"RAM_S4");
 c28_rw_data_t	c28_ro_data;
 
-// map to RAM S1
-#pragma DATA_SECTION(m3_rw_data,"RAM_S1");
-// map to RAM S5
-#pragma DATA_SECTION(c28_ro_data,"RAM_S5");
 
 struct morser m;
 enum OUTPUT res;
@@ -117,7 +117,6 @@ void do_morse_led(void) {
 int main(void)
 {
     volatile unsigned long 	ulLoop;
-    unsigned long *			pulMsgRam;
 
     // Disable Protection
     HWREG(SYSCTL_MWRALLOW) =  0xA5A5A5A5;
@@ -142,15 +141,6 @@ int main(void)
     // assign S4 and S5 of the shared ram for use by the C28
     RAMMReqSharedMemAccess((S4_ACCESS | S5_ACCESS), SX_C28MASTER);
 
-    //
-    ConfigureUART();
-    ConfigureLed();
-    ConfigureEcatPDI();
-    Configure_flashAPI();
-
-	// Give C28 control of LED_0 Port E pin 7
-    GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
-
     // Initialize S0 S1 RAM
     HWREG(RAM_CONFIG_BASE + RAM_O_MSXRTESTINIT1) |= 0x5;
     while((HWREG(RAM_CONFIG_BASE + RAM_O_MSXRINITDONE1)&0x5) != 0x5)  {  }
@@ -158,11 +148,17 @@ int main(void)
     HWREG(RAM_CONFIG_BASE + RAM_O_MTOCCRTESTINIT1) |= 0x1;
     while((HWREG(RAM_CONFIG_BASE + RAM_O_MTOCRINITDONE)&0x1) != 0x1)  {  }
 
-    //  Disable writes to protected registers.
-    //HWREG(SYSCTL_MWRALLOW) = 0;
 
-    // Initialize ipc variables.
-    pulMsgRam = (void *)0x2007F400;
+    //
+    ConfigureUART();
+    ConfigureLed();
+    ConfigureEcatPDI();
+    Configure_flashAPI();
+    Configure_Ipc();
+
+	// Give C28 control of LED_0 Port E pin 7
+    GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
+
 
 
 #ifdef _STANDALONE
@@ -170,18 +166,19 @@ int main(void)
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
 
     // Spin here until C28 is ready
-    while (!IPCCtoMFlagBusy(IPC_FLAG17)) ;
+    while (!IPCCtoMFlagBusy(IPC_FLAG17));
     IPCCtoMFlagAcknowledge(IPC_FLAG17);
 #endif
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
+
     // Enable processor interrupts.
     IntMasterEnable();
 
 
-    /////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////
     //
     /////////////////////////////////////////////////////////////////
 
@@ -191,7 +188,10 @@ int main(void)
 	// only for test .. erase flash using SDO
 	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
 		if ( ! erase_m3_app_flash() ) {
-			DPRINT("Fail erase flash\n");
+			DPRINT("Fail erase M3 flash\n");
+		}
+		if ( ! erase_c28_app_flash() ) {
+			DPRINT("Fail erase C28 flash\n");
 		}
 	}
 

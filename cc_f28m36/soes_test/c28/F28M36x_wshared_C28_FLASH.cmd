@@ -43,28 +43,29 @@ MEMORY
 {
 PAGE 0:    /* Program Memory */
            /* Memory (RAM/FLASH/OTP) blocks can be moved to PAGE1 for data allocation */
-   RAML0       : origin = 0x008000, length = 0x001000     /* on-chip RAM block L0 */
-   RAML1       : origin = 0x009000, length = 0x001000     /* on-chip RAM block L1 */
+   RAML0L1     : origin = 0x008000, length = 0x002000
+   //RAML0       : origin = 0x008000, length = 0x001000     /* on-chip RAM block L0 */
+   //RAML1       : origin = 0x009000, length = 0x001000     /* on-chip RAM block L1 */
    
-   FLASHN      : origin = 0x100000, length = 0x002000     /* on-chip FLASH */
-   FLASHM      : origin = 0x102000, length = 0x002000     /* on-chip FLASH */
-   FLASHL      : origin = 0x104000, length = 0x002000     /* on-chip FLASH */
-   FLASHK      : origin = 0x106000, length = 0x002000     /* on-chip FLASH */
-   FLASHJ      : origin = 0x108000, length = 0x008000     /* on-chip FLASH */
-   FLASHI      : origin = 0x110000, length = 0x008000     /* on-chip FLASH */
-   FLASHH      : origin = 0x118000, length = 0x008000     /* on-chip FLASH */
-   FLASHG      : origin = 0x120000, length = 0x008000     /* on-chip FLASH */
-   FLASHF      : origin = 0x128000, length = 0x008000     /* on-chip FLASH */
-   FLASHE      : origin = 0x130000, length = 0x008000     /* on-chip FLASH */
-   FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
-   FLASHC      : origin = 0x13A000, length = 0x002000     /* on-chip FLASH */
+   //FLASHN      : origin = 0x100000, length = 0x002000     /* on-chip FLASH */
+   //FLASHM      : origin = 0x102000, length = 0x002000     /* on-chip FLASH */
+   //FLASHL      : origin = 0x104000, length = 0x002000     /* on-chip FLASH */
+   //FLASHK      : origin = 0x106000, length = 0x002000     /* on-chip FLASH */
+   //FLASHJ      : origin = 0x108000, length = 0x008000     /* on-chip FLASH */
+   //FLASHI      : origin = 0x110000, length = 0x008000     /* on-chip FLASH */
+   //FLASHH      : origin = 0x118000, length = 0x008000     /* on-chip FLASH */
+   //FLASHG      : origin = 0x120000, length = 0x008000     /* on-chip FLASH */
+   //FLASHF      : origin = 0x128000, length = 0x008000     /* on-chip FLASH */
+   //FLASHE      : origin = 0x130000, length = 0x008000     /* on-chip FLASH */
+   //FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
+   //FLASHC      : origin = 0x13A000, length = 0x002000     /* on-chip FLASH */
    FLASHA      : origin = 0x13E000, length = 0x001F80     /* on-chip FLASH */
    
-   CSM_RSVD    : origin = 0x13FF80, length = 0x000070     /* Part of FLASHA.  Program with all 0x0000 when CSM is in use. */
+   //CSM_RSVD    : origin = 0x13FF80, length = 0x000070     /* Part of FLASHA.  Program with all 0x0000 when CSM is in use. */
    BEGIN       : origin = 0x13FFF0, length = 0x000002     /* Part of FLASHA.  Used for "boot to Flash" bootloader mode. */
-   FLASH_EXE_ONLY_P0  : origin = 0x13FFF2, length = 0x000002  /* Part of FLASHA.  Flash execute only locations in FLASHA */ 
-   ECSL_PWL_P0 : origin = 0x13FFF4, length = 0x000004     /* Part of FLASHA.  ECSL password locations in FLASHA */
-   CSM_PWL_P0  : origin = 0x13FFF8, length = 0x000008     /* Part of FLASHA.  CSM password locations in FLASHA */
+   //FLASH_EXE_ONLY_P0  : origin = 0x13FFF2, length = 0x000002  /* Part of FLASHA.  Flash execute only locations in FLASHA */
+   //ECSL_PWL_P0 : origin = 0x13FFF4, length = 0x000004     /* Part of FLASHA.  ECSL password locations in FLASHA */
+   //CSM_PWL_P0  : origin = 0x13FFF8, length = 0x000008     /* Part of FLASHA.  CSM password locations in FLASHA */
 
    FPUTABLES   : origin = 0x3FD21A, length = 0x0006A0     /* FPU Tables in Boot ROM */
    IQTABLES    : origin = 0x3FD8BA, length = 0x000B50     /* IQ Math Tables in Boot ROM */
@@ -116,7 +117,7 @@ SECTIONS
    codestart           : > BEGIN       PAGE = 0, ALIGN(4)
 
    ramfuncs            : LOAD = FLASHA,
-                         RUN = RAML0,
+                         RUN = RAML0L1,
                          LOAD_START(_RamfuncsLoadStart),
                          LOAD_SIZE(_RamfuncsLoadSize),
                          LOAD_END(_RamfuncsLoadEnd),
@@ -125,10 +126,10 @@ SECTIONS
                          RUN_END(_RamfuncsRunEnd),
                          PAGE = 0, ALIGN(4)
 
-   flashexeonly        : > FLASH_EXE_ONLY_P0 PAGE = 0, ALIGN(4)
-   ecslpasswds         : > ECSL_PWL_P0 PAGE = 0, ALIGN(4)
-   csmpasswds          : > CSM_PWL_P0  PAGE = 0, ALIGN(4)
-   csm_rsvd            : > CSM_RSVD    PAGE = 0, ALIGN(4)
+   //flashexeonly        : > FLASH_EXE_ONLY_P0 PAGE = 0, ALIGN(4)
+   //ecslpasswds         : > ECSL_PWL_P0 PAGE = 0, ALIGN(4)
+   //csmpasswds          : > CSM_PWL_P0  PAGE = 0, ALIGN(4)
+   //csm_rsvd            : > CSM_RSVD    PAGE = 0, ALIGN(4)
 
    
    /* The following section definitions are required when using the IPC API Drivers */ 
