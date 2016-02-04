@@ -11,6 +11,15 @@
 #include "soes_hook.h"
 #include "osal.h"
 
+//#define ESC_DEBUG
+#ifdef ESC_DEBUG
+    #define DPRINT(...) OSAL_PRINT ("hook: "__VA_ARGS__)
+    #define DEBUG_ASSERT(expression)    ASSERT(expression)
+#else
+    #define DPRINT(...)
+    #define DEBUG_ASSERT(expression)
+#endif  /* ESC_DEBUG */
+
 esc_cfg_t 	esc_config = { 0, 0 };
 foe_cfg_t 	foe_config = { 0, 0 };
 uint8		foe_buffer[FLASH_PAGE_SIZE];
