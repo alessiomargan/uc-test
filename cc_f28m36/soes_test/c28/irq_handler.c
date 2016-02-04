@@ -4,12 +4,8 @@
 #include "definitions.h"
 #include "shared_ram.h"
 
-extern m3_rw_data_t		m3_ro_data;
-extern c28_rw_data_t	c28_rw_data;
-extern tIpcController  	g_sIpcController1;
-extern tIpcController  	g_sIpcController2;
 
-__interrupt void MtoCIPC1IntHandler(void)
+__interrupt void MtoC_ipc1_isr(void)
 {
     tIpcMessage sMessage;
 
@@ -46,7 +42,7 @@ __interrupt void MtoCIPC1IntHandler(void)
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 
-__interrupt void MtoCIPC2IntHandler (void)
+__interrupt void MtoC_ipc2_isr (void)
 {
     tIpcMessage sMessage;
 

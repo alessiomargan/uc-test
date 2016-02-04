@@ -18,9 +18,10 @@
 //###########################################################################
 
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
-#include "F28M36x_Ipc_drivers.h"
 
 #include <string.h>
+
+#include "definitions.h"
 #include "shared_ram.h"
 
 
@@ -30,25 +31,6 @@ extern Uint16 RamfuncsLoadStart;
 extern Uint16 RamfuncsLoadSize;
 extern Uint16 RamfuncsRunStart;
 #endif
-
-extern void Configure_Pie_Vector();
-extern void Configure_C28_Timer();
-extern void Configure_C28_Gpio();
-extern void Configure_C28_ePWM();
-
-// map to RAM S0
-#pragma DATA_SECTION(m3_ro_data,"RAM_S0");
-m3_rw_data_t	m3_ro_data;
-// map to RAM S1
-#pragma DATA_SECTION(foe_buffer,"RAM_S1");
-Uint16			foe_buffer[128];
-// map to RAM S4
-#pragma DATA_SECTION(c28_rw_data,"RAM_S4");
-c28_rw_data_t	c28_rw_data;
-
-volatile tIpcController g_sIpcController1;
-volatile tIpcController g_sIpcController2;
-
 
 
 void main(void)
@@ -104,6 +86,7 @@ void main(void)
 	Configure_C28_Gpio();
 	Configure_C28_Timer();
 	Configure_C28_ePWM();
+	Configure_flashAPI();
 	Configure_C28_Ipc();
 
 

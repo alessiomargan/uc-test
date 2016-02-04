@@ -83,8 +83,10 @@ PAGE 1 :   /* Data Memory */
    BOOT_RSVD   : origin = 0x000002, length = 0x00009F     /* Part of M0, BOOT rom will use this for stack */
    RAMM0       : origin = 0x0000A1, length = 0x00035F     /* on-chip RAM block M0 */
    RAMM1       : origin = 0x000400, length = 0x000400     /* on-chip RAM block M1 */
-   RAML2       : origin = 0x00A000, length = 0x001000     /* on-chip RAM block L2 */
-   RAML3       : origin = 0x00B000, length = 0x001000     /* on-chip RAM block L3 */
+   //RAML2       : origin = 0x00A000, length = 0x001000     /* on-chip RAM block L2 */
+   //RAML3       : origin = 0x00B000, length = 0x001000     /* on-chip RAM block L3 */
+   RAML2L3     : origin = 0x00A000, length = 0x002000     /* on-chip RAM block L2 */
+
    RAMS0       : origin = 0x00C000, length = 0x001000     /* on-chip Shared RAM block S0 */
    RAMS1       : origin = 0x00D000, length = 0x001000     /* on-chip Shared RAM block S1 */
    RAMS2       : origin = 0x00E000, length = 0x001000     /* on-chip Shared RAM block S2 */
@@ -110,21 +112,45 @@ PAGE 1 :   /* Data Memory */
 SECTIONS
 {
 
-   /* Allocate program areas: */
-   .cinit              : > FLASHA      PAGE = 0, ALIGN(4)
-   .pinit              : > FLASHA,     PAGE = 0, ALIGN(4)
-   .text               : > FLASHA      PAGE = 0, ALIGN(4)
-   codestart           : > BEGIN       PAGE = 0, ALIGN(4)
+	/* Allocate program areas: */
+   	//.cinit              : > FLASHA      PAGE = 0, ALIGN(4)
+   	//.pinit              : > FLASHA,     PAGE = 0, ALIGN(4)
+   	//.text               : > FLASHA      PAGE = 0, ALIGN(4)
+   	codestart           : > BEGIN       PAGE = 0, ALIGN(4)
+	copysections		: > FLASHA,		PAGE = 0, ALIGN(4)
 
-   ramfuncs            : LOAD = FLASHA,
-                         RUN = RAML0L1,
-                         LOAD_START(_RamfuncsLoadStart),
-                         LOAD_SIZE(_RamfuncsLoadSize),
-                         LOAD_END(_RamfuncsLoadEnd),
-                         RUN_START(_RamfuncsRunStart),
-                         RUN_SIZE(_RamfuncsRunSize),
-                         RUN_END(_RamfuncsRunEnd),
-                         PAGE = 0, ALIGN(4)
+   	/* Allocate uninitalized data sections: */
+   	.stack              : > RAMM0       PAGE = 1
+   	.ebss               : > RAML2L3     PAGE = 1
+   	.esysmem            : > RAML2L3     PAGE = 1
+
+   	/* Initalized sections go in Flash */
+   	/* For SDFlash to program these, they must be allocated to page 0 */
+   	//.econst             : > FLASHA      PAGE = 0, ALIGN(4)
+   	//.switch             : > FLASHA      PAGE = 0, ALIGN(4)
+
+	GROUP
+    {
+    	.cinit
+    	.econst
+    	.switch
+    	.text
+	}	LOAD = FLASHA , PAGE = 0
+		RUN  = RAML2L3 , PAGE = 1
+		LOAD_START(_init_load), RUN_START(_init_run), SIZE(_init_size)
+
+	GROUP
+	{
+		ramfuncs { -l F021_API_C28x_FPU32.lib }
+	}	LOAD = FLASHA, PAGE = 0
+     	RUN = RAML2L3, PAGE = 1
+        LOAD_START(_RamfuncsLoadStart),
+        LOAD_SIZE(_RamfuncsLoadSize),
+        LOAD_END(_RamfuncsLoadEnd),
+        RUN_START(_RamfuncsRunStart),
+        RUN_SIZE(_RamfuncsRunSize),
+        RUN_END(_RamfuncsRunEnd),
+        ALIGN(4)
 
    //flashexeonly        : > FLASH_EXE_ONLY_P0 PAGE = 0, ALIGN(4)
    //ecslpasswds         : > ECSL_PWL_P0 PAGE = 0, ALIGN(4)
@@ -147,16 +173,6 @@ SECTIONS
        PUTREADIDX :   TYPE = DSECT
    }   
    
-   /* Allocate uninitalized data sections: */
-   .stack              : > RAMM0       PAGE = 1
-   .ebss               : > RAML2       PAGE = 1
-   .esysmem            : > RAML2       PAGE = 1
-
-   /* Initalized sections go in Flash */
-   /* For SDFlash to program these, they must be allocated to page 0 */
-   .econst             : > FLASHA      PAGE = 0, ALIGN(4)
-   .switch             : > FLASHA      PAGE = 0, ALIGN(4)
-
    /* Allocate IQ math areas: */
    IQmath              : > FLASHA      PAGE = 0, ALIGN(4)       /* Math Code */
    IQmathTables        : > IQTABLES,   PAGE = 0, TYPE = NOLOAD
@@ -169,39 +185,8 @@ SECTIONS
    RAM_S4  : > RAMS4,      PAGE = 1
    RAM_S5  : > RAMS5,      PAGE = 1
 
-   DMARAML2           : > RAML2,       PAGE = 1
-   DMARAML3           : > RAML3,       PAGE = 1
-
-  /* Uncomment the section below if calling the IQNexp() or IQexp()
-      functions from the IQMath.lib library in order to utilize the
-      relevant IQ Math table in Boot ROM (This saves space and Boot ROM
-      is 1 wait-state). If this section is not uncommented, IQmathTables2
-      will be loaded into other memory (SARAM, Flash, etc.) and will take
-      up space, but 0 wait-state is possible.
-   */
-   /*
-   IQmathTables2    : > IQTABLES2, PAGE = 0, TYPE = NOLOAD
-   {
-
-              IQmath.lib<IQNexpTable.obj> (IQmathTablesRam)
-
-   }
-   */
-    /* Uncomment the section below if calling the IQNasin() or IQasin()
-       functions from the IQMath.lib library in order to utilize the
-       relevant IQ Math table in Boot ROM (This saves space and Boot ROM
-       is 1 wait-state). If this section is not uncommented, IQmathTables2
-       will be loaded into other memory (SARAM, Flash, etc.) and will take
-       up space, but 0 wait-state is possible.
-    */
-    /*
-    IQmathTables3    : > IQTABLES3, PAGE = 0, TYPE = NOLOAD
-    {
-
-               IQmath.lib<IQNasinTable.obj> (IQmathTablesRam)
-
-    }
-    */
+   DMARAML2           : > RAML2L3,       PAGE = 1
+   DMARAML3           : > RAML2L3,       PAGE = 1
 
    /* .reset is a standard section used by the compiler.  It contains the */
    /* the address of the start of _c_int00 for C Code.   /*
