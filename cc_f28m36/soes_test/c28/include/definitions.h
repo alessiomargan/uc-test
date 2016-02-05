@@ -4,6 +4,8 @@
 #include "DSP28x_Project.h"
 #include "F28M36x_Ipc_drivers.h"
 
+#include "shared_ram.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -16,7 +18,20 @@ extern "C" {
 #define LED_0_OFF 		GpioDataRegs.GPACLEAR.bit.GPIO31 = 1;
 #define LED_0_TOGGLE	GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
 
-#include "shared_ram.h"
+#if (CPU_FRQ_150MHZ || DSP28_F28M36Px_150MHZ || DSP28_F28M36Hx_150MHZ)
+	#define CPU_FRQ	150
+#elif (CPU_FRQ_125MHZ || DSP28_F28M36Px_125MHZ)
+	#define CPU_FRQ	100
+#elif (CPU_FRQ_100MHZ || DSP28_F28M36Hx_100MHZ)
+	#define CPU_FRQ	100
+#elif CPU_FRQ_75MHZ
+	#define CPU_FRQ	75
+#elif CPU_FRQ_60MHZ
+	#define CPU_FRQ	60
+#else
+	#error CPU_FREQ
+#endif
+
 
 extern void cpu_timer0_isr(void);
 extern void cpu_timer1_isr(void);

@@ -25,6 +25,7 @@
 #define _64KSector_u32length   	0x4000
 
 extern foe_cfg_t 	gFOE_config;
+extern volatile m3_rw_data_t	m3_rw_data;
 
 
 
@@ -112,24 +113,24 @@ bool erase_m3_app_flash() {
 	Fapi_StatusType            oReturnCheck;
     Fapi_FlashStatusWordType   oFlashStatusWord;
 
-    DPRINT("Erase flash 0x%04X and 0x%04X\n", APP_START_ADDRESS, APP_CRC_ADDRESS);
+    DPRINT("M3 >> Erase flash 0x%04X and 0x%04X\n", M3_FLASH_APP_START, M3_APP_CRC_ADDR);
 
     FlashGainPump();
 
     // Erase App Sector
     // Sector M N have the example code so leave it programmed
-    oReturnCheck = Fapi_issueAsyncCommandWithAddress(Fapi_EraseSector, (uint32_t *)APP_START_ADDRESS);
+    oReturnCheck = Fapi_issueAsyncCommandWithAddress(Fapi_EraseSector, (uint32_t *)M3_FLASH_APP_START);
 
     // Wait until FSM is done with erase sector operation
     while (Fapi_checkFsmForReady() != Fapi_Status_FsmReady){}
 
     // The Erase step itself does a verify as it goes.
     // This verify is a 2nd verification that can be done.
-    oReturnCheck = Fapi_doBlankCheck((uint32_t *)APP_START_ADDRESS, _64KSector_u32length, &oFlashStatusWord);
+    oReturnCheck = Fapi_doBlankCheck((uint32_t *)M3_FLASH_APP_START, _64KSector_u32length, &oFlashStatusWord);
 
     // Erase crc app Sector
     // Sector K have the example code so leave it programmed
-    oReturnCheck = Fapi_issueAsyncCommandWithAddress(Fapi_EraseSector, (uint32_t *)APP_CRC_ADDRESS);
+    oReturnCheck = Fapi_issueAsyncCommandWithAddress(Fapi_EraseSector, (uint32_t *)M3_APP_CRC_ADDR);
 
     // Wait until FSM is done with erase sector operation
     while (Fapi_checkFsmForReady() != Fapi_Status_FsmReady){}
@@ -144,6 +145,7 @@ bool erase_m3_app_flash() {
 #pragma CODE_SECTION(erase_c28_app_flash,"ramfuncs");
 bool erase_c28_app_flash() {
 
+	DPRINT("C28 >> Erase flash 0x%04X\n", C28_FLASH_APP_START);
 	return (ipc_c28_service(FN_ERASE_FLASH) == FN_ERASE_FLASH);
 }
 
@@ -173,7 +175,8 @@ Fapi_StatusType write_flash(uint32_t ui32FlashAddr, uint8_t * buffer, uint32_t s
 
     	//DPRINT("progFlashAddr 0x%04X, chunk size %d\n", progFlashAddr, buffer_chunk_size);
 
-        oReturnCheck = Fapi_issueProgrammingCommand((uint32 *)progFlashAddr, buffer+bytesWritten, buffer_chunk_size, 0, 0, Fapi_AutoEccGeneration);
+        oReturnCheck = Fapi_issueProgrammingCommand((uint32 *)progFlashAddr, buffer+bytesWritten, buffer_chunk_size,
+        		                                    0, 0, Fapi_AutoEccGeneration);
 
         while(Fapi_checkFsmForReady() == Fapi_Status_FsmBusy);
 
@@ -239,6 +242,9 @@ uint32 foe_write_shared_RAM(foe_writefile_cfg_t * writefile_cfg, uint8 * data) {
 	ui32FlashAddr = writefile_cfg->address_offset + writefile_cfg->dest_start_address;
 	DPRINT("foe_write_shared_RAM FlashAddr 0x%04X with %d bytes\n", ui32FlashAddr, bytestowrite);
 
+	//
+	m3_rw_data.foe_flashAddr = ui32FlashAddr;
+
 	if ( ipc_c28_service(FN_FOE_BUFF) != FN_FOE_BUFF ) {
 		DPRINT("FAIL foe_write_shared_RAM FlashAddr 0x%04X with %d bytes\n",
 				ui32FlashAddr, bytestowrite);
@@ -255,8 +261,8 @@ uint32_t calc_app_crc(void) {
 	uint32 crc_calc = 0;
 
 	FlashGainPump();
-    for(i=0, k=0; k < FLASH_APP_SIZE; i++, k=i*4  ) {
-		crc_calc ^= *(uint32*)(APP_START_ADDRESS+k);
+    for(i=0, k=0; k < M3_FLASH_APP_SIZE; i++, k=i*4  ) {
+		crc_calc ^= *(uint32*)(M3_FLASH_APP_START+k);
 	}
     FlashLeavePump();
 	//crc_calc = 0xF0CACC1A;
@@ -271,11 +277,11 @@ uint32_t calc_app_crc(void) {
 void write_app_crc(void) {
 
 	uint32_t	crc;
-    uint32_t 	ui32FlashAddr = APP_CRC_ADDRESS;
+    uint32_t 	ui32FlashAddr = M3_APP_CRC_ADDR;
 
 	crc = calc_app_crc();
 	if ( write_flash(ui32FlashAddr, (uint8 *)&crc, sizeof(crc)) == Fapi_Status_Success ) {
-		gFlash_crc = *(uint32*)APP_CRC_ADDRESS;
+		gFlash_crc = *(uint32*)M3_APP_CRC_ADDR;
 		DPRINT("write_flash appCRC 0x%04X\n", gFlash_crc);
 	} else {
 		DPRINT("FAIL write_flash appCRC !!!\n");

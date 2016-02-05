@@ -19,6 +19,7 @@
 #include "peripherals.h"
 #include "soes_hook.h"
 #include "osal.h"
+#include "shared_ram.h"
 
 //#define ESC_DEBUG
 #ifdef ESC_DEBUG
@@ -33,8 +34,9 @@
 esc_cfg_t 	gESC_config = { 0, 0 };
 foe_cfg_t 	gFOE_config = { 0, 0, 0, 0, 0 };
 
-#pragma DATA_SECTION(foe_buffer,"RAM_S1");
-uint8		foe_buffer[256];
+//#pragma DATA_SECTION(foe_buffer,"RAM_S1");
+//uint8		foe_buffer[256];
+extern volatile m3_rw_data_t	m3_rw_data;
 
 extern foe_writefile_cfg_t      gFOE_firmware_files[];
 
@@ -55,7 +57,7 @@ void jump_to_app(void) {
 
 	// APPLICATION ENTRY POINT SYMBOL: "_c_int00"  address: 002c5375
 	//jumper = (void (*)())0x002c5375;
-	jumper = (void (*)())(*(uint32*)APP_START_ADDR);
+	jumper = (void (*)())(*(uint32*)M3_ENTRY_POINT_ADDR);
 	jumper();
 }
 
@@ -187,11 +189,11 @@ void setup_esc_configs(void)
 	}
 
 	/** Allocate static in caller func to fit buffer_size */
-	gFOE_config.fbuffer = foe_buffer;
+	gFOE_config.fbuffer = m3_rw_data.foe_buffer;
 	/** Write this to fill-up, ex. 0xFF for "non write" */
 	gFOE_config.empty_write = 0xFF;
 	/** Buffer size before we flush to destination */
-	gFOE_config.buffer_size = sizeof(foe_buffer);
+	gFOE_config.buffer_size = sizeof(m3_rw_data.foe_buffer);
 	/** Number of files used in firmware update */
 	gFOE_config.n_files = file_cnt;
 	/** Pointer to files configured to be used by FoE */

@@ -57,7 +57,7 @@ PAGE 0:    /* Program Memory */
    //FLASHG      : origin = 0x120000, length = 0x008000     /* on-chip FLASH */
    //FLASHF      : origin = 0x128000, length = 0x008000     /* on-chip FLASH */
    //FLASHE      : origin = 0x130000, length = 0x008000     /* on-chip FLASH */
-   //FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
+   FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
    //FLASHC      : origin = 0x13A000, length = 0x002000     /* on-chip FLASH */
    FLASHA      : origin = 0x13E000, length = 0x001F80     /* on-chip FLASH */
    
@@ -137,7 +137,8 @@ SECTIONS
     	.text
 	}	LOAD = FLASHA , PAGE = 0
 		RUN  = RAML2L3 , PAGE = 1
-		LOAD_START(_init_load), RUN_START(_init_run), SIZE(_init_size)
+		LOAD_START(_init_load), RUN_START(_init_run), SIZE(_init_size),
+		ALIGN(4)
 
 	GROUP
 	{

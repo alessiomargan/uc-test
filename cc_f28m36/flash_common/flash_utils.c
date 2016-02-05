@@ -1,21 +1,7 @@
-#include <stdint.h>
+#include "flash_utils.h"
 
-
-#if defined (_C28X)
-	#include "F021_Concerto_C28x.h"
-	#include "F28M36x_Device.h"
-	#include "F28M36x_GlobalPrototypes.h"
-	#include "F28M36x_Flash.h"
-#else
-	#include "F021_Concerto_Cortex.h"
-	#include "driverlib/device.h"
-	#include "driverlib/flash.h"
-#endif
-
-
-#define _16KSector_u32length 	0x1000
-#define _64KSector_u32length   	0x4000
-
+//#define _16KSector_u32length 	0x1000
+//#define _64KSector_u32length   	0x4000
 
 #pragma CODE_SECTION(Example_Error,"ramfuncs");
 void Example_Error(Fapi_StatusType status)
@@ -36,21 +22,7 @@ void Configure_flashAPI(void) {
     // This function must reside in RAM
     FlashGainPump();
 
-	#if (CPU_FRQ_150MHZ || DSP28_F28M36Px_150MHZ || DSP28_F28M36Hx_150MHZ)
-	oReturnCheck = Fapi_initializeAPI(F021_CPU0_BASE_ADDRESS, 150);
-	#endif
-	#if (CPU_FRQ_125MHZ || DSP28_F28M36Px_125MHZ)
-	oReturnCheck = Fapi_initializeAPI(F021_CPU0_BASE_ADDRESS, 125);
-	#endif
-	#if (CPU_FRQ_100MHZ || DSP28_F28M36Hx_100MHZ)
-	oReturnCheck = Fapi_initializeAPI(F021_CPU0_BASE_ADDRESS, 100);
-	#endif
-	#if CPU_FRQ_75MHZ
-	oReturnCheck = Fapi_initializeAPI(F021_CPU0_BASE_ADDRESS, 75);
-	#endif
-	#if CPU_FRQ_60MHZ
-	oReturnCheck = Fapi_initializeAPI(F021_CPU0_BASE_ADDRESS, 60);
-	#endif
+	oReturnCheck = Fapi_initializeAPI(F021_CPU0_BASE_ADDRESS, CPU_FRQ);
 
 	if(oReturnCheck != Fapi_Status_Success)
 	{
@@ -95,8 +67,8 @@ void Configure_flashAPI(void) {
 }
 
 
-#pragma CODE_SECTION(erase_flash_sector,"ramfuncs");
-Fapi_StatusType erase_flash_sector(uint32_t address) {
+#pragma CODE_SECTION(Erase_flash_sector,"ramfuncs");
+Fapi_StatusType Erase_flash_sector(uint32_t address) {
 
 	Fapi_StatusType            oReturnCheck;
     Fapi_FlashStatusWordType   oFlashStatusWord;
@@ -111,11 +83,78 @@ Fapi_StatusType erase_flash_sector(uint32_t address) {
 
     // The Erase step itself does a verify as it goes.
     // This verify is a 2nd verification that can be done.
-    oReturnCheck = Fapi_doBlankCheck((uint32_t *)address, _64KSector_u32length, &oFlashStatusWord);
+    //oReturnCheck = Fapi_doBlankCheck((uint32_t *)address, _64KSector_u32length, &oFlashStatusWord);
 
     // Leave control over pump
     FlashLeavePump();
 
     return oReturnCheck;
+
+}
+
+
+#pragma CODE_SECTION(Write_flash,"ramfuncs");
+#ifdef _C28X
+Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint16_t * dataBuffer, uint32_t dataBufferSize) {
+#else
+Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint8_t * dataBuffer, uint32_t dataBufferSize) {
+#endif
+	Fapi_StatusType       		oReturnCheck = Fapi_Status_Success;
+    //Fapi_FlashStatusWordType   	oFlashStatusWord;
+    //Fapi_FlashStatusType   		oFlashStatus;
+
+    uint32_t unitsWritten = 0;
+	uint32_t unitsToWrite = dataBufferSize; // bytes or words
+	uint32_t progFlashAddr = ui32FlashAddr;
+	uint32_t buffer_chunk_size;
+
+    FlashGainPump();
+
+    while ( (unitsToWrite > 0) && (oReturnCheck == Fapi_Status_Success)) {
+
+    	// check chunk size
+    	if ( unitsToWrite > FLS_BANK_WIDTH) {
+    		buffer_chunk_size = FLS_BANK_WIDTH;
+    	} else {
+    		buffer_chunk_size = unitsToWrite;
+    	}
+
+    	//DPRINT("progFlashAddr 0x%04X, chunk size %d\n", progFlashAddr, buffer_chunk_size);
+
+        oReturnCheck = Fapi_issueProgrammingCommand(
+        		(uint32 *)progFlashAddr, 		// start address in Flash for the data
+				dataBuffer+unitsWritten,		// pointer to the Data buffer address
+				buffer_chunk_size,				// number of (M3 bytes)/(C28 16-bit words) in the Data buffer
+				0, 0, Fapi_AutoEccGeneration);
+
+        while(Fapi_checkFsmForReady() == Fapi_Status_FsmBusy);
+
+        // on error break loop
+        if(oReturnCheck != Fapi_Status_Success) {
+        	DPRINT("FAIL Fapi_issueProgrammingCommand 0x%04X\n", progFlashAddr);
+        	break;
+        }
+
+#if 0
+        // Read FMSTAT register contents to know the status of FSM after
+        // program command for any debug
+        oFlashStatus = Fapi_getFsmStatus();
+        // Verify the values programmed.  The Program step itself does a verify as it goes.
+        // This verify is a 2nd verification that can be done.
+        oReturnCheck = Fapi_doVerifyByByte((uint8 *)progFlashAddr, buffer_chunk_size, dataBuffer+bytesWritten, &oFlashStatusWord);
+        // on error break loop
+        if(oReturnCheck != Fapi_Status_Success) {
+        	DPRINT("FAIL Fapi_doVerifyByByte 0x%04X\n", progFlashAddr);
+        	break;
+        }
+#endif
+        unitsToWrite  -= buffer_chunk_size;
+        unitsWritten  += buffer_chunk_size;
+        progFlashAddr += buffer_chunk_size;
+	}
+
+    FlashLeavePump();
+
+	return oReturnCheck;
 
 }

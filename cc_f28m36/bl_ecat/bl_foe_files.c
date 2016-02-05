@@ -9,8 +9,8 @@ extern void write_app_crc(void);
 foe_writefile_cfg_t      gFOE_firmware_files[] = {
     {
     		.name =					"soes_m3.bin",
-			.max_data = 			FLASH_APP_SIZE, 	// sector size ?!?
-			.dest_start_address =	APP_START_ADDRESS, //
+			.max_data = 			M3_FLASH_APP_SIZE, 	// sector size ?!?
+			.dest_start_address =	M3_FLASH_APP_START, //
 			.address_offset =		0,
 			.filepass =				0xDEAD,
 			.write_function =		foe_write_flash,
@@ -27,8 +27,8 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
     },
     {
     		.name =					"soes_c28.bin",
-			.max_data = 			FLASH_APP_SIZE, 	// sector size ?!?
-			.dest_start_address =	APP_START_ADDRESS, //
+			.max_data = 			C28_FLASH_APP_SIZE * 2, 	// flash A sector size in bytes
+			.dest_start_address =	C28_FLASH_APP_START, //
 			.address_offset =		0,
 			.filepass =				0xDAD0,
 			.write_function =		foe_write_shared_RAM,

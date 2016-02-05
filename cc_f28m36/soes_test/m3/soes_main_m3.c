@@ -79,7 +79,6 @@ int main(void)
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
                          SYSCTL_XCLKDIV_4);
 
-#ifdef _FLASH
     // Copy time critical code and Flash setup code to RAM
     // This includes the following functions:  InitFlash();
     // The  RamfuncsLoadStart, RamfuncsLoadSize, and RamfuncsRunStart
@@ -89,7 +88,6 @@ int main(void)
     // Call Flash Initialization to setup flash waitstates
     // This function must reside in RAM
     FlashInit();
-#endif
 
     // assign S0 and S1 of the shared ram for use by the M3
     RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_M3MASTER);
@@ -103,24 +101,7 @@ int main(void)
     HWREG(RAM_CONFIG_BASE + RAM_O_MTOCCRTESTINIT1) |= 0x1;
     while((HWREG(RAM_CONFIG_BASE + RAM_O_MTOCRINITDONE)&0x1) != 0x1)  {  }
 
-
-#ifdef _STANDALONE
-#ifdef _FLASH
-    //  Send boot command to allow the C28 application to begin execution
-    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-#else
-    //  Send boot command to allow the C28 application to begin execution
-    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_RAM);
-#endif
-    // Spin here until C28 is ready
-    while (!IPCCtoMFlagBusy(IPC_FLAG17));
-    IPCCtoMFlagAcknowledge(IPC_FLAG17);
-
-#endif
-
-    // MWare/boards_drivers
-    //PinoutSet();
-
+    //
     ConfigureUART();
     ConfigureLed();
     ConfigureEcatPDI();
@@ -137,6 +118,15 @@ int main(void)
 	// Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
+#ifdef _STANDALONE
+    //  Send boot command to allow the C28 application to begin execution
+    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
+    // Spin here until C28 is ready
+    while (!IPCCtoMFlagBusy(IPC_FLAG17));
+    IPCCtoMFlagAcknowledge(IPC_FLAG17);
+
+#endif
+
     // enable dog0
     SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
@@ -149,6 +139,11 @@ int main(void)
     // Enable processor interrupts.
     IntMasterEnable();
 
+    /////////////////////////////////////////////////////////////////
+	//
+	/////////////////////////////////////////////////////////////////
+
+	// ecat initialization
 	soes_init();
 
 	// Loop forever while the timers run.

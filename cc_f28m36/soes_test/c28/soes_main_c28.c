@@ -89,7 +89,6 @@ void main(void)
 	Configure_flashAPI();
 	Configure_C28_Ipc();
 
-
 	// Enable global Interrupts and higher priority real-time debug events:
 	EINT;  // Enable Global interrupt INTM
 	ERTM;  // Enable Global realtime interrupt DBGM

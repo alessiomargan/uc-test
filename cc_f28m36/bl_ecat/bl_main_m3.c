@@ -70,10 +70,10 @@ __error__(char *pcFilename, unsigned long ulLine)
 
 // map to RAM S0
 #pragma DATA_SECTION(m3_rw_data,"RAM_S0");
-m3_rw_data_t	m3_rw_data;
+volatile m3_rw_data_t	m3_rw_data;
 // map to RAM S4
 #pragma DATA_SECTION(c28_ro_data,"RAM_S4");
-c28_rw_data_t	c28_ro_data;
+volatile c28_rw_data_t	c28_ro_data;
 
 
 struct morser m;
@@ -148,7 +148,6 @@ int main(void)
     HWREG(RAM_CONFIG_BASE + RAM_O_MTOCCRTESTINIT1) |= 0x1;
     while((HWREG(RAM_CONFIG_BASE + RAM_O_MTOCRINITDONE)&0x1) != 0x1)  {  }
 
-
     //
     ConfigureUART();
     ConfigureLed();
@@ -159,24 +158,43 @@ int main(void)
 	// Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
+    // only for test .. erase flash using SDO
+	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
+		if ( ! erase_m3_app_flash() ) 	{ DPRINT("Fail erase M3 flash\n"); }
+	}
 
+	gFlash_crc = *(uint32_t*)(M3_APP_CRC_ADDR);
+	DPRINT("app main 0x%X\n", *(uint32_t*)(M3_ENTRY_POINT_ADDR));
+	/////////////////////////////////////////////////////////////
+	// jump to app if
+	// - et1000 GPO3 is LOW
+	// - app CRC is valid
+	if ( test_jump_to_app() ) {
+	   	jump_to_app();
+	   	// ..........
+	}
+	/////////////////////////////////////////////////////////////
+	// running bootloader
 
 #ifdef _STANDALONE
     //  Send boot command to allow the C28 application to begin execution
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-
     // Spin here until C28 is ready
     while (!IPCCtoMFlagBusy(IPC_FLAG17));
     IPCCtoMFlagAcknowledge(IPC_FLAG17);
+    // only for test .. erase flash using SDO
+	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
+		// needs c28 running !!!
+		if ( ! erase_c28_app_flash() )	{ DPRINT("Fail erase C28 flash\n"); }
+	}
 #endif
+
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
-
     // Enable processor interrupts.
     IntMasterEnable();
-
 
 	/////////////////////////////////////////////////////////////////
     //
@@ -184,25 +202,6 @@ int main(void)
 
     // ecat initialization
 	soes_init();
-
-	// only for test .. erase flash using SDO
-	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
-		if ( ! erase_m3_app_flash() ) {
-			DPRINT("Fail erase M3 flash\n");
-		}
-		if ( ! erase_c28_app_flash() ) {
-			DPRINT("Fail erase C28 flash\n");
-		}
-	}
-
-	gFlash_crc = *(uint32_t*)(APP_CRC_ADDRESS);
-	DPRINT("app main 0x%X\n", *(uint32_t*)(APP_START_ADDR));
-	// jump to app if
-	// - et1000 GPO3 is LOW
-	// - app CRC is valid
-	if ( test_jump_to_app() ) {
-	   	jump_to_app();
-	}
 
 	while (1) {
 
