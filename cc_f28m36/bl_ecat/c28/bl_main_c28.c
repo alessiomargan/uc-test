@@ -24,12 +24,15 @@
 #include "c28/include/definitions.h"
 #include "common/include/shared_ram.h"
 
+extern uint16_t do_jump_to_app;
+
 #ifdef _FLASH
 // These are defined by the linker (see device linker command file)
 extern Uint16 RamfuncsLoadStart;
 extern Uint16 RamfuncsLoadSize;
 extern Uint16 RamfuncsRunStart;
 #endif
+
 
 void main(void)
 {
@@ -82,23 +85,30 @@ void main(void)
 	Configure_Pie_Vector();
 
 	Configure_C28_Gpio();
-	Configure_C28_Timer();
-	Configure_C28_ePWM();
 	Configure_flashAPI();
 	Configure_C28_Ipc();
+
 
 	// Enable global Interrupts and higher priority real-time debug events:
 	EINT;  // Enable Global interrupt INTM
 	ERTM;  // Enable Global realtime interrupt DBGM
 
+	c28_rw_data.flash_crc = *(uint32_t*)(C28_APP_CRC_ADDR);
+	c28_rw_data.calc_crc = calc_app_crc();
+	c28_rw_data.test_type_uint32 = 0xdeadbeef;
+	c28_rw_data.test_type_uint16 = 0xcafe;
+	c28_rw_data.test_type_uint64 = 0xf1cadeadbeefdad0;
 
-	// Flag to M3 that the variables are ready in MSG RAM with CTOM IPC Flag 18
-	CtoMIpcRegs.CTOMIPCSET.bit.IPC18 = 1;
-    //IpcSync(IPC_FLAG18);
+	// Flag to M3 that the variables are ready in MSG RAM with CTOM IPC Flag 17
+	CtoMIpcRegs.CTOMIPCSET.bit.IPC17 = 1;
 
 	for(;;) {
     	// loop
+		if (bootM3bits) { LED_0_ON; } else { LED_0_OFF; }
 
+		if ( do_jump_to_app == 0xDEAD ) {
+			jump_to_app();
+		}
     }
 }
 

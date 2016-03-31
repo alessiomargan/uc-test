@@ -1,8 +1,8 @@
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
 #include "F28M36x_Ipc_drivers.h"
 
-#include "definitions.h"
-#include "shared_ram.h"
+#include "c28/include/definitions.h"
+#include "common/include/shared_ram.h"
 
 
 

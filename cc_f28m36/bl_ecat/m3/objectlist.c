@@ -121,7 +121,7 @@ const _objd SDO8001[] =
   {0x3, DTYPE_UNSIGNED32,   	32, ATYPE_RO, 	"flash_crc",  		0, &gFlash_crc},
   {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "bl_ver",   		0, &gBL_ver},
   {0x5, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"crc_ok",  			0, &gCrc_ok},
-  {0x6, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"et1100_boot_pin",0, &gET1100_boot_pin},
+  {0x6, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"et1100_boot_pin",	0, &gET1100_boot_pin},
 
 };
 

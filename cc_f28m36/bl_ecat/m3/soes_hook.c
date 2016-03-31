@@ -8,14 +8,14 @@
 #include "driverlib/gpio.h"
 
 
-
 #include <soes/utypes.h>
 #include <soes/esc.h>
 #include <soes/esc_coe.h>
 #include <soes/esc_foe.h>
 #include <soes/soes.h>
 
-#include "bl_config.h"
+#include "m3/include/definitions.h"
+
 #include "peripherals.h"
 #include "soes_hook.h"
 #include "osal.h"
@@ -36,7 +36,8 @@ foe_cfg_t 	gFOE_config = { 0, 0, 0, 0, 0 };
 
 //#pragma DATA_SECTION(foe_buffer,"RAM_S1");
 //uint8		foe_buffer[256];
-extern volatile m3_rw_data_t	m3_rw_data;
+extern m3_bl_rw_data_t	m3_rw_data;
+extern c28_bl_rw_data_t	c28_ro_data;
 
 extern foe_writefile_cfg_t      gFOE_firmware_files[];
 
@@ -51,7 +52,7 @@ char 	gBL_ver[8] = "cert_1.0";
 
 void (*jumper)(void);
 
-void jump_to_app(void) {
+void jump_to_M3_app(void) {
 	//__asm("    .global _c_int00\n"
 	//     "    b.w     _c_int00");
 
@@ -67,7 +68,7 @@ void jump_to_app(void) {
  * 	 AND
  * - et1000 boot pin is LOW
  */
-bool test_jump_to_app(void)
+bool test_jump_to_M3_app(void)
 {
 	uint32_t app_crc = calc_app_crc();
 	//et1100_boot_pin = ESC_GPO_LL() & 0x0004;
@@ -76,6 +77,14 @@ bool test_jump_to_app(void)
 	OSAL_PRINT ("gCrc_ok %d : app 0x%X  flash 0x%X\n", gCrc_ok, app_crc, gFlash_crc);
 	return ( ! gET1100_boot_pin && gCrc_ok);
 }
+bool test_jump_to_C28_app(void)
+{
+	uint32_t c28_crc_ok;
+	gET1100_boot_pin = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0);
+	c28_crc_ok = ( (c28_ro_data.flash_crc == c28_ro_data.calc_crc) && (c28_ro_data.flash_crc != 0xFFFFFFFF) );
+	OSAL_PRINT ("c28Crc_ok %d : calc 0x%X  flash 0x%X\n", c28_crc_ok, c28_ro_data.calc_crc, c28_ro_data.flash_crc);
+	return ( ! gET1100_boot_pin && c28_crc_ok);
+}
 
 void handle_sdo_0x8001_01(void)
 {
@@ -83,11 +92,13 @@ void handle_sdo_0x8001_01(void)
 
 	switch (gFlash_cmd) {
 		case FLASH_CMD_ERASE_M3 :
-			success = erase_m3_app_flash();
+			success = erase_M3_app_flash();
 			break;
 		case FLASH_CMD_ERASE_C28 :
-			success = erase_c28_app_flash();
+			success = erase_C28_app_flash();
 			break;
+		case FLASH_TEST_ERASE_C28 :
+			success = test_C28_erase_write_flash();
 		default :
 			break;
 	}

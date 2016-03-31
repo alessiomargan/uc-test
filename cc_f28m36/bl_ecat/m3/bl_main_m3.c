@@ -33,10 +33,10 @@
 #include <soes/soes.h>
 
 #include "pins.h"
-#include "bl_config.h"
 #include "shared_ram.h"
 #include "peripherals.h"
 #include "soes_hook.h"
+#include "flash_utils.h"
 #include "tiva-morser/morse.h"
 
 #define DPRINT(...) UARTprintf("btl: "__VA_ARGS__)
@@ -49,7 +49,6 @@ extern unsigned long RamfuncsRunStart;
 extern unsigned long RamfuncsLoadSize;
 #endif
 
-extern void Configure_flashAPI(void);
 
 //*****************************************************************************
 // The error routine that is called if the driver library encounters an error.
@@ -70,10 +69,10 @@ __error__(char *pcFilename, unsigned long ulLine)
 
 // map to RAM S0
 #pragma DATA_SECTION(m3_rw_data,"RAM_S0");
-volatile m3_rw_data_t	m3_rw_data;
+volatile m3_bl_rw_data_t	m3_rw_data;
 // map to RAM S4
 #pragma DATA_SECTION(c28_ro_data,"RAM_S4");
-volatile c28_rw_data_t	c28_ro_data;
+volatile c28_bl_rw_data_t	c28_ro_data;
 
 
 struct morser m;
@@ -111,12 +110,14 @@ void do_morse_led(void) {
     /////////////////////////////////////////////////////////////////
 
     GPIOPinWrite(LED_1_BASE, LED_1_PIN, led_status << 2 );
-
+    //
+    ipc_c28_bits(led_status);
 }
 
 int main(void)
 {
     volatile unsigned long 	ulLoop;
+    bool test_M3, test_C28;
 
     // Disable Protection
     HWREG(SYSCTL_MWRALLOW) =  0xA5A5A5A5;
@@ -158,37 +159,45 @@ int main(void)
 	// Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
+#ifdef _STANDALONE
+    //  Send boot command to allow the C28 application to begin execution
+    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
+    // Spin here until C28 bootloader is ready
+    while (!IPCCtoMFlagBusy(IPC_FLAG17));
+    IPCCtoMFlagAcknowledge(IPC_FLAG17);
+#endif
+
     // only for test .. erase flash using SDO
 	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
-		if ( ! erase_m3_app_flash() ) 	{ DPRINT("Fail erase M3 flash\n"); }
+		//if ( ! erase_M3_app_flash() ) 	{ DPRINT("Fail erase M3 flash\n"); }
+#ifdef _STANDALONE
+		// needs c28 running !!!
+		if ( ! erase_C28_app_flash() )	{ DPRINT("Fail erase C28 flash\n"); }
+#endif
 	}
 
 	gFlash_crc = *(uint32_t*)(M3_APP_CRC_ADDR);
 	DPRINT("app main 0x%X\n", *(uint32_t*)(M3_ENTRY_POINT_ADDR));
+	DPRINT("c28 test_types 0x%02X 0x%04X 0x%04X%04X\n",
+			c28_ro_data.test_type_uint16,
+			c28_ro_data.test_type_uint32,
+			(uint32_t)(c28_ro_data.test_type_uint64 >> 32),
+			(uint32_t)(c28_ro_data.test_type_uint64) );
 	/////////////////////////////////////////////////////////////
 	// jump to app if
 	// - et1000 GPO3 is LOW
 	// - app CRC is valid
-	if ( test_jump_to_app() ) {
-	   	jump_to_app();
-	   	// ..........
-	}
-	/////////////////////////////////////////////////////////////
-	// running bootloader
+	test_M3 = test_jump_to_M3_app();
+	test_C28 = test_jump_to_C28_app();
+
+	if ( test_M3 && test_C28 ) {
 
 #ifdef _STANDALONE
-    //  Send boot command to allow the C28 application to begin execution
-    IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-    // Spin here until C28 is ready
-    while (!IPCCtoMFlagBusy(IPC_FLAG17));
-    IPCCtoMFlagAcknowledge(IPC_FLAG17);
-    // only for test .. erase flash using SDO
-	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
-		// needs c28 running !!!
-		if ( ! erase_c28_app_flash() )	{ DPRINT("Fail erase C28 flash\n"); }
-	}
+	   	jump_to_C28_app();
 #endif
-
+	   	jump_to_M3_app();
+	   	// ..........
+	}
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);

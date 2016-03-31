@@ -57,14 +57,14 @@ PAGE 0:    /* Program Memory */
    //FLASHH      : origin = 0x118000, length = 0x008000     /* on-chip FLASH */
    //FLASHG      : origin = 0x120000, length = 0x008000     /* on-chip FLASH */
    //FLASHF      : origin = 0x128000, length = 0x008000     /* on-chip FLASH */
-   FLASHE      : origin = 0x130000, length = 0x007FFE     /* App */
-   FLASHE_BGN  : origin = 0x137FFE, length = 0x000002     /* App codestart */
+   //FLASHE      : origin = 0x130000, length = 0x008000     /* on-chip FLASH */
+   FLASHE      : origin = 0x130000, length = 0x008000     /* App */
    //FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
-   //FLASHC      : origin = 0x13A000, length = 0x002000     /* on-chip FLASH */
-   //FLASHA      : origin = 0x13E000, length = 0x001F80     /* Bootloader */
-   
+   //FLASHB      : origin = 0x13C000, length = 0x002000     /* on-chip FLASH */
+
+   FLASHA      : origin = 0x13E000, length = 0x001F80     /* Bootloader */
    //CSM_RSVD    : origin = 0x13FF80, length = 0x000070     /* Part of FLASHA.  Program with all 0x0000 when CSM is in use. */
-   //BEGIN       : origin = 0x13FFF0, length = 0x000002     /* Part of FLASHA.  Used for "boot to Flash" bootloader mode. */
+   BEGIN       : origin = 0x13FFF0, length = 0x000002     /* Part of FLASHA.  Used for "boot to Flash" bootloader mode. */
    //FLASH_EXE_ONLY_P0  : origin = 0x13FFF2, length = 0x000002  /* Part of FLASHA.  Flash execute only locations in FLASHA */
    //ECSL_PWL_P0 : origin = 0x13FFF4, length = 0x000004     /* Part of FLASHA.  ECSL password locations in FLASHA */
    //CSM_PWL_P0  : origin = 0x13FFF8, length = 0x000008     /* Part of FLASHA.  CSM password locations in FLASHA */
@@ -101,7 +101,6 @@ PAGE 1 :   /* Data Memory */
    CTOMRAM     : origin = 0x03F800, length = 0x000400     /* C28 to M3 Message RAM */
    MTOCRAM     : origin = 0x03FC00, length = 0x000400     /* M3 to C28 Message RAM */
    
-   FLASHB      : origin = 0x13C000, length = 0x002000     /* on-chip FLASH */
 }
 
 /* Allocate sections to memory blocks.
@@ -115,12 +114,11 @@ SECTIONS
 {
 
 	/* Allocate program areas: */
-   	.cinit              : > FLASHE      PAGE = 0, ALIGN(4)
-   	.pinit              : > FLASHE,     PAGE = 0, ALIGN(4)
-   	.text               : > FLASHE      PAGE = 0, ALIGN(4)
-   	//APP_START_ADDR        : > FLASHE_BGN  PAGE = 0, ALIGN(4)
-	codestart           : > FLASHE_BGN  PAGE = 0, ALIGN(2)
-	//copysections		: > FLASHE,		PAGE = 0, ALIGN(4)
+   	.cinit              : > FLASHA      PAGE = 0, ALIGN(4)
+   	.pinit              : > FLASHA,     PAGE = 0, ALIGN(4)
+   	.text               : > FLASHA      PAGE = 0, ALIGN(4)
+   	codestart           : > BEGIN       PAGE = 0, ALIGN(4)
+	//copysections		: > FLASHA,		PAGE = 0, ALIGN(4)
 
    	/* Allocate uninitalized data sections: */
    	.stack              : > RAMM0       PAGE = 1
@@ -129,8 +127,8 @@ SECTIONS
 
    	/* Initalized sections go in Flash */
    	/* For SDFlash to program these, they must be allocated to page 0 */
-   	.econst             : > FLASHE      PAGE = 0, ALIGN(4)
-   	.switch             : > FLASHE      PAGE = 0, ALIGN(4)
+   	.econst             : > FLASHA      PAGE = 0, ALIGN(4)
+   	.switch             : > FLASHA      PAGE = 0, ALIGN(4)
 
 /*
 	GROUP
@@ -139,16 +137,15 @@ SECTIONS
     	.econst
     	.switch
     	.text
-	}	LOAD = FLASHE , PAGE = 0
+	}	LOAD = FLASHA , PAGE = 0
 		RUN  = RAML2L3 , PAGE = 1
 		LOAD_START(_init_load), RUN_START(_init_run), SIZE(_init_size),
 		ALIGN(4)
 */
-
 	GROUP
 	{
 		ramfuncs { -l F021_API_C28x_FPU32.lib }
-	}	LOAD = FLASHE, PAGE = 0
+	}	LOAD = FLASHA, PAGE = 0
      	RUN = RAML2L3, PAGE = 1
         LOAD_START(_RamfuncsLoadStart),
         LOAD_SIZE(_RamfuncsLoadSize),
@@ -163,6 +160,7 @@ SECTIONS
    //csmpasswds          : > CSM_PWL_P0  PAGE = 0, ALIGN(4)
    //csm_rsvd            : > CSM_RSVD    PAGE = 0, ALIGN(4)
 
+	FLS_APP_CRC : > FLASHE_CRC, PAGE 0
    
    /* The following section definitions are required when using the IPC API Drivers */ 
    GROUP : > CTOMRAM, PAGE = 1 
@@ -180,7 +178,7 @@ SECTIONS
    }   
    
    /* Allocate IQ math areas: */
-   IQmath              : > FLASHE      PAGE = 0, ALIGN(4)       /* Math Code */
+   IQmath              : > FLASHA      PAGE = 0, ALIGN(4)       /* Math Code */
    IQmathTables        : > IQTABLES,   PAGE = 0, TYPE = NOLOAD
 
    /* Allocate FPU math areas: */

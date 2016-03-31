@@ -1,10 +1,11 @@
-#include "bl_config.h"
+#include "m3/include/definitions.h"
 #include "soes/utypes.h"
 #include "soes/esc_foe.h"
 
-extern uint32 foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8 * data);
-extern uint32 foe_write_shared_RAM(foe_writefile_cfg_t * writefile_cfg, uint8 * data);
-extern void write_app_crc(void);
+extern uint32 foe_write_M3_flash(foe_writefile_cfg_t * writefile_cfg, uint8 * data);
+extern uint32 foe_write_C28_flash(foe_writefile_cfg_t * writefile_cfg, uint8 * data);
+extern void write_M3_app_crc(void);
+extern void write_C28_app_crc(void);
 
 foe_writefile_cfg_t      gFOE_firmware_files[] = {
     {
@@ -13,8 +14,8 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
 			.dest_start_address =	M3_FLASH_APP_START, //
 			.address_offset =		0,
 			.filepass =				0xDEAD,
-			.write_function =		foe_write_flash,
-			.on_foe_close = 		write_app_crc,
+			.write_function =		foe_write_M3_flash,
+			.on_foe_close = 		write_M3_app_crc,
     },
     {
     		.name =					"params.bin",
@@ -22,7 +23,7 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
 			.dest_start_address =	0,
 			.address_offset =		0,
 			.filepass =				0xDEAD,
-			.write_function =		foe_write_flash,
+			.write_function =		foe_write_M3_flash,
 			.on_foe_close = 		0,
     },
     {
@@ -31,8 +32,8 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
 			.dest_start_address =	C28_FLASH_APP_START, //
 			.address_offset =		0,
 			.filepass =				0xDAD0,
-			.write_function =		foe_write_shared_RAM,
-			.on_foe_close = 		0,
+			.write_function =		foe_write_C28_flash,
+			.on_foe_close = 		write_C28_app_crc,
     },
     { 0, 0, 0, 0, 0, 0 }
 };

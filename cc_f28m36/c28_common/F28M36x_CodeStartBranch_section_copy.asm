@@ -41,8 +41,8 @@
     .sect "codestart"
 
 code_start:
-	;LB _c_int00         	; Branch to start of boot.asm in RTS library
-    LB copy_sections    	;Branch to copy_sections
+    ;LB _c_int00         	; Branch to start of boot.asm in RTS library
+    LB copy_sections    	; Branch to copy_sections
                        		; end codestart section
 
 

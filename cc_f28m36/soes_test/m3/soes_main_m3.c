@@ -121,9 +121,10 @@ int main(void)
 #ifdef _STANDALONE
     //  Send boot command to allow the C28 application to begin execution
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-    // Spin here until C28 is ready
-    while (!IPCCtoMFlagBusy(IPC_FLAG17));
-    IPCCtoMFlagAcknowledge(IPC_FLAG17);
+    // Spin here until C28 application is ready
+    while (!IPCCtoMFlagBusy(IPC_FLAG18));
+    IPCCtoMFlagAcknowledge(IPC_FLAG18);
+    //IpcSync(IPC_FLAG18);
 
 #endif
 
