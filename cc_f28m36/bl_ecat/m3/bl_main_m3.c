@@ -169,7 +169,7 @@ int main(void)
 
     // only for test .. erase flash using SDO
 	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
-		//if ( ! erase_M3_app_flash() ) 	{ DPRINT("Fail erase M3 flash\n"); }
+		if ( ! erase_M3_app_flash() ) 	{ DPRINT("Fail erase M3 flash\n"); }
 #ifdef _STANDALONE
 		// needs c28 running !!!
 		if ( ! erase_C28_app_flash() )	{ DPRINT("Fail erase C28 flash\n"); }

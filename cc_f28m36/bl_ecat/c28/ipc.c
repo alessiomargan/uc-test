@@ -79,7 +79,6 @@ void bootloaderService(Uint32 param)
 		break;
 
 	case FN_JUMP_APP :
-		//jump_to_app();
 		do_jump_to_app = 0xDEAD;
 		bootloaderServiceResult = FN_JUMP_APP;
 		break;

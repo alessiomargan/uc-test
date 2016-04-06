@@ -33,8 +33,6 @@ extern Uint16 RamfuncsRunStart;
 
 void main(void)
 {
-   unsigned long delay;
-
    // Step 1. Initialize System Control:
    // PLL, WatchDog, enable Peripheral Clocks
    // This example function is found in the F28M36x_SysCtrl.c file.

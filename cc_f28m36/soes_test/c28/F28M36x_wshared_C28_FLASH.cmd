@@ -118,8 +118,7 @@ SECTIONS
    	.cinit              : > FLASHE      PAGE = 0, ALIGN(4)
    	.pinit              : > FLASHE,     PAGE = 0, ALIGN(4)
    	.text               : > FLASHE      PAGE = 0, ALIGN(4)
-   	//APP_START_ADDR        : > FLASHE_BGN  PAGE = 0, ALIGN(4)
-	codestart           : > FLASHE_BGN  PAGE = 0, ALIGN(2)
+   	codestart           : > FLASHE_BGN  PAGE = 0, ALIGN(2)
 	//copysections		: > FLASHE,		PAGE = 0, ALIGN(4)
 
    	/* Allocate uninitalized data sections: */

@@ -127,21 +127,17 @@ SECTIONS
     .z2_csm_rsvd  :   >  CSM_RSVD_Z2, ALIGN(8)
     
     GROUP
-     {
-       ramfuncs
-       {
-         -l F021_API_CortexM3_LE.lib
-       }
-     }                       LOAD = FLASH_N | FLASH_M,
-                             RUN = C0,
-                             LOAD_START(RamfuncsLoadStart),
-                             LOAD_SIZE(RamfuncsLoadSize),
-                             LOAD_END(RamfuncsLoadEnd),
-                             RUN_START(RamfuncsRunStart),
-                             RUN_SIZE(RamfuncsRunSize),
-                             RUN_END(RamfuncsRunEnd),
-                             crc_table(AppCrc, algorithm=CRC32_PRIME),
-                             PAGE = 0, ALIGN(8)
+    {
+        ramfuncs { -l F021_API_CortexM3_LE.lib }
+    }   LOAD = FLASH_N | FLASH_M,
+		RUN = C0,
+		LOAD_START(RamfuncsLoadStart),
+		LOAD_SIZE(RamfuncsLoadSize),
+		LOAD_END(RamfuncsLoadEnd),
+		RUN_START(RamfuncsRunStart),
+		RUN_SIZE(RamfuncsRunSize),
+		RUN_END(RamfuncsRunEnd),
+		ALIGN(8)
  
  	FLS_APP_CRC : > FLS_E_CRC
 
