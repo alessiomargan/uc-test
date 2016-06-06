@@ -27,6 +27,7 @@
 
 #include <utils/uartstdio.h>
 
+#include "osal.h"
 #include "pins.h"
 #include "soes_hook.h"
 #include "peripherals.h"
@@ -105,7 +106,7 @@ void ConfigureEcatPDI (void)
     GPIOIntEnable(SPI_ECAT_SSI_PORT, SPI_ECAT_IRQ_PIN);
     IntEnable(INT_GPIOB);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 
 }
 
@@ -123,7 +124,7 @@ void ConfigureLed(void)
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /**
@@ -145,7 +146,7 @@ void ConfigureTimer(void)
     // Enable the timer.
     TimerEnable(TIMER0_BASE, TIMER_A);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 
@@ -166,7 +167,7 @@ void Configure_ADC(void)
     ADCIntEnable(ADC0_BASE, ADC0_SEQ_NR);
     IntEnable(INT_ADC0SS2);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 
 }
 

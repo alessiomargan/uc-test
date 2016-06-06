@@ -136,7 +136,7 @@ void ADC2IntHandler(void) {
     uint32_t ADCmV = (uint32_t)((adc_buff[0] * 3300) / 4096);
     fTemp = (float)(147500 - 75 * ADCmV) / 1000; //((1475 * 1023) - (2250 * adc_buff[0])) / 10230;
 
-    tx_pdo._real = fTemp;
+    tx_pdo.temperature = fTemp;
 
 }
 

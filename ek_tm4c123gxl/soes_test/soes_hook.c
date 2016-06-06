@@ -149,13 +149,7 @@ void ecat_process_pdo(void) {
 	      RXPDO_update();
 	}
 
-    tx_pdo._sint ++;
-    tx_pdo._usint ++;
-    tx_pdo._int ++;
-    tx_pdo._uint = rx_pdo._type;
-    tx_pdo._dint = rx_pdo._value;
-    tx_pdo._udint ++;
-    tx_pdo._ulint = rx_pdo._ts;
+    //tx_pdo._sint ++;
 
     TXPDO_update();
 }

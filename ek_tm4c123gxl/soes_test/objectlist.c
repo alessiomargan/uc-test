@@ -81,45 +81,6 @@ const _objd SDO1018[] =
   {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_3, 0, 0},
   {0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_4, 0x00000000, 0},
 };
-#if 0
-const _objd SDO1600[] =
-{
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1600_0, 1, 0},
-  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_1, 0x70000108, 0},
-};
-const _objd SDO1A00[] =
-{
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A00_0, 3, 0},
-  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000108, 0},
-  {0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_2, 0x60000208, 0},
-  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_3, 0x60000320, 0},
-};
-#endif
-// RxPdo 1600 
-const _objd SDO1600[] =
-{
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName1600_0, 3, 0},
-  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_1, 0x70000110, 0},
-  {0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_2, 0x70000220, 0},
-  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_3, 0x70000340, 0},
-};
-
-// TxPdo
-const _objd SDO1A00[] =
-{
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName1A00_0, 11, 0},
-  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000108, 0},
-  {0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_2, 0x60000208, 0},
-  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_3, 0x60000308, 0},
-  {0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000408, 0},
-  {0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000510, 0},
-  {0x6, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000610, 0},
-  {0x7, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000720, 0},
-  {0x8, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000820, 0},
-  {0x9, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000940, 0},
-  {0xa, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000a40, 0},
-  {0xb, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_1, 0x60000b20, 0},
-};
 
 const _objd SDO1C00[] =
 {
@@ -139,46 +100,78 @@ const _objd SDO1C13[] =
   {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C13_0, 1, 0},
   {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_1, 0x1A00, 0},
 };
-#if 0
-const _objd SDO6000[] =
+
+// RxPdo 1600 
+const _objd SDO1600[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6000_0, 3, 0},
-  {0x1, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6000_1, 0, &Rb.button1},
-  {0x2, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6000_2, 0, &Rb.button2},
-  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6000_3, 0, &Rb.heartbeat},
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "Number of Elements", 12, 0},
+  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 1",	0x60000120, 0},
+  {0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 2", 0x60000210, 0},
+  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 3", 0x60000310, 0},
+  {0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 4", 0x60000410, 0},
+  {0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 5", 0x60000510, 0},
+  {0x6, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 6", 0x60000610, 0},
+  {0x7, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 7", 0x60000710, 0},
+  {0x8, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 8", 0x60000810, 0},
+  {0x9, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 9",	0x60000910, 0},
+  {0xa, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 10",0x60000a10, 0},
+  {0xb, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 11",0x60000a10, 0},
+  {0xc, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 12",0x60000a20, 0},
 };
 const _objd SDO7000[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7000_0, 1, 0},
-  {0x1, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName7000_1, 0, &Wb.leds},
+  {0x0, DTYPE_UNSIGNED8,   	8, ATYPE_RO,  "Number of Elements", 12, 0},
+  {0x1, DTYPE_REAL32, 		32, ATYPE_RW, "pos_ref",	0, &rx_pdo.pos_ref},
+  {0x2, DTYPE_INTEGER16,  	16, ATYPE_RW, "vel_ref",	0, &rx_pdo.vel_ref},
+  {0x3, DTYPE_INTEGER16,  	16, ATYPE_RW, "tor_ref",	0, &rx_pdo.tor_ref},
+  {0x4, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "gain_kp_m",	0, &rx_pdo.gain_kp_m},
+  {0x5, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "gain_kp_l",	0, &rx_pdo.gain_kp_l},
+  {0x6, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "gain_kd_m",	0, &rx_pdo.gain_kd_m},
+  {0x7, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "gain_kd_l",	0, &rx_pdo.gain_kd_l},
+  {0x8, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "gain_kp_m",	0, &rx_pdo.gain_kp_m},
+  {0x9, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "gain_ki",	0, &rx_pdo.gain_ki},
+  {0xa, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "fault_ack",	0, &rx_pdo.fault_ack},
+  {0x9, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "gain_ki",	0, &rx_pdo.gain_ki},
+  {0xa, DTYPE_UNSIGNED16, 	16, ATYPE_RW, "ts",			0, &rx_pdo.ts},
+  {0xb, DTYPE_UNSIGNED16,	16, ATYPE_RW, "op_idx_aux",	0, &rx_pdo.op_idx_aux},
+  {0xc, DTYPE_REAL32, 		32, ATYPE_RW, "aux",		0, &rx_pdo.aux},
+
 };
-#endif
+
+// TxPdo
+const _objd SDO1A00[] =
+{
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "Number of Elements", 10, 0},
+  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 1",	0x60000120, 0},
+  {0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 2", 0x60000220, 0},
+  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 3", 0x60000320, 0},
+  {0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 4", 0x60000410, 0},
+  {0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 5", 0x60000510, 0},
+  {0x6, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 6", 0x60000610, 0},
+  {0x7, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 7", 0x60000710, 0},
+  {0x8, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 8", 0x60000810, 0},
+  {0x9, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 9",	0x60000910, 0},
+  {0xa, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Mapped Obj 10",0x60000a20, 0},
+};
+
 const _objd SDO6000[] =
 {
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName6000_0, 11, 0},
-  {0x1, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName6000_1, 0, &tx_pdo.____bits},
-  {0x2, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName6000_2, 0, &tx_pdo._bits},
-  {0x3, DTYPE_INTEGER8,    8, ATYPE_RO, acName6000_3, 0, &tx_pdo._sint},
-  {0x4, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName6000_3, 0, &tx_pdo._usint},
-  {0x5, DTYPE_INTEGER16,  16, ATYPE_RO, acName6000_3, 0, &tx_pdo._int},
-  {0x6, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName6000_3, 0, &tx_pdo._uint},
-  {0x7, DTYPE_INTEGER32,  32, ATYPE_RO, acName6000_3, 0, &tx_pdo._dint},
-  {0x8, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6000_3, 0, &tx_pdo._udint},
-  {0x9, DTYPE_INTEGER64,  64, ATYPE_RO, acName6000_3, 0, &tx_pdo._lint},
-  {0xa, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName6000_3, 0, &tx_pdo._ulint},
-  {0xb, DTYPE_REAL32,     32, ATYPE_RO, acName6000_3, 0, &tx_pdo._real},
-};
-const _objd SDO7000[] =
-{
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName7000_0, 3, 0},
-  {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName7000_1, 0, &rx_pdo._type},
-  {0x2, DTYPE_INTEGER32,  32, ATYPE_RW, acName7000_2, 0, &rx_pdo._value},
-  {0x3, DTYPE_UNSIGNED64, 64, ATYPE_RW, acName7000_3, 0, &rx_pdo._ts},
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "Number of Elements", 10, 0},
+  {0x1, DTYPE_REAL32,		32, ATYPE_RO, "link_pos",		0, &tx_pdo.link_pos},
+  {0x2, DTYPE_REAL32,   	32, ATYPE_RO, "motor_pos",		0, &tx_pdo.motor_pos},
+  {0x3, DTYPE_REAL32,   	32, ATYPE_RO, "link_vel",		0, &tx_pdo.link_vel},
+  {0x4, DTYPE_INTEGER16,  	16, ATYPE_RO, "motor_vel",		0, &tx_pdo.motor_vel},
+  {0x5, DTYPE_INTEGER16,  	16, ATYPE_RO, "torque",			0, &tx_pdo.torque},
+  {0x6, DTYPE_UNSIGNED16,	16, ATYPE_RO, "temperature",	0, &tx_pdo.temperature},
+  {0x7, DTYPE_UNSIGNED16,  	16, ATYPE_RO, "fault",			0, &tx_pdo.fault},
+  {0x8, DTYPE_UNSIGNED16,	16, ATYPE_RO, "rtt", 			0, &tx_pdo.rtt},
+  {0x9, DTYPE_UNSIGNED16,   16, ATYPE_RO, "op_idx_ack",		0, &tx_pdo.op_idx_ack},
+  {0xa, DTYPE_REAL32,     	32, ATYPE_RO, "aux",			0, &tx_pdo.aux},
 };
 
 const _objd SDO8000[] =
 {
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, acName8000_0, 2, 0},
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "Number of Elements", 2, 0},
   {0x1, DTYPE_INTEGER32,  32, ATYPE_RW, acName8000_1, 0, &par_1},
   {0x2, DTYPE_INTEGER32,  32, ATYPE_RW, acName8000_2, 0, &par_2},
 };
@@ -190,14 +183,14 @@ const _objectlist SDOobjects[] =
   {0x1009, OTYPE_VAR, 0, 0, acName1009, SDO1009},
   {0x100A, OTYPE_VAR, 0, 0, acName100A, SDO100A},
   {0x1018, OTYPE_RECORD, 4, 0, acName1018, SDO1018},
-  {0x1600, OTYPE_RECORD, 3, 0, acName1600, SDO1600},
-  {0x1A00, OTYPE_RECORD, 11, 0, acName1A00, SDO1A00},
-  {0x1C00, OTYPE_ARRAY, 4, 0, acName1C00, SDO1C00},
-  {0x1C12, OTYPE_ARRAY, 1, 0, acName1C12, SDO1C12},
-  {0x1C13, OTYPE_ARRAY, 1, 0, acName1C13, SDO1C13},
-  {0x6000, OTYPE_RECORD, 11, 0, acName6000, SDO6000},
-  {0x7000, OTYPE_RECORD, 3, 0, acName7000, SDO7000},
-  {0x8000, OTYPE_RECORD, 2, 0, acName8000, SDO8000},
+  {0x1600, OTYPE_RECORD,10, 0,	"Receive PDO Mapping", SDO1600},
+  {0x1A00, OTYPE_RECORD,12, 0,	"Transmit PDO Mapping", SDO1A00},
+  {0x1C00, OTYPE_ARRAY, 4, 0,	acName1C00, SDO1C00},
+  {0x1C12, OTYPE_ARRAY, 1, 0,	acName1C12, SDO1C12},
+  {0x1C13, OTYPE_ARRAY, 1, 0,	acName1C13, SDO1C13},
+  {0x6000, OTYPE_RECORD, 12, 0,	"Inputs",	SDO6000},
+  {0x7000, OTYPE_RECORD, 10, 0,	"Outputs",	SDO7000},
+  {0x8000, OTYPE_RECORD, 2, 0,	"Flash_par",SDO8000},
   {0xffff, 0xff, 0xff, 0xff, 0, 0}
 };
 

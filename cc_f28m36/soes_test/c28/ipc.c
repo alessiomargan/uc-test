@@ -1,5 +1,3 @@
-#include "F021_Concerto_C28x.h"
-
 #include "c28/include/definitions.h"
 #include "common/include/shared_ram.h"
 #include "flash_utils.h"

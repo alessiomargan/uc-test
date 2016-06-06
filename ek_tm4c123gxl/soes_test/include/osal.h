@@ -25,4 +25,12 @@ extern void UARTprintf(const char *pcString, ...);
 
 #define OSAL_PRINT UARTprintf
 
+#ifdef _DEBUG
+	#define DPRINT(...) OSAL_PRINT ("dbg: "__VA_ARGS__)
+	#define DEBUG_ASSERT(expression)    ASSERT(expression)
+#else
+#	define DPRINT(...)
+#	define DEBUG_ASSERT(expression)
+#endif  /* DEBUG */
+
 #endif
