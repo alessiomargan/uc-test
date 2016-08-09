@@ -31,13 +31,48 @@ typedef struct {
     float        aux;                // get value or nack erro code
 } __attribute__((__packed__)) tx_pdo_t;
 
+typedef struct {
+
+	// Flash
+    float   PosGainP;
+    float   PosGainI;
+    float   PosGainD;
+    float   TorGainP;
+    float   TorGainI;
+    float   TorGainD;
+    float   Pos_I_lim;
+    float   Tor_I_lim;
+    float   Min_pos;
+    float   Max_pos;
+    float   Max_tor;
+    float   Max_cur;
+    int16_t ConfigFlags;
+    int16_t ConfigFlags2;
+    float   ImpedancePosGainP;
+    float   ImpedancePosGainD;
+    int     MaxPWM;
+    int16_t Joint_number;
+    int16_t Joint_robot_id;
+    float   Target_velocity;
+
+
+	// Ram
+	char fw_ver[8];
+    unsigned short ctrl_status_cmd;
+    unsigned short ctrl_status_cmd_ack;
+    unsigned short flash_params_cmd;
+    unsigned short flash_params_cmd_ack;
+    unsigned int ack_board_faults;
+    float direct_ref;
+    float abs_pos;
+    float m_current;
+
+} __attribute__((__packed__)) sdo_t;
 
 
 extern tx_pdo_t tx_pdo;
 extern rx_pdo_t rx_pdo;
-
-extern int par_1;
-extern int par_2;
+extern sdo_t	sdo;
 
 void setup_esc_configs(void);
 

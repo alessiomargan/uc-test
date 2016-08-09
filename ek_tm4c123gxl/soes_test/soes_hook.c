@@ -11,9 +11,13 @@
 int par_1;
 int par_2;
 
-rx_pdo_t          rx_pdo;
-tx_pdo_t          tx_pdo;
-
+rx_pdo_t	rx_pdo;
+tx_pdo_t    tx_pdo;
+sdo_t		sdo = {
+		.Min_pos = -0.123,
+		.Max_pos =  0.456,
+		.fw_ver = "_(@)(@)_",
+};
 
 esc_cfg_t 	esc_config = { 0, 0 };
 
@@ -149,7 +153,15 @@ void ecat_process_pdo(void) {
 	      RXPDO_update();
 	}
 
-    //tx_pdo._sint ++;
+    tx_pdo.link_pos = rx_pdo.pos_ref;
+    tx_pdo.motor_pos = rx_pdo.pos_ref;
+    tx_pdo.link_vel = rx_pdo.vel_ref;
+    tx_pdo.motor_vel = rx_pdo.vel_ref;
+    tx_pdo.torque = rx_pdo.tor_ref;
+    //
+    tx_pdo.rtt = rx_pdo.ts;
+    // get/set:idx_var
+    rx_pdo.op_idx_aux;
 
     TXPDO_update();
 }
