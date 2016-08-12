@@ -57,9 +57,7 @@ MEMORY
     //FLASH_H (RX)    : origin = 0x00260000, length = 0x20000
     //FLASH_G (RX)    : origin = 0x00280000, length = 0x20000
     //FLASH_F (RX)    : origin = 0x002A0000, length = 0x20000
-    //!!FLASH_E (RX)    : origin = 0x002C0000, length = 0x20000
-    FLASH_E (RX)    : origin = 0x002C0000, length = 0x1FFFC  /* Application */
-    APP_START (RX)  : origin = 0x002DFFFC, length = 0x0004   /* App "main" address */
+    //FLASH_E (RX)    : origin = 0x002C0000, length = 0x20000 /* Application */
     //FLASH_D (RX)    : origin = 0x002E0000, length = 0x8000
     //FLASH_C (RX)    : origin = 0x002E8000, length = 0x8000
     //FLASH_B (RX)    : origin = 0x002F0000, length = 0x8000
@@ -108,10 +106,10 @@ SECTIONS
 {
     .intvecs:   > INTVECS, ALIGN(8)
     .resetisr:  > RESETISR, ALIGN(8)
-    .text   :   >> FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .const  :   >> FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .cinit  :   > FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .pinit  :   > FLASH_N | FLASH_M, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
+    .text   :   >> FLASH_N | FLASH_M, ALIGN(8)
+    .const  :   >> FLASH_N | FLASH_M, ALIGN(8)
+    .cinit  :   > FLASH_N | FLASH_M,  ALIGN(8)
+    .pinit  :   > FLASH_N | FLASH_M,  ALIGN(8)
 
     .vtable :   >  C0 | C1 | C2 | C3
     .data   :   >  C2 | C3
@@ -119,7 +117,6 @@ SECTIONS
     .sysmem :   >  C0 | C1 | C2 | C3
     .stack  :   >  C0 | C1 | C2 | C3
     
-    .TI.crctab : > FLASH_N | FLASH_M, ALIGN(8)
     
     .z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
     .z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)

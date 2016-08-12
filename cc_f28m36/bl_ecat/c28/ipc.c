@@ -45,7 +45,8 @@ void bootloaderService(Uint32 param)
 	switch (param) {
 
 	case FN_ERASE_FLASH :
-		if ( Erase_flash_sector(FLASHE_START) == Fapi_Status_Success ) {
+		if ( Erase_flash_sector(FLASHE_START) == Fapi_Status_Success  &&
+			 Erase_flash_sector(C28_APP_CRC_ADDR) == Fapi_Status_Success ) {
 			bootloaderServiceResult = FN_ERASE_FLASH;
 		} else {
 			bootloaderServiceResult = FN_ERROR;

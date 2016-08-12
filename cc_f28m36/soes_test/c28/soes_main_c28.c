@@ -89,10 +89,8 @@ void main(void)
 	EINT;  // Enable Global interrupt INTM
 	ERTM;  // Enable Global realtime interrupt DBGM
 
-
 	// Flag to M3 that the variables are ready in MSG RAM with CTOM IPC Flag 18
-	CtoMIpcRegs.CTOMIPCSET.bit.IPC18 = 1;
-    //IpcSync(IPC_FLAG18);
+	//CtoMIpcRegs.CTOMIPCSET.bit.IPC18 = 1;
 
 	for(;;) {
     	// loop

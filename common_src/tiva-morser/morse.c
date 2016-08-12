@@ -150,6 +150,6 @@ enum OUTPUT tick(struct morser *morser) {
 void init_morser(struct morser *m, char *str) { 
   m->state = TICKING;
   m->string = str;
-  m->string_pos = -1;
+  m->string_pos = 255;
   next_char(m); 
 }

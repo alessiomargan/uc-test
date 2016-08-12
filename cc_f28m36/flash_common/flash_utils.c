@@ -190,13 +190,13 @@ Fapi_StatusType Test_EraseWrite_flash(uint32_t sectorAddr)
 
 	oReturnCheck = Erase_flash_sector(sectorAddr);
     if(oReturnCheck != Fapi_Status_Success) {
-    	DPRINT("FAIL Test_EraseWrite_flash 0x%04X\n", sectorAddr);
+    	//DPRINT("FAIL Test_EraseWrite_flash 0x%04X\n", sectorAddr);
     	return oReturnCheck;
     }
 
 	oReturnCheck = Write_flash(sectorAddr,dataBuff,sizeof(dataBuff));
     if(oReturnCheck != Fapi_Status_Success) {
-    	DPRINT("FAIL Test_EraseWrite_flash 0x%04X\n", sectorAddr);
+    	//DPRINT("FAIL Test_EraseWrite_flash 0x%04X\n", sectorAddr);
     	return oReturnCheck;
     }
 

@@ -38,7 +38,6 @@ extern "C" {
 #define C28_FLASH_APP_SIZE  0x008000
 #define C28_APP_CRC_ADDR	0x106000
 
-
 extern void MtoC_ipc1_isr(void);
 extern void MtoC_ipc2_isr(void);
 
