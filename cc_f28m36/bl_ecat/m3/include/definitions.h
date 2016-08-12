@@ -31,7 +31,6 @@ extern "C" {
 #define SectorE_start        	0x002C0000
 #define SectorE_end          	0x002E0000
 
-#define M3_ENTRY_POINT_ADDR 	0x002DFFFC
 #define M3_APP_CRC_ADDR 		0x00218000
 
 #define M3_FLASH_APP_START 		SectorE_start
@@ -39,6 +38,7 @@ extern "C" {
 
 #define C28_FLASH_APP_START 	0x130000 //0x13E000
 #define C28_FLASH_APP_SIZE		0x008000 //0x001F80
+#define C28_APP_CRC_ADDR		0x106000
 
 #ifdef __cplusplus
 }

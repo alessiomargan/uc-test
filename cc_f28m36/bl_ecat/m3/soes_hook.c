@@ -17,6 +17,7 @@
 #include "m3/include/definitions.h"
 
 #include "peripherals.h"
+#include "user_flash.h"
 #include "soes_hook.h"
 #include "osal.h"
 #include "shared_ram.h"
@@ -34,10 +35,8 @@
 esc_cfg_t 	gESC_config = { 0, 0 };
 foe_cfg_t 	gFOE_config = { 0, 0, 0, 0, 0 };
 
-//#pragma DATA_SECTION(foe_buffer,"RAM_S1");
-//uint8		foe_buffer[256];
-extern m3_bl_rw_data_t	m3_rw_data;
-extern c28_bl_rw_data_t	c28_ro_data;
+extern m3_bl_rw_data_t	m3_bl_rw_data;
+extern c28_bl_rw_data_t	c28_bl_ro_data;
 
 extern foe_writefile_cfg_t      gFOE_firmware_files[];
 
@@ -50,41 +49,6 @@ char 	gBL_ver[8] = "cert_1.0";
 
 #pragma DATA_SECTION(gFlash_crc,"FLS_APP_CRC");
 
-void (*jumper)(void);
-
-void jump_to_M3_app(void) {
-	//__asm("    .global _c_int00\n"
-	//     "    b.w     _c_int00");
-
-	// APPLICATION ENTRY POINT SYMBOL: "_c_int00"  address: 002c5375
-	//jumper = (void (*)())0x002c5375;
-	jumper = (void (*)())(*(uint32*)M3_ENTRY_POINT_ADDR);
-	jumper();
-}
-
-/**
- * return true if :
- * - crc is valid
- * 	 AND
- * - et1000 boot pin is LOW
- */
-bool test_jump_to_M3_app(void)
-{
-	uint32_t app_crc = calc_app_crc();
-	//et1100_boot_pin = ESC_GPO_LL() & 0x0004;
-	gET1100_boot_pin = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0);
-	gCrc_ok = ( (app_crc == gFlash_crc) && (gFlash_crc != 0xFFFFFFFF) );
-	OSAL_PRINT ("gCrc_ok %d : app 0x%X  flash 0x%X\n", gCrc_ok, app_crc, gFlash_crc);
-	return ( ! gET1100_boot_pin && gCrc_ok);
-}
-bool test_jump_to_C28_app(void)
-{
-	uint32_t c28_crc_ok;
-	gET1100_boot_pin = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0);
-	c28_crc_ok = ( (c28_ro_data.flash_crc == c28_ro_data.calc_crc) && (c28_ro_data.flash_crc != 0xFFFFFFFF) );
-	OSAL_PRINT ("c28Crc_ok %d : calc 0x%X  flash 0x%X\n", c28_crc_ok, c28_ro_data.calc_crc, c28_ro_data.flash_crc);
-	return ( ! gET1100_boot_pin && c28_crc_ok);
-}
 
 void handle_sdo_0x8001_01(void)
 {
@@ -200,11 +164,11 @@ void setup_esc_configs(void)
 	}
 
 	/** Allocate static in caller func to fit buffer_size */
-	gFOE_config.fbuffer = m3_rw_data.foe_buffer;
+	gFOE_config.fbuffer = m3_bl_rw_data.foe_buffer;
 	/** Write this to fill-up, ex. 0xFF for "non write" */
 	gFOE_config.empty_write = 0xFF;
 	/** Buffer size before we flush to destination */
-	gFOE_config.buffer_size = sizeof(m3_rw_data.foe_buffer);
+	gFOE_config.buffer_size = sizeof(m3_bl_rw_data.foe_buffer);
 	/** Number of files used in firmware update */
 	gFOE_config.n_files = file_cnt;
 	/** Pointer to files configured to be used by FoE */

@@ -57,8 +57,8 @@ PAGE 0:    /* Program Memory */
    //FLASHH      : origin = 0x118000, length = 0x008000     /* on-chip FLASH */
    //FLASHG      : origin = 0x120000, length = 0x008000     /* on-chip FLASH */
    //FLASHF      : origin = 0x128000, length = 0x008000     /* on-chip FLASH */
-   FLASHE      : origin = 0x130000, length = 0x007FFE     /* App */
-   FLASHE_BGN  : origin = 0x137FFE, length = 0x000002     /* App codestart */
+   FLASHE      : origin = 0x130000, length = 0x007FF0     /* App */
+   FLASHE_BGN  : origin = 0x137FF0, length = 0x000002     /* App codestart */
    //FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
    //FLASHC      : origin = 0x13A000, length = 0x002000     /* on-chip FLASH */
    //FLASHA      : origin = 0x13E000, length = 0x001F80     /* Bootloader */
@@ -118,7 +118,7 @@ SECTIONS
    	.cinit              : > FLASHE      PAGE = 0, ALIGN(4)
    	.pinit              : > FLASHE,     PAGE = 0, ALIGN(4)
    	.text               : > FLASHE      PAGE = 0, ALIGN(4)
-   	codestart           : > FLASHE_BGN  PAGE = 0, ALIGN(2)
+   	codestart           : > FLASHE_BGN  PAGE = 0, ALIGN(4)
 	//copysections		: > FLASHE,		PAGE = 0, ALIGN(4)
 
    	/* Allocate uninitalized data sections: */

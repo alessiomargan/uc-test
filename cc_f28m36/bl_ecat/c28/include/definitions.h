@@ -38,7 +38,6 @@ extern "C" {
 #define C28_FLASH_APP_SIZE  0x008000
 #define C28_APP_CRC_ADDR	0x106000
 
-
 extern void MtoC_ipc1_isr(void);
 extern void MtoC_ipc2_isr(void);
 
@@ -53,8 +52,8 @@ extern void bootloaderService(Uint32 param);
 extern Uint32 bootloaderServiceResult;
 extern Uint32 bootM3bits;
 
-extern volatile m3_bl_rw_data_t		m3_ro_data;
-extern volatile c28_bl_rw_data_t	c28_rw_data;
+extern volatile m3_bl_rw_data_t		m3_bl_ro_data;
+extern volatile c28_bl_rw_data_t	c28_bl_rw_data;
 
 extern volatile tIpcController  	g_sIpcController1;
 extern volatile tIpcController  	g_sIpcController2;

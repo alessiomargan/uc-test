@@ -72,10 +72,9 @@ void Timer0AIntHandler(void) {
     if ( ! DC_activation() ) {
         ecat_process_pdo();
     }
-    // every 10 cycles
-    if ( (timer0_cnt % 10) == 0 ) {
-        soes_loop();
-    }
+
+    // every cycle
+	soes_loop();
 
     //
     M3_wr_shared();
@@ -84,7 +83,7 @@ void Timer0AIntHandler(void) {
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle 
         HWREGBITB(&toggle, 0) ^= 1;
-        UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle );
+        UARTprintf("\r tmr0: %d %d %d", timer0_cnt, toggle, m3_rw_data.v_int32 );
     }
 
     GPIOPinWrite(LED_1_BASE, LED_1_PIN, toggle << 2 );

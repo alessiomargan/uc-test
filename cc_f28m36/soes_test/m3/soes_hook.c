@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <soes/utypes.h>
 #include <soes/esc.h>
 #include <soes/esc_coe.h>
@@ -10,17 +12,14 @@
 
 #define DPRINT(...)
 
-int par_1;
-int par_2;
 
-rx_pdo_t          rx_pdo;
-tx_pdo_t          tx_pdo;
+rx_pdo_t	rx_pdo;
+tx_pdo_t    tx_pdo;
+aux_pdo_t   aux_pdo;
+sdo_t		sdo;
 
 esc_cfg_t 	esc_config = { 0, 0 };
 
-extern int main(void);
-#pragma DATA_SECTION(jumper_to_app,"APP_START_ADDR");
-uint32_t volatile * const jumper_to_app = (uint32_t)&main;
 
 /**
  */
@@ -32,6 +31,15 @@ static void jump_to_bootloader(void) {
     Watchdog0Reset();
 }
 
+static void on_PREOP(void) {
+
+	memcpy(sdo.fw_ver, fw_ver, sizeof(sdo.fw_ver));
+	sdo.PosGainP = 123.456;
+	sdo.PosGainI = 456.678;
+	sdo.PosGainD = 678.910;
+
+	memset((void*)&tx_pdo,0,sizeof(tx_pdo));
+}
 
 /** Mandatory: Hook called from the slave stack SDO Download handler to act on
  * user specified Index and Sub-index.
@@ -110,6 +118,9 @@ static void RXPDO_update (void)
 void pre_state_change_hook (uint8 * as, uint8 * an)
 {
     DPRINT ("pre_state_change_hook 0x%02X %d\n", *as, *an);
+    if ( (*as == INIT_TO_PREOP) && (*an & ESCerror ) == 0 ) {
+    	on_PREOP();
+    }
 }
 
 /** Optional: Hook called AFTER state change for application
@@ -120,7 +131,6 @@ void post_state_change_hook (uint8 * as, uint8 * an)
     DPRINT ("post_state_change_hook 0x%02X %d\n", *as, *an);
     /* Add specific step change hooks here */
     if ( (*as == INIT_TO_BOOT) && (*an & ESCerror ) == 0 ) {
-
     	jump_to_bootloader();
     }
 
@@ -136,10 +146,55 @@ void setup_esc_configs(void) {
 }
 
 
+#define AUX_PDO_OP_SET 0xFB
+#define AUX_PDO_OP_GET 0xBF
+#define AUX_PDO_OP_ACK 0x00
+#define AUX_PDO_OP_NAC 0xEE
+
+#define AUX_PDO_EE_INVALID_OP	0xE1
+#define AUX_PDO_EE_INVALID_IDX	0xE2
+#define AUX_PDO_EE_READONLY 	0xE3
+extern const _objd SDO8002[];
+
+void handle_aux_pdo(void) {
+
+	const _objd * pobjd;
+	uint8 op  = rx_pdo.op_idx_aux >> 8;
+	uint8 idx = rx_pdo.op_idx_aux & 0xFF;
+
+	//UARTprintf("%s %d %d\n", __FUNCTION__, op, idx );
+
+	if ( ! (op == AUX_PDO_OP_SET || op == AUX_PDO_OP_GET) ) {
+		tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
+		tx_pdo.aux = (float)AUX_PDO_EE_INVALID_OP;
+		return;
+	}
+	pobjd = SDO8002;
+	if ( idx < 1 || idx > pobjd->value ) {
+		tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
+		tx_pdo.aux = (float)AUX_PDO_EE_INVALID_IDX;
+		return;
+	}
+	pobjd = SDO8002+idx;
+	if ( op == AUX_PDO_OP_SET && pobjd->access == ATYPE_RO ) {
+		tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
+		tx_pdo.aux = (float)AUX_PDO_EE_READONLY;
+		return;
+	}
+	// op & idx are valid
+	tx_pdo.op_idx_ack = (AUX_PDO_OP_ACK << 8) | idx;
+	if ( op == AUX_PDO_OP_SET ) {
+		*(float*)(pobjd->data) = rx_pdo.aux;
+		tx_pdo.aux = rx_pdo.aux;
+	}
+	if ( op == AUX_PDO_OP_GET ) {
+		tx_pdo.aux = *(float*)(pobjd->data);
+	}
+
+}
+
 /**
  *
- *
- * @author amargan (7/4/2014)
  */
 void ecat_process_pdo(void) {
 
@@ -147,14 +202,21 @@ void ecat_process_pdo(void) {
 	      RXPDO_update();
 	}
 
-    tx_pdo._sint ++;
-    tx_pdo._usint ++;
-    tx_pdo._int ++;
-    tx_pdo._uint = rx_pdo._type;
-    tx_pdo._dint = rx_pdo._value;
-    tx_pdo._udint ++;
-    tx_pdo._ulint = rx_pdo._ts;
+	if ( rx_pdo.op_idx_aux != 0 ) {
+		handle_aux_pdo();
+	}
 
-    TXPDO_update();
+	aux_pdo.pos_ref_fb = rx_pdo.pos_ref;
+	aux_pdo.volt_ref = 0;
+	aux_pdo.vout = 0;
+	aux_pdo.current = 0;
+
+	tx_pdo.link_pos = rx_pdo.pos_ref;
+	tx_pdo.motor_pos = rx_pdo.pos_ref;
+	tx_pdo.torque = 0;
+	tx_pdo.max_temperature = 21;
+	tx_pdo.rtt = rx_pdo.ts;
+
+	TXPDO_update();
 }
 

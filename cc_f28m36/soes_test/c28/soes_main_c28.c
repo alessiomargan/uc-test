@@ -78,10 +78,9 @@ void main(void)
 	InitPieVectTable();
 
 	Configure_Pie_Vector();
-
 	Configure_C28_Gpio();
 	Configure_C28_Timer();
-	Configure_C28_ePWM();
+	//Configure_C28_ePWM();
 	Configure_flashAPI();
 	Configure_C28_Ipc();
 
@@ -89,14 +88,11 @@ void main(void)
 	EINT;  // Enable Global interrupt INTM
 	ERTM;  // Enable Global realtime interrupt DBGM
 
-
-	// Flag to M3 that the variables are ready in MSG RAM with CTOM IPC Flag 18
-	CtoMIpcRegs.CTOMIPCSET.bit.IPC18 = 1;
-    //IpcSync(IPC_FLAG18);
+	//Synchronize the two CPUs.
+	IpcSync(IPC_FLAG18);
 
 	for(;;) {
     	// loop
-
     }
 }
 

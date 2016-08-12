@@ -4,11 +4,9 @@
 
 #include "c28/include/definitions.h"
 
-uint16_t do_jump_to_app = 0;
-
 void jump_to_app(void) {
 	DINT;
-	asm("	LB 0x137FFE");
+	asm("	LB 0x137FF0");
 }
 
 uint32_t calc_app_crc(void) {
@@ -30,8 +28,8 @@ Fapi_StatusType write_app_crc(void) {
 
 	crc = calc_app_crc();
 	if ( Write_flash(ui32FlashAddr, (uint16_t*)&crc, sizeof(crc)) == Fapi_Status_Success ) {
-		c28_rw_data.flash_crc = *(uint32*)C28_APP_CRC_ADDR;
-		c28_rw_data.calc_crc = crc;
+		c28_bl_rw_data.flash_crc = *(uint32*)C28_APP_CRC_ADDR;
+		c28_bl_rw_data.calc_crc = crc;
 		return Fapi_Status_Success;
 	} else {
 		return Fapi_Error_Fail;
@@ -45,7 +43,8 @@ void bootloaderService(Uint32 param)
 	switch (param) {
 
 	case FN_ERASE_FLASH :
-		if ( Erase_flash_sector(FLASHE_START) == Fapi_Status_Success ) {
+		if ( Erase_flash_sector(FLASHE_START) == Fapi_Status_Success  &&
+			 Erase_flash_sector(C28_APP_CRC_ADDR) == Fapi_Status_Success ) {
 			bootloaderServiceResult = FN_ERASE_FLASH;
 		} else {
 			bootloaderServiceResult = FN_ERROR;
@@ -53,7 +52,7 @@ void bootloaderService(Uint32 param)
 		break;
 
 	case FN_FOE_BUFF :
-		if ( Write_flash(m3_ro_data.foe_flashAddr, m3_ro_data.foe_buffer, 128) == Fapi_Status_Success ) {
+		if ( Write_flash(m3_bl_ro_data.foe_flashAddr, m3_bl_ro_data.foe_buffer, 128) == Fapi_Status_Success ) {
 			bootloaderServiceResult = FN_FOE_BUFF;
 		} else {
 			bootloaderServiceResult = FN_ERROR;
@@ -70,17 +69,12 @@ void bootloaderService(Uint32 param)
 
 	case FN_TEST_FLS :
 		oReturnCheck = Test_EraseWrite_flash(0x100000);
-		c28_rw_data.test_type_uint32 = oReturnCheck;
+		c28_bl_rw_data.test_type_uint32 = oReturnCheck;
 		if ( oReturnCheck == Fapi_Status_Success ) {
 			bootloaderServiceResult = FN_TEST_FLS;
 		} else {
 			bootloaderServiceResult = FN_ERROR;
 		}
-		break;
-
-	case FN_JUMP_APP :
-		do_jump_to_app = 0xDEAD;
-		bootloaderServiceResult = FN_JUMP_APP;
 		break;
 
 	default:

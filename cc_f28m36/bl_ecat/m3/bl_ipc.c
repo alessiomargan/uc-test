@@ -68,15 +68,9 @@ uint32_t ipc_c28_service(uint32_t param) {
 void ipc_c28_bits(uint32_t bits) {
 
 	IPCMtoCDataWrite(&g_sIpcController1, pulMsgRam[2], bits,
-				 	 IPC_LENGTH_32_BITS, ENABLE_BLOCKING, NO_FLAG);
+				 	 IPC_LENGTH_32_BITS, DISABLE_BLOCKING, NO_FLAG);
 }
 
-#pragma CODE_SECTION(jump_to_C28_app,"ramfuncs");
-void jump_to_C28_app(void) {
-
-	//IPCMtoCFunctionCall(&g_sIpcController1, pulMsgRam[0], FN_JUMP_APP, 0);
-	return (ipc_c28_service(FN_JUMP_APP) == FN_JUMP_APP );
-}
 
 //*****************************************************************************
 // CtoM IPC INT1 Interrupt Handler -

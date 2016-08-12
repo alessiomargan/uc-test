@@ -10,6 +10,7 @@
 
 #include "shared_ram.h"
 #include "flash_utils.h"
+#include "bl_ipc.h"
 
 #include "soes_hook.h"
 #include "osal.h"
@@ -26,9 +27,9 @@
 //#define _16KSector_u32length 	0x1000
 //#define _64KSector_u32length  0x4000
 
-extern foe_cfg_t 	gFOE_config;
-extern m3_bl_rw_data_t	m3_rw_data;
-extern c28_bl_rw_data_t	c28_ro_data;
+extern foe_cfg_t 		gFOE_config;
+extern m3_bl_rw_data_t	m3_bl_rw_data;
+extern c28_bl_rw_data_t	c28_bl_ro_data;
 
 
 
@@ -44,7 +45,7 @@ bool erase_M3_app_flash() {
 #pragma CODE_SECTION(erase_C28_app_flash,"ramfuncs");
 bool erase_C28_app_flash() {
 
-	DPRINT("C28 >> Erase flash 0x%04X\n", C28_FLASH_APP_START);
+	DPRINT("C28 >> Erase flash 0x%04X and 0x%04X\n", C28_FLASH_APP_START, C28_APP_CRC_ADDR);
 	return (ipc_c28_service(FN_ERASE_FLASH) == FN_ERASE_FLASH);
 }
 
@@ -84,7 +85,7 @@ uint32 foe_write_C28_flash(foe_writefile_cfg_t * writefile_cfg, uint8 * data) {
 			bytestowrite, bytestowrite/2);
 
 	//
-	m3_rw_data.foe_flashAddr = ui32FlashAddr;
+	m3_bl_rw_data.foe_flashAddr = ui32FlashAddr;
 
 	if ( ipc_c28_service(FN_FOE_BUFF) != FN_FOE_BUFF ) {
 		DPRINT("FAIL foe_write_shared_RAM FlashAddr 0x%04X with %d bytes\n",
@@ -132,7 +133,7 @@ void write_M3_app_crc(void) {
 void write_C28_app_crc(void) {
 
 	if ( ipc_c28_service(FN_APP_CRC) == FN_APP_CRC ) {
-		DPRINT("ipc_c28_service calc 0x%04X flash 0x%04X\n", c28_ro_data.calc_crc, c28_ro_data.flash_crc);
+		DPRINT("ipc_c28_service calc 0x%04X flash 0x%04X\n", c28_bl_ro_data.calc_crc, c28_bl_ro_data.flash_crc);
 	} else {
 		DPRINT("FAIL write_C28_app_crc\n");
 	}

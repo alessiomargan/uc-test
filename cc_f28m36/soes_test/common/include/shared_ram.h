@@ -21,13 +21,6 @@ typedef struct {
     int32_t    	v_int32;
     uint64_t	v_uint64;
     float		v_float;
-    //
-#ifdef _C28X
-    uint16_t	foe_buffer[128];
-#else
-    uint8_t		foe_buffer[256];
-#endif
-    uint32_t	foe_flashAddr;
 
 } m3_rw_data_t;
 
@@ -43,7 +36,6 @@ typedef struct {
     //
     uint16_t	ipc_irq_err_cnt;
     uint32_t	ipc_irq_error;
-    //
 
 } c28_rw_data_t;
 

@@ -58,15 +58,16 @@ __error__(char *pcFilename, unsigned long ulLine)
 //
 //*****************************************************************************
 
+const char fw_ver[8] = "xXx/\\xXx";
+
 m3_rw_data_t	m3_rw_data;
 c28_rw_data_t	c28_ro_data;
 
-// map to RAM S0
-#pragma DATA_SECTION(m3_rw_data,"RAM_S0");
-// map to RAM S4
-#pragma DATA_SECTION(c28_ro_data,"RAM_S4");
+// map to RAM S1
+#pragma DATA_SECTION(m3_rw_data,"RAM_S1");
+// map to RAM S5
+#pragma DATA_SECTION(c28_ro_data,"RAM_S5");
 
-//#pragma CODE_SECTION(main,"main_app");
 int main(void)
 {
     volatile unsigned long ulLoop;
@@ -79,27 +80,24 @@ int main(void)
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
                          SYSCTL_XCLKDIV_4);
 
+    SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG0);
+    SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
+
+#ifdef _FLASH
     // Copy time critical code and Flash setup code to RAM
     // This includes the following functions:  InitFlash();
     // The  RamfuncsLoadStart, RamfuncsLoadSize, and RamfuncsRunStart
     // symbols are created by the linker. Refer to the device .cmd file.
     memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (size_t)&RamfuncsLoadSize);
-
     // Call Flash Initialization to setup flash waitstates
     // This function must reside in RAM
     FlashInit();
+#endif
 
-    // assign S0 and S1 of the shared ram for use by the M3
-    RAMMReqSharedMemAccess((S0_ACCESS | S1_ACCESS), SX_M3MASTER);
-    // assign S4 and S5 of the shared ram for use by the C28
-    RAMMReqSharedMemAccess((S4_ACCESS | S5_ACCESS), SX_C28MASTER);
-
-    // Initialize S0 S1 RAM
-    HWREG(RAM_CONFIG_BASE + RAM_O_MSXRTESTINIT1) |= 0x5;
-    while((HWREG(RAM_CONFIG_BASE + RAM_O_MSXRINITDONE1)&0x5) != 0x5)  {  }
-    // MTOC_MSG_RAM Test and Initialization
-    HWREG(RAM_CONFIG_BASE + RAM_O_MTOCCRTESTINIT1) |= 0x1;
-    while((HWREG(RAM_CONFIG_BASE + RAM_O_MTOCRINITDONE)&0x1) != 0x1)  {  }
+    // assign S0 of the shared ram for use by the M3
+    RAMMReqSharedMemAccess((S1_ACCESS), SX_M3MASTER);
+    // assign S4 of the shared ram for use by the C28
+    RAMMReqSharedMemAccess((S5_ACCESS), SX_C28MASTER);
 
     //
     ConfigureUART();
@@ -118,19 +116,12 @@ int main(void)
 	// Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
-#ifdef _STANDALONE
+#ifdef _BOOT_C28
     //  Send boot command to allow the C28 application to begin execution
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-    // Spin here until C28 application is ready
-    while (!IPCCtoMFlagBusy(IPC_FLAG18));
-    IPCCtoMFlagAcknowledge(IPC_FLAG18);
-    //IpcSync(IPC_FLAG18);
-
+    //Synchronize the two CPUs.
+    IpcSync(IPC_FLAG18);
 #endif
-
-    // enable dog0
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
-    SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
     //The hardware priority mechanism will only look at the upper N bits of the priority level
     //where N is 3 for the Concerto family

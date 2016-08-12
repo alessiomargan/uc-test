@@ -44,8 +44,8 @@ MEMORY
     CSM_RSVD_Z1     : origin = 0x00200024, length = 0x000C
     
     /* Flash Block 0, Sector 0 */
-    RESETISR (RX)   : origin = 0x00200030, length = 0x0008   /* Reset ISR is mapped to boot to Flash location */
-    INTVECS (RX)    : origin = 0x00201000, length = 0x0258
+    //RESETISR (RX)   : origin = 0x00200030, length = 0x0008   /* Reset ISR is mapped to boot to Flash location */
+    //INTVECS (RX)    : origin = 0x00201000, length = 0x0258
     
     //FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8   /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
     //FLASH_M (RX)    : origin = 0x00208000, length = 0x8000   /* Bootloader */
@@ -58,8 +58,9 @@ MEMORY
     //FLASH_G (RX)    : origin = 0x00280000, length = 0x20000
     //FLASH_F (RX)    : origin = 0x002A0000, length = 0x20000
     //!!FLASH_E (RX)    : origin = 0x002C0000, length = 0x20000
-    FLASH_E (RX)    : origin = 0x002C0000, length = 0x1FFFC  /* Application */
-    APP_START (RX)  : origin = 0x002DFFFC, length = 0x0004   /* App "main" address */
+    RESETISR (RX)   : origin = 0x002C0000, length = 0x0008   /* Reset ISR is mapped to boot to Flash location */
+    INTVECS (RX)    : origin = 0x002C1000, length = 0x0258
+    FLASH_E (RX)    : origin = 0x002C2000, length = 0x1DFFF  /* Application */
     //FLASH_D (RX)    : origin = 0x002E0000, length = 0x8000
     //FLASH_C (RX)    : origin = 0x002E8000, length = 0x8000
     //FLASH_B (RX)    : origin = 0x002F0000, length = 0x8000
@@ -106,20 +107,18 @@ MEMORY
 
 SECTIONS
 {
-    .intvecs:   > INTVECS, ALIGN(8)
+    .intvecs:   > INTVECS,  ALIGN(8)
     .resetisr:  > RESETISR, ALIGN(8)
-    .text   :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .const  :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .cinit  :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
-    .pinit  :   > FLASH_E, crc_table(AppCrc, algorithm=CRC32_PRIME), ALIGN(8)
+    .text   :   > FLASH_E,  ALIGN(8)
+    .const  :   > FLASH_E,  ALIGN(8)
+    .cinit  :   > FLASH_E,  ALIGN(8)
+    .pinit  :   > FLASH_E,  ALIGN(8)
 
     .vtable :   >  C0 | C1 | C2 | C3
     .data   :   >  C2 | C3
     .bss    :   >> C2 | C3
     .sysmem :   >  C0 | C1 | C2 | C3
     .stack  :   >  C0 | C1 | C2 | C3
-    
-    .TI.crctab : > FLASH_E, ALIGN(8)
     
     .z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
     .z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)
@@ -134,11 +133,9 @@ SECTIONS
                            RUN_START(RamfuncsRunStart),
                            RUN_SIZE(RamfuncsRunSize),
                            RUN_END(RamfuncsRunEnd),
-                           crc_table(AppCrc, algorithm=CRC32_PRIME),
                            PAGE = 0, ALIGN(8)
                            
-    APP_START_ADDR : > APP_START
-	FLS_APP_CRC : > FLS_E_CRC
+    FLS_APP_CRC : > FLS_E_CRC
 
     RAM_S0  : > S0
     RAM_S1  : > S1

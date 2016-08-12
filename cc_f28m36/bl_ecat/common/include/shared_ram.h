@@ -15,11 +15,11 @@
 #define FN_FOE_BUFF		0xF0E00BFF
 #define FN_APP_CRC		0x00000C4C
 #define FN_TEST_FLS     0x00007E57
-#define FN_JUMP_APP		0x06A77ACA
 
 // M3 RW shared RAM
 typedef struct {
 
+	uint16_t	boot_stage;
     uint32_t	foe_flashAddr;
 #ifdef _C28X
     uint16_t	foe_buffer[128];

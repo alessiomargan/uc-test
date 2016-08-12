@@ -30,8 +30,8 @@ __interrupt void MtoC_ipc1_isr(void)
             IPCMtoCFunctionCall(&sMessage);
             break;
         default:
-        	c28_rw_data.ipc_irq_err_cnt ++;
-        	c28_rw_data.ipc_irq_error = sMessage.ulcommand;
+        	c28_bl_rw_data.ipc_irq_err_cnt ++;
+        	c28_bl_rw_data.ipc_irq_error = sMessage.ulcommand;
         	break;
         }
     }
@@ -58,8 +58,8 @@ __interrupt void MtoC_ipc2_isr (void)
             IPCMtoCBlockRead(&sMessage);
             break;
         default:
-        	c28_rw_data.ipc_irq_err_cnt ++;
-        	c28_rw_data.ipc_irq_error = sMessage.ulcommand;
+        	c28_bl_rw_data.ipc_irq_err_cnt ++;
+        	c28_bl_rw_data.ipc_irq_error = sMessage.ulcommand;
         	break;
         }
     }
