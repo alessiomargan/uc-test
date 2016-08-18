@@ -162,6 +162,7 @@ int main(void)
     Configure_flashAPI();
     Configure_Ipc();
 
+
 	// Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
 
