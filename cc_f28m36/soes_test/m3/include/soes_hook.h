@@ -11,27 +11,27 @@
 
 
 typedef IAR_PACKED struct {
-    float        pos_ref;  //link
-    int16_t      vel_ref;  //link
-    int16_t      tor_ref;  //link
-    uint16_t     gains[5];
-    uint16_t     fault_ack;
-    uint16_t     ts;
-    uint16_t     op_idx_aux;    // op [get/set] , idx
-    float        aux;        // set value
+	float		pos_ref;  //link
+    float      	vel_ref;  //link
+    float      	tor_ref;  //link
+    float     	gains[5];
+    uint16_t    fault_ack;
+    uint16_t    ts;
+    uint16_t    op_idx_aux;    // op [get/set] , idx
+    float       aux;        // set value
 } CCS_PACKED rx_pdo_t;
 
 typedef IAR_PACKED struct {
-    float        link_pos;           // rad
-    float        motor_pos;           // rad
-    float        link_vel;            // rad
-    int16_t      motor_vel;             // rad/s
-    int16_t      torque;             // Nm
-    uint16_t     max_temperature;     // C
-    uint16_t     fault;
-    uint16_t     rtt;                // us
-    uint16_t     op_idx_ack;         // op [ack/nack] , idx
-    float        aux;                // get value or nack erro code
+    float   	link_pos;           // rad
+    float       motor_pos;           // rad
+    float       link_vel;            // rad
+    float      	motor_vel;             // rad/s
+    float      	torque;             // Nm
+    uint16_t    max_temperature;     // C
+    uint16_t    fault;
+    uint16_t    rtt;                // us
+    uint16_t    op_idx_ack;         // op [ack/nack] , idx
+    float		aux;                // get value or nack erro code
 } CCS_PACKED tx_pdo_t;
 
 typedef IAR_PACKED struct {

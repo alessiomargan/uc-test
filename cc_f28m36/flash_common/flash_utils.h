@@ -4,18 +4,18 @@
 #include <stdint.h>
 
 #ifdef _C28X
-	#include "F021_Concerto_C28x.h"
+	#include "c28/include/definitions.h"
+    #include "F021_Concerto_C28x.h"
 	#include "F28M36x_Device.h"
 	#include "F28M36x_GlobalPrototypes.h"
 	#include "F28M36x_Flash.h"
-	#include "c28/include/definitions.h"
-    #define DPRINT(...)
+	#define DPRINT(...)
 	#define  FLS_BANK_WIDTH	8
 #else
+	#include "m3/include/definitions.h"
 	#include "F021_Concerto_Cortex.h"
 	#include "driverlib/device.h"
 	#include "driverlib/flash.h"
-	#include "m3/include/definitions.h"
 	#define  FLS_BANK_WIDTH	16
 #endif
 

@@ -1,7 +1,7 @@
-#ifndef F28M36x_C28_DEF_H
-#define F28M36x_C28_DEF_H
+#ifndef __F28M36x_C28_DEF_H__
+#define __F28M36x_C28_DEF_H__
 
-#include "DSP28x_Project.h"
+#include "F28M36x_Device.h"     // F28M36x Headerfile Include File
 #include "F28M36x_Ipc_drivers.h"
 
 #include "common/include/shared_ram.h"

@@ -118,7 +118,7 @@ void ConfigureLed(void)
     GPIOPinTypeGPIOOutput(LED_1_BASE, LED_1_PIN);
 
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_7);
-    //GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_4);
 
     UARTprintf("%s\n",__FUNCTION__);
 }

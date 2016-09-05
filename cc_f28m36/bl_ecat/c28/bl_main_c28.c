@@ -31,6 +31,8 @@ extern Uint16 RamfuncsLoadSize;
 extern Uint16 RamfuncsRunStart;
 #endif
 
+inline void jump_to_app(void) { DINT; asm("	LB 0x137FF0"); }
+
 
 void main(void)
 {

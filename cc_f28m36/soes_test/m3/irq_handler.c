@@ -47,11 +47,10 @@ void GPIOGIntHandler(void) {
 	ecat_irq_cnt++;
 
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, GPIO_PIN_7);
-
     ecat_process_pdo();
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, 0);
 
     //UARTprintf("PDI irq %d\n", ecat_irq_cnt );
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, 0);
 }
 
 /**
@@ -64,8 +63,9 @@ void Timer0AIntHandler(void) {
 
     // Clear the timer interrupt.
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-
     timer0_cnt++;
+
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
 
     read_sensors();
 
@@ -87,6 +87,9 @@ void Timer0AIntHandler(void) {
     }
 
     GPIOPinWrite(LED_1_BASE, LED_1_PIN, toggle << 2 );
+
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_0);
+
 }
 
 

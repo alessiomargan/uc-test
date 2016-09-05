@@ -95,13 +95,13 @@ const _objd SDO1600[] =
 {
 	{0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "NumElem", 12, 0},
 	{0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000120, 0},
-	{0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000210, 0},
-	{0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000310, 0},
-	{0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000410, 0},
-	{0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000510, 0},
-	{0x6, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000610, 0},
-	{0x7, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000710, 0},
-	{0x8, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000810, 0},
+	{0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000220, 0},
+	{0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000320, 0},
+	{0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000420, 0},
+	{0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000520, 0},
+	{0x6, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000620, 0},
+	{0x7, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000720, 0},
+	{0x8, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000820, 0},
 	{0x9, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000910, 0},
 	{0xa, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000a10, 0},
 	{0xb, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_n, 0x70000b10, 0},
@@ -112,13 +112,13 @@ const _objd SDO7000[] =
 {
 	{0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "NumElem", 12, 0},
 	{0x1, DTYPE_REAL32,     32, ATYPE_RW, "Pos_ref",		0, &rx_pdo.pos_ref},
-	{0x2, DTYPE_INTEGER16,  16, ATYPE_RW, "Vel_ref",		0, &rx_pdo.vel_ref},
-	{0x3, DTYPE_INTEGER16,  16, ATYPE_RW, "Tor_ref",		0, &rx_pdo.tor_ref},
-	{0x4, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Gain_0", 		0, &rx_pdo.gains[0]}, // kp
-	{0x5, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Gain_1",			0, &rx_pdo.gains[1]}, // kd
-	{0x6, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Gain_2", 		0, &rx_pdo.gains[2]},
-	{0x7, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Gain_3", 		0, &rx_pdo.gains[3]},
-	{0x8, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Gain_4", 		0, &rx_pdo.gains[4]},
+	{0x2, DTYPE_REAL32,  	32, ATYPE_RW, "Vel_ref",		0, &rx_pdo.vel_ref},
+	{0x3, DTYPE_REAL32,  	32, ATYPE_RW, "Tor_ref",		0, &rx_pdo.tor_ref},
+	{0x4, DTYPE_REAL32, 	32, ATYPE_RW, "Gain_0", 		0, &rx_pdo.gains[0]}, // kp
+	{0x5, DTYPE_REAL32, 	32, ATYPE_RW, "Gain_1",			0, &rx_pdo.gains[1]}, // kd
+	{0x6, DTYPE_REAL32, 	32, ATYPE_RW, "Gain_2", 		0, &rx_pdo.gains[2]},
+	{0x7, DTYPE_REAL32, 	32, ATYPE_RW, "Gain_3", 		0, &rx_pdo.gains[3]},
+	{0x8, DTYPE_REAL32, 	32, ATYPE_RW, "Gain_4", 		0, &rx_pdo.gains[4]},
 	{0x9, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Fault_Ack", 		0, &rx_pdo.fault_ack},
 	{0xa, DTYPE_UNSIGNED16, 16, ATYPE_RW, "ts", 			0, &rx_pdo.ts},
 	{0xb, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Op_idx_aux", 	0, &rx_pdo.op_idx_aux},
@@ -132,8 +132,8 @@ const _objd SDO1A00[] =
 	{0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000120, 0},
 	{0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000220, 0},
 	{0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000320, 0},
-	{0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000410, 0},
-	{0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000510, 0},
+	{0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000420, 0},
+	{0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000520, 0},
 	{0x6, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000610, 0},
 	{0x7, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000710, 0},
 	{0x8, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_n, 0x60000810, 0},
@@ -143,17 +143,17 @@ const _objd SDO1A00[] =
 
 const _objd SDO6000[] =
 {
-	{0x0, DTYPE_UNSIGNED8,    8, ATYPE_RO, "NumElem", 10, 0},
-	{0x1, DTYPE_REAL32,      32, ATYPE_RO, "Link_position",			0, &tx_pdo.link_pos},
-	{0x2, DTYPE_REAL32,      32, ATYPE_RO, "Motor_position",		0, &tx_pdo.motor_pos},
-	{0x3, DTYPE_REAL32,      32, ATYPE_RO, "Link_velocity",			0, &tx_pdo.link_vel},
-	{0x4, DTYPE_INTEGER16,   16, ATYPE_RO, "Motor_velocity", 		0, &tx_pdo.motor_vel},
-	{0x5, DTYPE_INTEGER16,   16, ATYPE_RO, "Torque", 				0, &tx_pdo.torque},
-	{0x6, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Temperature", 			0, &tx_pdo.max_temperature},
-	{0x7, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Fault", 				0, &tx_pdo.fault},
-	{0x8, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Rtt", 					0, &tx_pdo.rtt},
-	{0x9, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Op_idx_ack", 			0, &tx_pdo.op_idx_ack},
-	{0xa, DTYPE_REAL32,  	 32, ATYPE_RO, "Aux", 					0, &tx_pdo.aux},
+	{0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "NumElem", 10, 0},
+	{0x1, DTYPE_REAL32,  	32, ATYPE_RO, "Link_position",			0, &tx_pdo.link_pos},
+	{0x2, DTYPE_REAL32,     32, ATYPE_RO, "Motor_position",			0, &tx_pdo.motor_pos},
+	{0x3, DTYPE_REAL32,     32, ATYPE_RO, "Link_velocity",			0, &tx_pdo.link_vel},
+	{0x4, DTYPE_REAL32,   	32, ATYPE_RO, "Motor_velocity", 		0, &tx_pdo.motor_vel},
+	{0x5, DTYPE_REAL32,  	32, ATYPE_RO, "Torque", 				0, &tx_pdo.torque},
+	{0x6, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Temperature", 			0, &tx_pdo.max_temperature},
+	{0x7, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Fault", 					0, &tx_pdo.fault},
+	{0x8, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Rtt", 					0, &tx_pdo.rtt},
+	{0x9, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Op_idx_ack", 			0, &tx_pdo.op_idx_ack},
+	{0xa, DTYPE_REAL32,  	32, ATYPE_RO, "Aux", 					0, &tx_pdo.aux},
 };
 
 

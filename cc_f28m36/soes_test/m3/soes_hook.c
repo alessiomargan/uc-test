@@ -202,14 +202,12 @@ void ecat_process_pdo(void) {
 	      RXPDO_update();
 	}
 
+	// RO aux_pod
+	aux_pdo.pos_ref_fb = rx_pdo.pos_ref;
+
 	if ( rx_pdo.op_idx_aux != 0 ) {
 		handle_aux_pdo();
 	}
-
-	aux_pdo.pos_ref_fb = rx_pdo.pos_ref;
-	aux_pdo.volt_ref = 0;
-	aux_pdo.vout = 0;
-	aux_pdo.current = 0;
 
 	tx_pdo.link_pos = rx_pdo.pos_ref;
 	tx_pdo.motor_pos = rx_pdo.pos_ref;

@@ -2,6 +2,7 @@
 #define __SHARED_RAM_H__
 
 #include <stdint.h>
+
 #ifdef _C28X
 	#include "F28M36x_Device.h"
 #else

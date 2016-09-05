@@ -1,13 +1,6 @@
-#include "F021_Concerto_C28x.h"
-
 #include "flash_utils.h"
-
 #include "c28/include/definitions.h"
 
-void jump_to_app(void) {
-	DINT;
-	asm("	LB 0x137FF0");
-}
 
 uint32_t calc_app_crc(void) {
 
