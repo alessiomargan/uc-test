@@ -184,13 +184,21 @@ const _objd SDO8001[] =
 
 };
 
+const _objd SDO8002[] =
+{
+  {0x0,  DTYPE_UNSIGNED8,    8, ATYPE_RO, "NumElem",  	3, 0},
+  {0x1,  DTYPE_REAL32,      32, ATYPE_RO, "pos_ref_fb", 0, &aux_pdo.pos_ref_fb},
+  {0x2,  DTYPE_REAL32,      32, ATYPE_RO, "iq_ref",     0, &aux_pdo.iq_ref},
+  {0x3,  DTYPE_REAL32,      32, ATYPE_RO, "iq_out",     0, &aux_pdo.iq_out}
+};
+
 const _objectlist SDOobjects[] =
 {
   {0x1000, OTYPE_VAR, 0, 0, acName1000, SDO1000},
   {0x1008, OTYPE_VAR, 0, 0, acName1008, SDO1008},
   {0x1009, OTYPE_VAR, 0, 0, acName1009, SDO1009},
   {0x100A, OTYPE_VAR, 0, 0, acName100A, SDO100A},
-  {0x1018, OTYPE_RECORD, 4, 0, acName1018, SDO1018},
+  {0x1018, OTYPE_RECORD,  4, 0, acName1018, SDO1018},
   {0x1600, OTYPE_RECORD, 12, 0,	"RxPDO Map", SDO1600},
   {0x1A00, OTYPE_RECORD, 10, 0,	"TxPDO Map", SDO1A00},
   {0x1C00, OTYPE_ARRAY, 4, 0,	acName1C00, SDO1C00},
@@ -199,7 +207,8 @@ const _objectlist SDOobjects[] =
   {0x6000, OTYPE_RECORD, 10, 0,	"TxPDO",	SDO6000},
   {0x7000, OTYPE_RECORD, 12, 0,	"RxPDO",	SDO7000},
   {0x8000, OTYPE_RECORD, 14, 0,	"Flash_par",SDO8000},
-  {0x8001, OTYPE_RECORD, 9, 0,	"Ram_par",	SDO8001},
+  {0x8001, OTYPE_RECORD,  9, 0,	"Ram_par",	SDO8001},
+  {0x8002, OTYPE_RECORD,  3, 0, "AuxPdo",   SDO8002},
   {0xffff, 0xff, 0xff, 0xff, 0, 0}
 };
 

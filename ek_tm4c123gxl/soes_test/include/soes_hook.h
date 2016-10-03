@@ -1,6 +1,14 @@
 #ifndef __SOES_HOOK_H__
 #define __SOES_HOOK_H__
 
+#ifdef ccs
+	#define IAR_PACKED
+	#define CCS_PACKED	__attribute__((__packed__))
+#else
+	#define IAR_PACKED 	__packed
+	#define CCS_PACKED
+#endif
+
 
 typedef struct {
     float       pos_ref;  //link
@@ -15,7 +23,7 @@ typedef struct {
     uint16_t    ts;
     uint16_t    op_idx_aux;  // op [get/set] , idx
     float       aux;         // set value
-} __attribute__((__packed__)) rx_pdo_t;
+} CCS_PACKED rx_pdo_t;
 
 
 typedef struct {
@@ -29,10 +37,9 @@ typedef struct {
     uint16_t     rtt;                // us
     uint16_t     op_idx_ack;         // op [ack/nack] , idx
     float        aux;                // get value or nack erro code
-} __attribute__((__packed__)) tx_pdo_t;
+} CCS_PACKED tx_pdo_t;
 
 typedef struct {
-
 	// Flash
     float   PosGainP;
     float   PosGainI;
@@ -54,8 +61,6 @@ typedef struct {
     int16_t Joint_number;
     int16_t Joint_robot_id;
     float   Target_velocity;
-
-
 	// Ram
 	char fw_ver[8];
     unsigned short ctrl_status_cmd;
@@ -67,12 +72,18 @@ typedef struct {
     float abs_pos;
     float m_current;
 
-} __attribute__((__packed__)) sdo_t;
+} CCS_PACKED sdo_t;
 
+typedef struct {
+	float   pos_ref_fb;
+	float	iq_ref;
+	float	iq_out;
+} CCS_PACKED aux_pdo_t;
 
-extern tx_pdo_t tx_pdo;
-extern rx_pdo_t rx_pdo;
-extern sdo_t	sdo;
+extern tx_pdo_t 	tx_pdo;
+extern rx_pdo_t 	rx_pdo;
+extern aux_pdo_t	aux_pdo;
+extern sdo_t		sdo;
 
 void setup_esc_configs(void);
 

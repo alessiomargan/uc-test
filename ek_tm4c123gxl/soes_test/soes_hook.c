@@ -13,6 +13,9 @@ int par_2;
 
 rx_pdo_t	rx_pdo;
 tx_pdo_t    tx_pdo;
+aux_pdo_t 	aux_pdo;
+
+
 sdo_t		sdo = {
 		.Min_pos = -0.123,
 		.Max_pos =  0.456,
