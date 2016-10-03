@@ -86,7 +86,6 @@ static void jump_to_M3_app(void) {
 	IntMasterDisable(); // disable interrupts
 	HWREG(NVIC_VTABLE) = 0x002C1000; // redirect the vector table
 	JumpStackPointerToAddress(0x002C0001); // jump to startup code of application
-
 }
 
 /**
@@ -98,17 +97,23 @@ static void jump_to_M3_app(void) {
 static bool test_jump_to_M3_app(void)
 {
 	uint32_t app_crc = calc_app_crc();
-	//et1100_boot_pin = ESC_GPO_LL() & 0x0004;
+#ifdef CONTROL_CARD
 	gET1100_boot_pin = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0);
-	gCrc_ok = ( (app_crc == gFlash_crc) && (gFlash_crc != 0xFFFFFFFF) );
-	OSAL_PRINT ("m3Crc_ok %d : calc 0x%X  flash 0x%X\n", gCrc_ok, app_crc, gFlash_crc);
-	return ( ! gET1100_boot_pin && gCrc_ok);
+#else
+	gET1100_boot_pin = GPIOPinRead(ECAT_GPIO_PORTBASE, ECAT_BOOT);
+#endif
+	m3_crc_ok = ( (app_crc == gFlash_crc) && (gFlash_crc != 0xFFFFFFFF) );
+	OSAL_PRINT ("m3Crc_ok %d : calc 0x%X  flash 0x%X\n", m3_crc_ok, app_crc, gFlash_crc);
+	return ( ! gET1100_boot_pin && m3_crc_ok);
 }
 
 static bool test_jump_to_C28_app(void)
 {
-	uint32_t c28_crc_ok;
+#ifdef CONTROL_CARD
 	gET1100_boot_pin = GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0);
+#else
+	gET1100_boot_pin = GPIOPinRead(ECAT_GPIO_PORTBASE, ECAT_BOOT);
+#endif
 	c28_crc_ok = ( (c28_bl_ro_data.flash_crc == c28_bl_ro_data.calc_crc) &&
 				   (c28_bl_ro_data.flash_crc != 0xFFFFFFFF) );
 	OSAL_PRINT ("c28Crc_ok %d : calc 0x%X  flash 0x%X\n",
@@ -162,9 +167,17 @@ int main(void)
     Configure_flashAPI();
     Configure_Ipc();
 
-
+#ifdef CONTROL_CARD
 	// Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
+#else
+    // Enable C28 Peripherals
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOR); //
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOS); //
+	// Give C28 Control of Ports
+	GPIOPinConfigureCoreSelect(GPIO_PORTR_BASE, GPIO_PIN_6,GPIO_PIN_C_CORE_SELECT); // DBG LED YLW
+	GPIOPinConfigureCoreSelect(GPIO_PORTS_BASE, GPIO_PIN_0,GPIO_PIN_C_CORE_SELECT); // DBG LED ORG
+#endif
 
 #ifdef _BOOT_C28
     //  Send boot command to allow the C28 application to begin execution
@@ -173,6 +186,7 @@ int main(void)
     IpcSync(IPC_FLAG17);
 #endif
 
+#ifdef CONTROL_CARD
     // only for test .. erase flash using SDO
 	if ( GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) ) {
 		if ( ! erase_M3_app_flash() ) 	{ DPRINT("Fail erase M3 flash\n"); }
@@ -181,6 +195,7 @@ int main(void)
 		if ( ! erase_C28_app_flash() )	{ DPRINT("Fail erase C28 flash\n"); }
 #endif
 	}
+#endif
 
 	gFlash_crc = *(uint32_t*)(M3_APP_CRC_ADDR);
 	DPRINT("c28 test_types 0x%02X 0x%04X 0x%04X%04X\n",
@@ -259,7 +274,11 @@ void do_morse_led(void) {
     }
     /////////////////////////////////////////////////////////////////
 
+#ifdef CONTROL_CARD
     GPIOPinWrite(LED_1_BASE, LED_1_PIN, led_status << 2 );
+#else
+    GPIOPinWrite(LED_GRN_BASE, LED_GRN_PIN, led_status ? LED_GRN_PIN : 0 );
+#endif
     //
     ipc_c28_bits(led_status);
 }

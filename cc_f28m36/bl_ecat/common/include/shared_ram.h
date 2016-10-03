@@ -35,6 +35,11 @@ typedef struct {
 
 typedef struct {
 
+#ifdef _C28X
+    uint16_t	bld_ver[8];
+#else
+    uint8_t		bld_ver[16];
+#endif
 	uint32_t	test_type_uint32;
 	uint16_t	test_type_uint16;
 	uint64_t	test_type_uint64;

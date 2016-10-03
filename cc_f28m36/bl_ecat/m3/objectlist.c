@@ -51,7 +51,7 @@ const _objd SDO1000[] =
 };
 const _objd SDO1008[] =
 {
-  {0x0, DTYPE_VISIBLE_STRING, 72, ATYPE_RO, acName1008_0, 0, "slavedemo"},
+  {0x0, DTYPE_VISIBLE_STRING, 128, ATYPE_RO, acName1008_0, 0, "F28M3x_bootldr"},
 };
 const _objd SDO1009[] =
 {
@@ -113,15 +113,17 @@ const _objd SDO7000[] =
   {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, "Number of Elements", 0, 0},
 };
 
-const _objd SDO8001[] =
+const _objd SDO8000[] =
 {
-  {0x0, DTYPE_UNSIGNED8,     	 8, ATYPE_RO,   "Number of Elements",   6, 0},
+  {0x0, DTYPE_UNSIGNED8,     	 8, ATYPE_RO,   "Number of Elements",   8, 0},
   {0x1, DTYPE_UNSIGNED16,   	16, ATYPE_RW, 	"flash_cmd",  		0, &gFlash_cmd},
   {0x2, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"flash_cmd_ack",	0, &gFlash_cmd_ack},
   {0x3, DTYPE_UNSIGNED32,   	32, ATYPE_RO, 	"flash_crc",  		0, &gFlash_crc},
-  {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "bl_ver",   		0, &gBL_ver},
-  {0x5, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"crc_ok",  			0, &gCrc_ok},
-  {0x6, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"et1100_boot_pin",	0, &gET1100_boot_pin},
+  {0x4, DTYPE_VISIBLE_STRING,  128, ATYPE_RO,   "m3_bl_ver",   		0, &gBL_ver},
+  {0x5, DTYPE_VISIBLE_STRING,  128, ATYPE_RO,   "c28_bl_ver",   	0, &c28_bl_ro_data.bld_ver},
+  {0x6, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"m3_crc_ok",  		0, &m3_crc_ok},
+  {0x7, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"c28_crc_ok",  		0, &c28_crc_ok},
+  {0x8, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"et1100_boot_pin",	0, &gET1100_boot_pin},
 
 };
 
@@ -141,7 +143,7 @@ const _objectlist SDOobjects[] =
   {0x1C13, OTYPE_ARRAY,  1,  0, acName1C13, SDO1C13},
   {0x6000, OTYPE_RECORD, 0,  0, acName6000, SDO6000},
   {0x7000, OTYPE_RECORD, 0,  0, acName7000, SDO7000},
-  {0x8001, OTYPE_RECORD, 6,  0, acName8001, SDO8001},
+  {0x8000, OTYPE_RECORD, 8,  0, "Ram Param", SDO8000},
   {0xffff, 0xff, 0xff, 0xff, 0, 0}
 };
 

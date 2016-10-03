@@ -24,6 +24,8 @@
 #include "c28/include/definitions.h"
 #include "common/include/shared_ram.h"
 
+const char 	c28_firmware_version[16] = "c28_F28M3x_1.0"; // YYMMDDHH
+
 #ifdef _FLASH
 // These are defined by the linker (see device linker command file)
 extern Uint16 RamfuncsLoadStart;
@@ -32,6 +34,19 @@ extern Uint16 RamfuncsRunStart;
 #endif
 
 inline void jump_to_app(void) { DINT; asm("	LB 0x137FF0"); }
+
+inline void Copy_string_to_M3(int16 *src, int16 *dst, uint16_t byte_length)  {
+
+	int n = 0;
+	while(*src && byte_length--) {
+		__byte(dst,n) = *src;
+		n++;
+		src++;
+	}
+	__byte(dst,n) = *src;
+}
+
+
 
 
 void main(void)
@@ -95,6 +110,7 @@ void main(void)
 	c28_bl_rw_data.test_type_uint32 = 0xdeadbeef;
 	c28_bl_rw_data.test_type_uint16 = 0xcafe;
 	c28_bl_rw_data.test_type_uint64 = 0xf1cadeadbeefdad0;
+	Copy_string_to_M3((int16*)c28_firmware_version, (int16*)c28_bl_rw_data.bld_ver, 16);
 
 	//Synchronize the two CPUs.
 	IpcSync(IPC_FLAG17);
@@ -102,8 +118,11 @@ void main(void)
 
 	for(;;) {
     	// loop
+#ifdef CONTROL_CARD
 		if (bootM3bits) { LED_0_ON; } else { LED_0_OFF; }
-
+#else
+		if (bootM3bits) { DEBUG_ORG_LED_ON; } else { DEBUG_ORG_LED_OFF; }
+#endif
 		if ( m3_bl_ro_data.boot_stage == 0xB007 ) { jump_to_app(); }
     }
 }

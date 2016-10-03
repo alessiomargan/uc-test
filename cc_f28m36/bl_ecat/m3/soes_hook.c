@@ -43,14 +43,15 @@ extern foe_writefile_cfg_t      gFOE_firmware_files[];
 uint16 	gFlash_cmd;
 uint16 	gFlash_cmd_ack;
 uint32 	gFlash_crc;
-uint16  gCrc_ok;
+uint16  m3_crc_ok;
+uint16  c28_crc_ok;
 uint16  gET1100_boot_pin;
-char 	gBL_ver[8] = "cert_1.0";
+char 	gBL_ver[16] = "m3_F28M3x_1.0";
 
 #pragma DATA_SECTION(gFlash_crc,"FLS_APP_CRC");
 
 
-void handle_sdo_0x8001_01(void)
+void handle_sdo_0x8000_01(void)
 {
 	bool	success = false;
 
@@ -75,12 +76,12 @@ void handle_sdo_0x8001_01(void)
 
 }
 
-void handle_sdo_0x8001(uint8 subindex)
+void handle_sdo_0x8000(uint8 subindex)
 {
 	switch ( subindex ) {
 		// 0x8001:01 flash_cmd
 		case 1:
-			handle_sdo_0x8001_01();
+			handle_sdo_0x8000_01();
 			break;
 		default:
 			break;
@@ -97,9 +98,9 @@ void handle_sdo_0x8001(uint8 subindex)
 void ESC_objecthandler (uint16 index, uint8 subindex)
 {
     switch ( index ) {
-    	case 0x8001:
+    	case 0x8000:
 		{
-			handle_sdo_0x8001(subindex);
+			handle_sdo_0x8000(subindex);
 			break;
 		}
         default:

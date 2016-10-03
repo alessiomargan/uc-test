@@ -45,16 +45,23 @@ void Configure_C28_Ipc(void)
 void Configure_C28_Gpio(void)
 {
 	EALLOW;
-
+#ifdef CONTROL_CARD
 	// control card led_0
 	GpioG1CtrlRegs.GPADIR.bit.GPIO31 = 1;
     // debug pin
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO70 = 1;
 
-    EDIS;
-
 	LED_0_OFF;// turn off LED
 	DEBUG_PIN_OFF;
+#else
+	GpioG1CtrlRegs.GPDMUX2.bit.GPIO126 = 0;  // GPIO126 = GPIO			--> DEBUG YELLOW LED
+	GpioG1CtrlRegs.GPDDIR.bit.GPIO126 = 1;   // OUTPUT
+
+	GpioG1CtrlRegs.GPEMUX1.bit.GPIO128 = 0;  // GPIO128 = GPIO			--> DEBUG ORANGE LED
+	GpioG1CtrlRegs.GPEDIR.bit.GPIO128 = 1;   // OUTPUT
+#endif
+    EDIS;
+
 }
 
 
