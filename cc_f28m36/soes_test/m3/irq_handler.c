@@ -25,30 +25,21 @@
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
-extern m3_rw_data_t		m3_rw_data;
-extern c28_rw_data_t	c28_ro_data;
-
-void M3_wr_shared() {
-
-    m3_rw_data.v_int16++;
-    m3_rw_data.v_int32++;
-    m3_rw_data.v_uint64++;
-    m3_rw_data.v_float = 0.12345f;
-
-}
+extern m3_rw_data_t    m3_rw_data;
+extern c28_rw_data_t   c28_ro_data;
 
 /**
  * 
  */
-void GPIOGIntHandler(void) {
+void EcatIntHandler(void) {
 
 	GPIOPinRead(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 	GPIOPinIntClear(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 	ecat_irq_cnt++;
 
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, GPIO_PIN_7);
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, GPIO_PIN_7);
     ecat_process_pdo();
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, 0);
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, 0);
 
     //UARTprintf("PDI irq %d\n", ecat_irq_cnt );
 }
@@ -65,30 +56,35 @@ void Timer0AIntHandler(void) {
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     timer0_cnt++;
 
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
 
     read_sensors();
+	//Process_ADC_EXT_AD7680();
+    //Process_Link_encoder_read();
 
-    if ( ! DC_activation() ) {
+	if ( ! DC_activation() ) {
         ecat_process_pdo();
     }
 
     // every cycle
 	soes_loop();
 
-    //
-    M3_wr_shared();
+
 
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle 
         HWREGBITB(&toggle, 0) ^= 1;
-        UARTprintf("\r tmr0: %d %d %d", timer0_cnt, toggle, m3_rw_data.v_int32 );
+        UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle);
     }
 
+#ifdef CONTROL_CARD
     GPIOPinWrite(LED_1_BASE, LED_1_PIN, toggle << 2 );
+#else
+    GPIOPinWrite(LED_GRN_BASE, LED_GRN_PIN, toggle ? LED_GRN_PIN : 0 );
+#endif
 
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_0);
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, 0);
 
 }
 

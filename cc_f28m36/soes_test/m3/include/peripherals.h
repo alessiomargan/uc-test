@@ -3,6 +3,7 @@
 
 void ConfigureUART(void);
 void ConfigureEcatPDI(void);
+void Configure_Link_Enc_BissC(void);
 void ConfigureLed(void);
 void ConfigureTimer(void);
 void Watchdog0Reset(void);

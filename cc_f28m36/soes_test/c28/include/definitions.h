@@ -25,14 +25,23 @@ extern "C" {
 #endif
 
 
+#ifdef CONTROL_CARD
+
 #define DEBUG_PIN_ON		GpioDataRegs.GPCSET.bit.GPIO70 = 1;
 #define DEBUG_PIN_OFF		GpioDataRegs.GPCCLEAR.bit.GPIO70 = 1;
 #define DEBUG_PIN_TOGGLE	GpioDataRegs.GPCTOGGLE.bit.GPIO70 = 1;
 
-#define LED_0_ON 		GpioDataRegs.GPASET.bit.GPIO31 = 1;
-#define LED_0_OFF 		GpioDataRegs.GPACLEAR.bit.GPIO31 = 1;
-#define LED_0_TOGGLE	GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
+#define LED_0_ON 			GpioDataRegs.GPASET.bit.GPIO31 = 1;
+#define LED_0_OFF 			GpioDataRegs.GPACLEAR.bit.GPIO31 = 1;
+#define LED_0_TOGGLE		GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
 
+#else
+
+#define DEBUG_ORG_LED_ON	GpioG1DataRegs.GPESET.bit.GPIO128 = 1;
+#define DEBUG_ORG_LED_OFF	GpioG1DataRegs.GPECLEAR.bit.GPIO128 = 1;
+#define DEBUG_ORG_LED_TGL	GpioG1DataRegs.GPETOGGLE.bit.GPIO128 = 1;
+
+#endif
 
 extern void cpu_timer0_isr(void);
 extern void cpu_timer1_isr(void);

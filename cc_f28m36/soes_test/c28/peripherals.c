@@ -84,12 +84,25 @@ void Configure_C28_Timer(void)
 void Configure_C28_Gpio(void)
 {
 	EALLOW;
-
+#ifdef CONTROL_CARD
 	// control card led_0
 	GpioG1CtrlRegs.GPADIR.bit.GPIO31 = 1;
     // debug pin
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO70 = 1;
 
+	LED_0_OFF;// turn off LED
+	DEBUG_PIN_OFF;
+#else
+	GpioG1CtrlRegs.GPDMUX2.bit.GPIO126 = 0;  // GPIO126 = GPIO			--> DEBUG YELLOW LED
+	GpioG1CtrlRegs.GPDDIR.bit.GPIO126 = 1;   // OUTPUT
+
+	GpioG1CtrlRegs.GPEMUX1.bit.GPIO128 = 0;  // GPIO128 = GPIO			--> DEBUG ORANGE LED
+	GpioG1CtrlRegs.GPEDIR.bit.GPIO128 = 1;   // OUTPUT
+#endif
+    EDIS;
+
+#if 0
+	EALLOW;
 	// PH0_GPIO48/49/50
 	GpioG1CtrlRegs.GPBMUX2.bit.GPIO48 = 0;
 	GpioG1CtrlRegs.GPBDIR.bit.GPIO48 = 0;
@@ -111,10 +124,8 @@ void Configure_C28_Gpio(void)
 	IER |= M_INT1;
 	// Enable XINT1_ISR in the PIE: Group 1 interrupt 4
 	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;
+#endif
 
-
-	LED_0_OFF;// turn off LED
-	DEBUG_PIN_OFF;
 }
 
 

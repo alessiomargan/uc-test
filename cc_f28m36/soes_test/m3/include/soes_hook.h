@@ -35,14 +35,42 @@ typedef IAR_PACKED struct {
 } CCS_PACKED tx_pdo_t;
 
 typedef IAR_PACKED struct {
-    float	volt_ref;
-    float	current;
-    float	vout;
-    float   pos_ref_fb;
+	float   pos_ref_fb;
+	float	iq_ref;
+	float	iq_out;
 } CCS_PACKED aux_pdo_t;
 
+
 typedef IAR_PACKED struct {
-    //
+
+	uint16_t 	Hardware_configuration;	// 0xABCD
+	    									// A = curr_sensor_type: 	0 = none 	1 = 6A 			2 = 10A 			3 = 20A			4 = 35A
+											// B = link enc type: 		0 = none	1 = 19-bit	 	2 = 20-bit
+											// C = torque_sensor_type: 	0 = none 	1 = analog DSP 	2 = analog_ext_ADC  3 = defl 19-bit 4 = defl 20-bit
+											// D = number of pole pair
+
+	uint16_t	Motor_gear_ratio;
+
+	float		Motor_electrical_phase_angle;
+	float 		Torsion_bar_stiffness;
+
+	float		CurrGainP;
+	float		CurrGainI;
+
+	float 		Max_cur;
+	float 		Max_tor;
+	float 		Max_vel;
+
+	float 		Joint_Min_pos;
+	float 		Joint_Max_pos;
+
+	float		Calibration_angle;
+	float 		Enc_offset;
+
+	int  		Joint_number;
+	int  		Joint_Robot_ID;
+
+	//
     float   PosGainP;
     float   PosGainI;
     float   PosGainD;
@@ -51,12 +79,6 @@ typedef IAR_PACKED struct {
     float   TorGainD;
     float   Pos_I_lim;
     float   Tor_I_lim;
-    float   Min_pos;
-    float   Max_pos;
-    float   Max_tor;
-    float   Max_cur;
-    int16_t Joint_number;
-    int16_t Joint_robot_id;
 
     char 		fw_ver[8];
     uint32_t	board_faults;

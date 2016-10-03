@@ -78,7 +78,7 @@ __interrupt void cpu_timer0_isr(void)
 	//Toggle debug pin
 	//if ( CpuTimer0.InterruptCount % 2 ) {
 	if ( m3_ro_data.v_int32 % 2 ) {
-		DEBUG_PIN_TOGGLE;
+		//DEBUG_PIN_TOGGLE;
 	}
 	// Acknowledge this interrupt to receive more interrupts from group 1
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
@@ -97,8 +97,11 @@ __interrupt void cpu_timer2_isr(void)
 	EALLOW;
 	CpuTimer2.InterruptCount++;
 
+#ifdef CONTROL_CARD
 	LED_0_TOGGLE;
-
+#else
+	DEBUG_ORG_LED_TGL;
+#endif
 	// The CPU acknowledges the interrupt.
 	EDIS;
 }

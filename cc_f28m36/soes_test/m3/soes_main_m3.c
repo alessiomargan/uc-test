@@ -94,17 +94,20 @@ int main(void)
     FlashInit();
 #endif
 
-    // assign S0 of the shared ram for use by the M3
+    // assign S1 of the shared ram for use by the M3
     RAMMReqSharedMemAccess((S1_ACCESS), SX_M3MASTER);
-    // assign S4 of the shared ram for use by the C28
+    // assign S5 of the shared ram for use by the C28
     RAMMReqSharedMemAccess((S5_ACCESS), SX_C28MASTER);
 
     //
     ConfigureUART();
     ConfigureLed();
     ConfigureEcatPDI();
-    ConfigureTimer();
+    //Configure_Link_Enc_BissC();
+    //Configure_AD7680();
+	ConfigureTimer();
 
+#ifdef CONTROL_CARD
     // Enable C28 Peripherals
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA); // ePWM
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC); //
@@ -115,6 +118,21 @@ int main(void)
 	GPIOPinConfigureCoreSelect(GPIO_PORTH_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
 	// Give C28 control of LED_0 Port E pin 7
     GPIOPinConfigureCoreSelect(LED_0_BASE, LED_0_PIN, GPIO_PIN_C_CORE_SELECT);
+#else
+    // Enable C28 Peripherals
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA); // ePWM
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC); //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH); //
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOR); //
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOS); //
+     // Give C28 Control of Port C
+ 	GPIOPinConfigureCoreSelect(GPIO_PORTA_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
+ 	GPIOPinConfigureCoreSelect(GPIO_PORTC_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
+ 	GPIOPinConfigureCoreSelect(GPIO_PORTH_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
+	GPIOPinConfigureCoreSelect(GPIO_PORTR_BASE, GPIO_PIN_6,GPIO_PIN_C_CORE_SELECT); // DBG LED YLW
+	GPIOPinConfigureCoreSelect(GPIO_PORTS_BASE, GPIO_PIN_0,GPIO_PIN_C_CORE_SELECT); // DBG LED ORG
+#endif
+
 
 #ifdef _BOOT_C28
     //  Send boot command to allow the C28 application to begin execution
@@ -126,8 +144,11 @@ int main(void)
     //The hardware priority mechanism will only look at the upper N bits of the priority level
     //where N is 3 for the Concerto family
     IntPrioritySet(INT_TIMER0A, 0x5);
+#ifdef CONTROL_CARD
     IntPrioritySet(INT_GPIOG,   0x5);
-
+#else
+    IntPrioritySet(INT_GPIOK,   0x5);
+#endif
     // Enable processor interrupts.
     IntMasterEnable();
 

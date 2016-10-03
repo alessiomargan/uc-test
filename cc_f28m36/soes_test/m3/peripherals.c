@@ -30,15 +30,14 @@
 #include "soes/utypes.h"
 #include "soes/esc.h"
 
-extern void GPIOGIntHandler(void);
+extern void EcatIntHandler(void);
 extern void Timer0AIntHandler(void);
 
 void disable_peripheral_irq(void)
 {
 
-	//IntDisable(INT_PWM1_1);
-    IntDisable(INT_TIMER0A);
-    IntDisable(INT_GPIOB);
+	IntDisable(INT_TIMER0A);
+    //IntDisable(INT_GPIOB);
 
 }
 
@@ -50,12 +49,21 @@ void disable_peripheral_irq(void)
  */
 void ConfigureUART(void)
 {
-    // Enable the GPIO Peripheral used by the UART.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+#ifdef CONTROL_CARD
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     GPIOPinConfigure(GPIO_PE4_U0RX);
     GPIOPinConfigure(GPIO_PE5_U0TX);
     GPIOPinTypeUART(GPIO_PORTE_BASE, GPIO_PIN_4 | GPIO_PIN_5);
     UARTStdioInit(0);
+#else
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
+    GPIOPinConfigure(GPIO_PG1_U2TX);
+    GPIOPinConfigure(GPIO_PG0_U2RX);
+    GPIOPinTypeUART(GPIO_PORTG_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    UARTStdioInit(2);
+#endif
+    UARTprintf("************************\n");
+    UARTprintf("%s\n",__FUNCTION__);
 }
 
 /**
@@ -74,10 +82,15 @@ void ConfigureEcatPDI (void)
 	GPIOPinTypeGPIOOutput(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS);
     GPIOPinWrite(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS, ECAT_SSI_CS);
     // Configure the pin muxing for SSI functions on port
+#ifdef CONTROL_CARD
     GPIOPinConfigure(GPIO_PD2_SSI0CLK);
-    //ROM_GPIOPinConfigure(GPIO_PB5_SSI2FSS);
     GPIOPinConfigure(GPIO_PD1_SSI0RX); // MISO
     GPIOPinConfigure(GPIO_PD0_SSI0TX); // MOSI
+#else
+    GPIOPinConfigure(GPIO_PR2_SSI3CLK);
+    GPIOPinConfigure(GPIO_PR1_SSI3RX); // MISO
+    GPIOPinConfigure(GPIO_PR0_SSI3TX); // MOSI
+#endif
     // Configure the GPIO settings for the SSI pins.  This function also gives
     // control of these pins to the SSI hardware.
     GPIOPinTypeSSI(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_PINS);
@@ -95,12 +108,72 @@ void ConfigureEcatPDI (void)
     // Configure the SPI INT pin as interrupt on falling edge.
     GPIOIntTypeSet(ECAT_GPIO_PORTBASE, ECAT_IRQ, GPIO_FALLING_EDGE);
 
-    GPIOPinIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
-    IntRegister(INT_GPIOG, GPIOGIntHandler);
-    IntEnable(INT_GPIOG);
+    // ET1100 pin
+	GPIOPinTypeGPIOInput(ECAT_GPIO_PORTBASE, ECAT_BOOT);
 
+    GPIOPinIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
+#ifdef CONTROL_CARD
+    IntRegister(INT_GPIOG, EcatIntHandler);
+    IntEnable(INT_GPIOG);
+#else
+    IntRegister(INT_GPIOK, EcatIntHandler);
+    IntEnable(INT_GPIOK);
+#endif
     UARTprintf("%s\n",__FUNCTION__);
 
+}
+
+void Configure_Link_Enc_BissC (void)
+{
+	// SSI0
+	// peripheralsz must be enabled for use.
+	SysCtlPeripheralEnable(LINK_ENC_SSI_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LINK_ENC_SSI_GPIO_SYSCTL_PERIPH);
+
+    // Configure the pin muxing for SSI functions on port
+    GPIOPinConfigure(GPIO_PE2_SSI1CLK);
+    GPIOPinConfigure(GPIO_PE1_SSI1RX); // MISO
+
+    // Configure the GPIO settings for the SSI pins.  This function also gives
+    // control of these pins to the SSI hardware.
+    GPIOPinTypeSSI(LINK_ENC_SSI_GPIO_PORTBASE, LINK_ENC_SSI_PINS);
+
+    // Configure and enable the SSI port for SPI master mode.
+    // Use SSI, system clock supply, idle clock level high and active low clock in
+    // freescale SPI mode, master mode, 5MHz SSI frequency, and 16-bit data.
+    SSIConfigSetExpClk(LINK_ENC_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_2, SSI_MODE_MASTER, 1000000, 16);
+    // Enable the SSI module.
+    SSIEnable(LINK_ENC_SSI_BASE);
+
+    UARTprintf("%s\n",__FUNCTION__);
+}
+
+void Configure_AD7680 (void)
+{
+	// SSI0
+	// peripheralsz must be enabled for use.
+	SysCtlPeripheralEnable(LINK_ENC_SSI_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LINK_ENC_SSI_GPIO_SYSCTL_PERIPH);
+
+	GPIOPinTypeGPIOOutput(LINK_ENC_SSI_GPIO_PORTBASE, GPIO_PIN_3);
+	GPIOPinWrite(LINK_ENC_SSI_GPIO_PORTBASE, GPIO_PIN_3, GPIO_PIN_3);
+
+    // Configure the pin muxing for SSI functions on port
+    GPIOPinConfigure(GPIO_PE2_SSI1CLK);
+    GPIOPinConfigure(GPIO_PE1_SSI1RX); // MISO
+
+    // Configure the GPIO settings for the SSI pins.  This function also gives
+    // control of these pins to the SSI hardware.
+    GPIOPinTypeSSI(LINK_ENC_SSI_GPIO_PORTBASE, LINK_ENC_SSI_PINS);
+
+    // Configure and enable the SSI port for SPI master mode.
+    // Use SSI, system clock supply, idle clock level high and active low clock in
+    // freescale SPI mode, master mode, 5MHz SSI frequency, and 16-bit data.
+    SSIConfigSetExpClk(LINK_ENC_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 1000000, 8);
+    // Enable the SSI module.
+    SSIEnable(LINK_ENC_SSI_BASE);
+
+    UARTprintf("%s\n",__FUNCTION__);
 }
 
 /**
@@ -111,14 +184,34 @@ void ConfigureEcatPDI (void)
 void ConfigureLed(void)
 {
     // Enable the GPIO port that is used for the on-board LED.
+#ifdef CONTROL_CARD
+    // Enable the GPIO port that is used for the on-board LED.
     SysCtlPeripheralEnable(LED_1_PERIPH);
     SysCtlPeripheralEnable(LED_0_PERIPH);
-
-    // control card led1
+    // control card : led1 - PORT F2
     GPIOPinTypeGPIOOutput(LED_1_BASE, LED_1_PIN);
-
+    // control card :
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_7);
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_4);
+    // control card : erase flash : PORT F0
+    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0);
+#else
+    // Enable the GPIO port that is used for the on-board LED.
+	SysCtlPeripheralEnable(LED_DBG_1_PERIPH);
+	SysCtlPeripheralEnable(LED_DBG_2_PERIPH);
+	SysCtlPeripheralEnable(LED_RED_PERIPH);
+	SysCtlPeripheralEnable(LED_GRN_PERIPH);
+
+	GPIOPinTypeGPIOOutput(LED_DBG_1_BASE, LED_DBG_1_PIN);
+	GPIOPinTypeGPIOOutput(LED_DBG_2_BASE, LED_DBG_2_PIN);
+	GPIOPinTypeGPIOOutput(LED_RED_BASE, LED_RED_PIN);
+	GPIOPinTypeGPIOOutput(LED_GRN_BASE, LED_GRN_PIN);
+
+	GPIOPinWrite(LED_DBG_1_BASE, LED_DBG_1_PIN,0);
+	GPIOPinWrite(LED_DBG_2_BASE, LED_DBG_2_PIN,0);
+	GPIOPinWrite(LED_RED_BASE, LED_RED_PIN,0);
+	GPIOPinWrite(LED_GRN_BASE, LED_GRN_PIN,0);
+
+#endif
 
     UARTprintf("%s\n",__FUNCTION__);
 }
