@@ -69,10 +69,7 @@ void Timer0AIntHandler(void) {
     if ( ! DC_activation() ) {
         ecat_process_pdo();
     }
-    // every 10 cycles
-    if ( (timer0_cnt % 10) == 0 ) {
-        soes_loop();
-    }
+	soes_loop();
 
 
     // every 1000 cycles

@@ -7,18 +7,17 @@
 #include "soes_hook.h"
 #include "osal.h"
 
+//#define DPRINT(...)
+#define DPRINT UARTprintf
 
-int par_1;
-int par_2;
-
-rx_pdo_t	rx_pdo;
+rx_pdo_t    rx_pdo;
 tx_pdo_t    tx_pdo;
-aux_pdo_t 	aux_pdo;
+aux_pdo_t	aux_pdo;
+sdo_t		sdo;
 
 
 sdo_t		sdo = {
-		.Min_pos = -0.123,
-		.Max_pos =  0.456,
+		.board_id = 696,
 		.fw_ver = "_(@)(@)_",
 };
 
@@ -80,7 +79,7 @@ void ESC_objecthandler (uint16 index, uint8 subindex)
                 /* Handle post-write of parameter values */
                 switch ( subindex ) {
                     default:
-                        DPRINT("post-write param %d %d\n", par_1, par_2);
+                        DPRINT("post-write param %d %d\n", index, subindex);
                         break;
                 }
                 break;
@@ -144,6 +143,53 @@ void setup_esc_configs(void) {
 
 }
 
+#define AUX_PDO_OP_SET 0xFB
+#define AUX_PDO_OP_GET 0xBF
+#define AUX_PDO_OP_ACK 0x00
+#define AUX_PDO_OP_NAC 0xEE
+
+#define AUX_PDO_EE_INVALID_OP   0xE1
+#define AUX_PDO_EE_INVALID_IDX  0xE2
+#define AUX_PDO_EE_READONLY     0xE3
+extern const _objd SDO8002[];
+
+void handle_aux_pdo(void) {
+
+    const _objd * pobjd;
+    uint8 op  = rx_pdo.op_idx_aux >> 8;
+    uint8 idx = rx_pdo.op_idx_aux & 0xFF;
+
+    //UARTprintf("%s %d %d\n", __FUNCTION__, op, idx );
+
+    if ( ! (op == AUX_PDO_OP_SET || op == AUX_PDO_OP_GET) ) {
+        tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
+        tx_pdo.aux = (float)AUX_PDO_EE_INVALID_OP;
+        return;
+    }
+    pobjd = SDO8002;
+    if ( idx < 1 || idx > pobjd->value ) {
+        tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
+        tx_pdo.aux = (float)AUX_PDO_EE_INVALID_IDX;
+        return;
+    }
+    pobjd = SDO8002+idx;
+    if ( op == AUX_PDO_OP_SET && pobjd->access == ATYPE_RO ) {
+        tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
+        tx_pdo.aux = (float)AUX_PDO_EE_READONLY;
+        return;
+    }
+    // op & idx are valid
+    tx_pdo.op_idx_ack = (AUX_PDO_OP_ACK << 8) | idx;
+    if ( op == AUX_PDO_OP_SET ) {
+        *(float*)(pobjd->data) = rx_pdo.aux;
+        tx_pdo.aux = rx_pdo.aux;
+    }
+    if ( op == AUX_PDO_OP_GET ) {
+        tx_pdo.aux = *(float*)(pobjd->data);
+    }
+
+}
+
 
 /**
  *
@@ -156,15 +202,23 @@ void ecat_process_pdo(void) {
 	      RXPDO_update();
 	}
 
+	// set RO aux
+	aux_pdo.pos_ref_fb =  0;
+	aux_pdo.volt_ref = 0;
+	aux_pdo.vout = 0;
+	aux_pdo.current = 0;
+
+	// set tx_pdo.op_idx_ack and tx_pdo.aux
+	if ( rx_pdo.op_idx_aux != 0 ) {
+		handle_aux_pdo();
+	}
+
     tx_pdo.link_pos = rx_pdo.pos_ref;
     tx_pdo.motor_pos = rx_pdo.pos_ref;
-    tx_pdo.link_vel = rx_pdo.vel_ref;
-    tx_pdo.motor_vel = rx_pdo.vel_ref;
-    tx_pdo.torque = rx_pdo.tor_ref;
-    //
+    tx_pdo.link_vel = 0;
+    tx_pdo.motor_vel = 0;
+    tx_pdo.torque = 0;
     tx_pdo.rtt = rx_pdo.ts;
-    // get/set:idx_var
-    rx_pdo.op_idx_aux;
 
     TXPDO_update();
 }

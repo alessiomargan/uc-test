@@ -26,15 +26,15 @@
 void init_PWM(void)
 {
     // Set the PWM clock to the system clock / 4.
-    ROM_SysCtlPWMClockSet(SYSCTL_PWMDIV_4);
+    SysCtlPWMClockSet(SYSCTL_PWMDIV_4);
 
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1);
 
-    ROM_GPIOPinConfigure(GPIO_PA6_M1PWM2);
-    ROM_GPIOPinConfigure(GPIO_PA7_M1PWM3);
+    GPIOPinConfigure(GPIO_PA6_M1PWM2);
+    GPIOPinConfigure(GPIO_PA7_M1PWM3);
 
-    ROM_GPIOPinTypePWM(GPIO_PORTA_BASE, GPIO_PIN_6 | GPIO_PIN_7);
+    GPIOPinTypePWM(GPIO_PORTA_BASE, GPIO_PIN_6 | GPIO_PIN_7);
 
 
     // Configure the three PWM generators for up/down counting mode, synchronous updates
