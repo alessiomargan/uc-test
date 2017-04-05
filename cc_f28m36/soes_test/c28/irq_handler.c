@@ -86,6 +86,7 @@ __interrupt void cpu_timer0_isr(void)
 
 __interrupt void cpu_timer1_isr(void)
 {
+	EALLOW;
 	CpuTimer1.InterruptCount++;
 
 	// The CPU acknowledges the interrupt.

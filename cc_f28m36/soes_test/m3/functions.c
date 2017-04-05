@@ -27,11 +27,11 @@
 #include "soes_hook.h"
 #include "peripherals.h"
 #include "flash_utils.h"
+#include "shared_ram.h"
 
 #include "soes/utypes.h"
 #include "soes/esc.h"
 
-extern m3_rw_data_t    m3_rw_data;
 
 #define		FLASH_C_ADDX (0x002E8000)
 
@@ -40,9 +40,8 @@ uint32_t 	rls_link_read = 0;
 uint16_t 	rls_link_error, rls_link_warning;
 float		enc_link_pos = 0, previous_enc_link_pos = 0;
 
-#define LINK_ENC_AKSIM_19_BIT	0xAAAA
-#define LINK_ENC_AKSIM_20_BIT	0xBBBB
-
+#define LINK_ENC_AKSIM_19_BIT 	0x0019
+#define LINK_ENC_AKSIM_20_BIT 	0x0020
 uint32_t Link_encoder_type = LINK_ENC_AKSIM_19_BIT;
 
 uint16_t RLS_Link_BISS_ReadData(uint16_t encoder_type, float *pnt) {

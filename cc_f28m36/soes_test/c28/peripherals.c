@@ -101,30 +101,6 @@ void Configure_C28_Gpio(void)
 #endif
     EDIS;
 
-#if 0
-	EALLOW;
-	// PH0_GPIO48/49/50
-	GpioG1CtrlRegs.GPBMUX2.bit.GPIO48 = 0;
-	GpioG1CtrlRegs.GPBDIR.bit.GPIO48 = 0;
-	GpioG1CtrlRegs.GPBQSEL2.bit.GPIO48 = 2;
-	GpioG1CtrlRegs.GPBCTRL.bit.QUALPRD3 = 0x02;
-
-	GpioG1CtrlRegs.GPBQSEL2.bit.GPIO49 = 0;
-	GpioG1CtrlRegs.GPBQSEL2.bit.GPIO50 = 0;
-
-    GpioG1TripRegs.GPTRIP4SEL.bit.GPTRIP4SEL = 48;
-
-	// Configure XINT1
-	XIntruptRegs.XINT1CR.bit.POLARITY = 1;     // Raising edge interrupt
-	// Enable XINT1
-    XIntruptRegs.XINT1CR.bit.ENABLE = 1;       // Enable XINT1
-
-    EDIS;
-
-	IER |= M_INT1;
-	// Enable XINT1_ISR in the PIE: Group 1 interrupt 4
-	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;
-#endif
 
 }
 

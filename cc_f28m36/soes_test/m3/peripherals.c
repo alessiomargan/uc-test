@@ -31,7 +31,8 @@
 #include "soes/esc.h"
 
 extern void EcatIntHandler(void);
-extern void Timer0AIntHandler(void);
+extern void Timer0A_IntHandler(void);
+extern void Timer1A_IntHandler(void);
 
 void disable_peripheral_irq(void)
 {
@@ -121,6 +122,38 @@ void ConfigureEcatPDI (void)
 #endif
     UARTprintf("%s\n",__FUNCTION__);
 
+}
+
+void Configure_LCD (void)
+{
+	// SSI1
+	// peripherals must be enabled for use.
+	SysCtlPeripheralEnable(LCD_SSI_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LCD_SSI_GPIO_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LCD_GPIO_SYSCTL_PERIPH);
+
+    // Configure the pin muxing for SSI functions on port
+    GPIOPinConfigure(GPIO_PE2_SSI1CLK);
+    GPIOPinConfigure(GPIO_PE0_SSI1TX); // MOSI
+
+    // Configure the GPIO settings for the SSI pins.  This function also gives
+    // control of these pins to the SSI hardware.
+    GPIOPinTypeSSI(LCD_SSI_GPIO_PORTBASE, LCD_SSI_PINS);
+
+    // Configure and enable the SSI port for SPI master mode.
+    // Use SSI, system clock supply, idle clock level high and active low clock in
+    // freescale SPI mode, master mode, 10MHz SSI frequency, and 8-bit data.
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 10000000, 8);
+    // Enable the SSI module.
+    SSIEnable(LCD_SSI_BASE);
+
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_A0);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_CS);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_RST);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_VDD);
+
+
+    UARTprintf("%s\n",__FUNCTION__);
 }
 
 void Configure_Link_Enc_BissC (void)
@@ -232,9 +265,24 @@ void ConfigureTimer(void)
     // Setup the interrupts for the timer timeouts.
     IntEnable(INT_TIMER0A);
     TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-    IntRegister(INT_TIMER0A, Timer0AIntHandler);
+    IntRegister(INT_TIMER0A, Timer0A_IntHandler);
     // Enable the timer.
     TimerEnable(TIMER0_BASE, TIMER_A);
+
+#if 1
+    // Enable peripheral TIMER1.
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER1);
+    // Configure the two 32-bit periodic timer.
+    TimerConfigure(TIMER1_BASE, TIMER_CFG_32_BIT_PER);
+    TimerLoadSet(TIMER1_BASE, TIMER_A, SysCtlClockGet(SYSTEM_CLOCK_SPEED)/500);	// 2 msec timer
+    // Setup the interrupts for the timer timeouts.
+    IntEnable(INT_TIMER1A);
+    TimerIntEnable(TIMER1_BASE, TIMER_TIMA_TIMEOUT);
+    IntRegister(INT_TIMER1A, Timer1A_IntHandler);
+    // Enable the timer.
+    TimerEnable(TIMER1_BASE, TIMER_A);
+#endif
+
 
     UARTprintf("%s\n",__FUNCTION__);
 }

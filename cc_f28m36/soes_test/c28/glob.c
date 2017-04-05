@@ -4,12 +4,12 @@
 
 // map to RAM S1
 #pragma DATA_SECTION(m3_ro_data,"RAM_S1");
-volatile m3_rw_data_t	m3_ro_data;
+volatile m3_to_c28_data_t	m3_ro_data;
 
 
 // map to RAM S5
 #pragma DATA_SECTION(c28_rw_data,"RAM_S5");
-volatile c28_rw_data_t	c28_rw_data;
+volatile c28_to_m3_data_t	c28_rw_data;
 
 volatile tIpcController g_sIpcController1;
 volatile tIpcController g_sIpcController2;

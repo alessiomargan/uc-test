@@ -6,20 +6,20 @@
 #include <soes/esc_foe.h>
 #include <soes/soes.h>
 
-#include <shared_ram.h>
+#include "shared_ram.h"
 #include "peripherals.h"
 #include "soes_hook.h"
 #include "osal.h"
 
 #define DPRINT(...)
 
-extern m3_rw_data_t    m3_rw_data;
-
 
 rx_pdo_t	rx_pdo;
 tx_pdo_t    tx_pdo;
 aux_pdo_t   aux_pdo;
 sdo_t		sdo;
+
+extern const char fw_ver[8];
 
 esc_cfg_t 	esc_config = { 0, 0 };
 
@@ -37,9 +37,7 @@ static void jump_to_bootloader(void) {
 static void on_PREOP(void) {
 
 	memcpy(sdo.fw_ver, fw_ver, sizeof(sdo.fw_ver));
-	sdo.PosGainP = 123.456;
-	sdo.PosGainI = 456.678;
-	sdo.PosGainD = 678.910;
+	sdo.board_id = 69;
 
 	memset((void*)&tx_pdo,0,sizeof(tx_pdo));
 }
@@ -212,10 +210,10 @@ void ecat_process_pdo(void) {
 		handle_aux_pdo();
 	}
 
-	tx_pdo.link_pos = m3_rw_data.v_float;
+	tx_pdo.link_pos = rx_pdo.pos_ref;
 	tx_pdo.motor_pos = rx_pdo.pos_ref;
 	tx_pdo.torque = 0;
-	tx_pdo.max_temperature = 21;
+	tx_pdo.temperature = 21;
 	tx_pdo.rtt = rx_pdo.ts;
 
 	TXPDO_update();

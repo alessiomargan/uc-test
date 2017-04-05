@@ -1,104 +1,75 @@
 #ifndef __SOES_HOOK_H__
 #define __SOES_HOOK_H__
 
-#ifdef ccs
-	#define IAR_PACKED
-	#define CCS_PACKED	__attribute__((__packed__))
-#else
-	#define IAR_PACKED 	__packed
-	#define CCS_PACKED
-#endif
-
+//#define PACKED 	__attribute__((__packed__))
+#define CCS_PACKED
+#define IAR_PACKED
 
 typedef IAR_PACKED struct {
-	float		pos_ref;  //link
-    float      	vel_ref;  //link
-    float      	tor_ref;  //link
-    float     	gains[5];
+    float       pos_ref;  				// motor position reference
+#ifdef FLOAT_PDO
+    float    	vel_ref;  				// motor velocity reference
+    float     	tor_ref;  				// torque reference
+    float    	gains[5];
+#else
+    int16_t  	vel_ref;  				// motor velocity reference
+    int16_t     tor_ref;  				// torque reference
+    uint16_t    gains[5];
+#endif
     uint16_t    fault_ack;
     uint16_t    ts;
-    uint16_t    op_idx_aux;    // op [get/set] , idx
-    float       aux;        // set value
+    uint16_t    op_idx_aux;    			// op [get/set] , idx
+    float       aux;        			// set value
 } CCS_PACKED rx_pdo_t;
 
 typedef IAR_PACKED struct {
-    float   	link_pos;           // rad
-    float       motor_pos;           // rad
-    float       link_vel;            // rad
-    float      	motor_vel;             // rad/s
-    float      	torque;             // Nm
-    uint16_t    max_temperature;     // C
+    float       link_pos;           	// link position (rad)
+    float       motor_pos;           	// motor position (rad)
+#ifdef FLOAT_PDO
+    float      	link_vel;             	// link velocity  (mrad/sec)
+    float      	motor_vel;              // motor velocity (mrad/sec)
+#else
+    int16_t     link_vel;             	// link velocity  (mrad/sec)
+    int16_t     motor_vel;              // motor velocity (mrad/sec)
+#endif
+    float       torque;            	    // Nm
+    uint16_t    temperature;     		// �C
     uint16_t    fault;
-    uint16_t    rtt;                // us
-    uint16_t    op_idx_ack;         // op [ack/nack] , idx
-    float		aux;                // get value or nack erro code
+    uint16_t    rtt;                	// us
+    uint16_t    op_idx_ack;         	// op [ack/nack] , idx
+    float       aux;                	// get value or nack erro code
 } CCS_PACKED tx_pdo_t;
 
 typedef IAR_PACKED struct {
-	float   pos_ref_fb;
-	float	iq_ref;
-	float	iq_out;
-} CCS_PACKED aux_pdo_t;
 
+    // 0x8000 flash param
+    uint32_t	board_id;
+    // 0x8001 ram param
+     char 		fw_ver[8];
+ 	uint16_t 	ctrl_status_cmd;
+ 	uint16_t 	ctrl_status_cmd_ack;
+ 	uint16_t 	flash_params_cmd;
+ 	uint16_t 	flash_params_cmd_ack;
+ 	uint16_t 	ack_board_faults;
 
-typedef IAR_PACKED struct {
+ } CCS_PACKED sdo_t;
 
-	uint16_t 	Hardware_configuration;	// 0xABCD
-	    									// A = curr_sensor_type: 	0 = none 	1 = 6A 			2 = 10A 			3 = 20A			4 = 35A
-											// B = link enc type: 		0 = none	1 = 19-bit	 	2 = 20-bit
-											// C = torque_sensor_type: 	0 = none 	1 = analog DSP 	2 = analog_ext_ADC  3 = defl 19-bit 4 = defl 20-bit
-											// D = number of pole pair
+ typedef IAR_PACKED struct {
+     // 0x8002 aux param
+     float volt_ref;
+     float current;
+     float vout;
+     float pos_ref_fb;
+     float pwm_duty;
 
-	uint16_t	Motor_gear_ratio;
+ } CCS_PACKED aux_pdo_t;
 
-	float		Motor_electrical_phase_angle;
-	float 		Torsion_bar_stiffness;
-
-	float		CurrGainP;
-	float		CurrGainI;
-
-	float 		Max_cur;
-	float 		Max_tor;
-	float 		Max_vel;
-
-	float 		Joint_Min_pos;
-	float 		Joint_Max_pos;
-
-	float		Calibration_angle;
-	float 		Enc_offset;
-
-	int  		Joint_number;
-	int  		Joint_Robot_ID;
-
-	//
-    float   PosGainP;
-    float   PosGainI;
-    float   PosGainD;
-    float   TorGainP;
-    float   TorGainI;
-    float   TorGainD;
-    float   Pos_I_lim;
-    float   Tor_I_lim;
-
-    char 		fw_ver[8];
-    uint32_t	board_faults;
-    uint16_t	ctrl_status_cmd;
-    uint16_t	ctrl_status_cmd_ack;
-    uint16_t	flash_params_cmd;
-    uint16_t	flash_params_cmd_ack;
-
-} CCS_PACKED sdo_t;
-
-extern tx_pdo_t		tx_pdo;
-extern rx_pdo_t		rx_pdo;
-extern aux_pdo_t	aux_pdo;
-extern sdo_t 		sdo;
-
-extern const char fw_ver[];
-
+extern tx_pdo_t tx_pdo;
+extern rx_pdo_t rx_pdo;
+extern sdo_t sdo;
+extern aux_pdo_t aux_pdo;
 
 void setup_esc_configs(void);
-
 void ecat_process_pdo(void);
 
 #endif 

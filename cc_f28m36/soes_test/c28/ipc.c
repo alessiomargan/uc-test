@@ -11,7 +11,7 @@ void bootloaderService(Uint32 param)
 	switch (param) {
 
 	default:
-		bootloaderServiceResult = FN_ERROR;
+		//bootloaderServiceResult = FN_ERROR;
 		break;
 
 	}

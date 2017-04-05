@@ -88,8 +88,9 @@ void main(void)
 	EINT;  // Enable Global interrupt INTM
 	ERTM;  // Enable Global realtime interrupt DBGM
 
-	//Synchronize the two CPUs.
-	IpcSync(IPC_FLAG18);
+	//IpcSync(IPC_FLAG18);
+	//	Set CTOM IPC Flag
+	CtoMIpcRegs.CTOMIPCSET.bit.IPC18 = 1;
 
 	for(;;) {
     	// loop

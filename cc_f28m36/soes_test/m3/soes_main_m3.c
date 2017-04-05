@@ -60,8 +60,8 @@ __error__(char *pcFilename, unsigned long ulLine)
 
 const char fw_ver[8] = "xXx/\\xXx";
 
-m3_rw_data_t	m3_rw_data;
-c28_rw_data_t	c28_ro_data;
+m3_to_c28_data_t	m3_rw_data;
+c28_to_m3_data_t	c28_ro_data;
 
 // map to RAM S1
 #pragma DATA_SECTION(m3_rw_data,"RAM_S1");
@@ -103,9 +103,9 @@ int main(void)
     ConfigureUART();
     ConfigureLed();
     ConfigureEcatPDI();
+	ConfigureTimer();
     //Configure_Link_Enc_BissC();
     //Configure_AD7680();
-	ConfigureTimer();
 
 #ifdef CONTROL_CARD
     // Enable C28 Peripherals
@@ -125,7 +125,7 @@ int main(void)
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH); //
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOR); //
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOS); //
-     // Give C28 Control of Port C
+     // Give C28 Control of Port A C H
  	GPIOPinConfigureCoreSelect(GPIO_PORTA_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
  	GPIOPinConfigureCoreSelect(GPIO_PORTC_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
  	GPIOPinConfigureCoreSelect(GPIO_PORTH_BASE, 0xFF,GPIO_PIN_C_CORE_SELECT);
@@ -137,18 +137,21 @@ int main(void)
 #ifdef _BOOT_C28
     //  Send boot command to allow the C28 application to begin execution
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
-    //Synchronize the two CPUs.
-    IpcSync(IPC_FLAG18);
+    //IpcSync(IPC_FLAG18);
+    //	Wait for CTOM IPC Flag
+    while((HWREG(MTOCIPC_BASE + IPC_O_CTOMIPCSTS) & IPC_FLAG18) == 0) {}
 #endif
 
     //The hardware priority mechanism will only look at the upper N bits of the priority level
     //where N is 3 for the Concerto family
-    IntPrioritySet(INT_TIMER0A, 0x5);
+    IntPrioritySet(INT_TIMER0A, (char)(3)<<5); // middle prio soes loop
+    IntPrioritySet(INT_TIMER1A, (char)(2)<<5); // higher prio sensor
 #ifdef CONTROL_CARD
-    IntPrioritySet(INT_GPIOG,   0x5);
+    IntPrioritySet(INT_GPIOG,   (char)(3)<<5); // middle prio pdi ecat irq
 #else
-    IntPrioritySet(INT_GPIOK,   0x5);
+    IntPrioritySet(INT_GPIOK,   (char)(3)<<5); // middle prio pdi ecat irq
 #endif
+
     // Enable processor interrupts.
     IntMasterEnable();
 

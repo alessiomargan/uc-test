@@ -25,8 +25,7 @@
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
-extern m3_rw_data_t    m3_rw_data;
-extern c28_rw_data_t   c28_ro_data;
+
 
 /**
  * 
@@ -47,7 +46,7 @@ void EcatIntHandler(void) {
 /**
  * 
  */
-void Timer0AIntHandler(void) {
+void Timer0A_IntHandler(void) {
 
     static uint32_t timer0_cnt;
     static volatile uint32_t  toggle;
@@ -58,9 +57,6 @@ void Timer0AIntHandler(void) {
 
     //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
 
-    read_sensors();
-	//Process_ADC_EXT_AD7680();
-    //Process_Link_encoder_read();
 
 	if ( ! DC_activation() ) {
         ecat_process_pdo();
@@ -69,17 +65,15 @@ void Timer0AIntHandler(void) {
     // every cycle
 	soes_loop();
 
-
-
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
-        // toggle 
+        // toggle
         HWREGBITB(&toggle, 0) ^= 1;
         UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle);
     }
 
 #ifdef CONTROL_CARD
-    GPIOPinWrite(LED_1_BASE, LED_1_PIN, toggle << 2 );
+    GPIOPinWrite(LED_1_BASE, LED_1_PIN, toggle ? LED_1_PIN : 0 );
 #else
     GPIOPinWrite(LED_GRN_BASE, LED_GRN_PIN, toggle ? LED_GRN_PIN : 0 );
 #endif
@@ -88,6 +82,25 @@ void Timer0AIntHandler(void) {
 
 }
 
+
+void Timer1A_IntHandler(void) {
+
+    static uint32_t timer1_cnt;
+    static volatile uint32_t  toggle;
+
+    // Clear the timer interrupt.
+    TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);
+    timer1_cnt++;
+
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
+
+    read_sensors();
+	//Process_ADC_EXT_AD7680();
+    //Process_Link_encoder_read();
+
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, 0);
+
+}
 
 
 

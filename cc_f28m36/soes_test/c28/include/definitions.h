@@ -61,8 +61,8 @@ extern void Configure_flashAPI(void);
 extern void bootloaderService(Uint32 param);
 extern Uint32 bootloaderServiceResult;
 
-extern volatile m3_rw_data_t	m3_ro_data;
-extern volatile c28_rw_data_t	c28_rw_data;
+extern volatile m3_to_c28_data_t	m3_ro_data;
+extern volatile c28_to_m3_data_t	c28_rw_data;
 
 extern volatile tIpcController  	g_sIpcController1;
 extern volatile tIpcController  	g_sIpcController2;
