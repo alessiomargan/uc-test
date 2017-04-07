@@ -100,10 +100,11 @@ int main(void)
     RAMMReqSharedMemAccess((S5_ACCESS), SX_C28MASTER);
 
     //
-    ConfigureUART();
-    ConfigureLed();
-    ConfigureEcatPDI();
-	ConfigureTimer();
+    Configure_UART();
+    Configure_Led();
+    Configure_EcatPDI();
+	Configure_Timer();
+	Configure_LCD();
     //Configure_Link_Enc_BissC();
     //Configure_AD7680();
 
@@ -163,8 +164,12 @@ int main(void)
 	soes_init();
 
 	// Loop forever while the timers run.
+	ulLoop = 0;
     while (1) {
-            // do nothing .. just loop
+        // do nothing .. just loop
+
+    	// 100 msec
+        SysCtlDelay( (SysCtlClockGet(SYSTEM_CLOCK_SPEED) / 1000) * 100 );
 	}
 }
 

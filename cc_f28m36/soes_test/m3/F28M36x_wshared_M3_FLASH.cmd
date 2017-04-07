@@ -107,12 +107,13 @@ MEMORY
 
 SECTIONS
 {
-    .intvecs:   > INTVECS,  ALIGN(8)
-    .resetisr:  > RESETISR, ALIGN(8)
-    .text   :   > FLASH_E,  ALIGN(8)
-    .const  :   > FLASH_E,  ALIGN(8)
-    .cinit  :   > FLASH_E,  ALIGN(8)
-    .pinit  :   > FLASH_E,  ALIGN(8)
+    .intvecs:       > INTVECS,  ALIGN(8)
+    .resetisr:      > RESETISR, ALIGN(8)
+    .text   :       > FLASH_E,  ALIGN(8)
+    .const  :       > FLASH_E,  ALIGN(8)
+    .cinit  :       > FLASH_E,  ALIGN(8)
+    .pinit  :       > FLASH_E,  ALIGN(8)
+    .init_array :   > FLASH_E,  ALIGN(8)
 
     .vtable :   >  C0 | C1 | C2 | C3
     .data   :   >  C2 | C3

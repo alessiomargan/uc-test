@@ -1,11 +1,12 @@
 #ifndef __PERIPHERALS_H__
 #define __PERIPHERALS_H__
 
-void ConfigureUART(void);
-void ConfigureEcatPDI(void);
+void Configure_UART(void);
+void Configure_EcatPDI(void);
 void Configure_Link_Enc_BissC(void);
-void ConfigureLed(void);
-void ConfigureTimer(void);
+void Configure_Led(void);
+void Configure_Timer(void);
+void Configure_LCD(void);
 void Watchdog0Reset(void);
 
 void disable_peripheral_irq(void);

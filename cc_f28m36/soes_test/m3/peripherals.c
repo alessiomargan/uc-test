@@ -34,6 +34,9 @@ extern void EcatIntHandler(void);
 extern void Timer0A_IntHandler(void);
 extern void Timer1A_IntHandler(void);
 
+extern void lcd_init(void);
+extern void lcd_self_test(void);
+
 void disable_peripheral_irq(void)
 {
 
@@ -48,7 +51,7 @@ void disable_peripheral_irq(void)
  *
  * @author amargan (7/4/2014)
  */
-void ConfigureUART(void)
+void Configure_UART(void)
 {
 #ifdef CONTROL_CARD
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
@@ -72,7 +75,7 @@ void ConfigureUART(void)
  *
  * @author amargan (7/4/2014)
  */
-void ConfigureEcatPDI (void)
+void Configure_EcatPDI (void)
 {
 	// SSI0 and GPIOD on PORTD
     // peripheralsz must be enabled for use.
@@ -142,8 +145,8 @@ void Configure_LCD (void)
 
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level high and active low clock in
-    // freescale SPI mode, master mode, 10MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 10000000, 8);
+    // freescale SPI mode, master mode, 1MHz SSI frequency, and 8-bit data.
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 1000000, 8);
     // Enable the SSI module.
     SSIEnable(LCD_SSI_BASE);
 
@@ -152,6 +155,9 @@ void Configure_LCD (void)
     GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_RST);
     GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_VDD);
 
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
+    lcd_init();
 
     UARTprintf("%s\n",__FUNCTION__);
 }
@@ -214,7 +220,7 @@ void Configure_AD7680 (void)
  *
  * @author amargan (7/4/2014)
  */
-void ConfigureLed(void)
+void Configure_Led(void)
 {
     // Enable the GPIO port that is used for the on-board LED.
 #ifdef CONTROL_CARD
@@ -254,7 +260,7 @@ void ConfigureLed(void)
  *
  * @author amargan (7/4/2014)
  */
-void ConfigureTimer(void)
+void Configure_Timer(void)
 {
     // Enable peripheral TIMER0.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
