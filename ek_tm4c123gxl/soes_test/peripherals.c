@@ -110,6 +110,41 @@ void ConfigureEcatPDI (void)
 
 }
 
+void Configure_LCD (void)
+{
+	// SSI1
+	// peripherals must be enabled for use.
+	SysCtlPeripheralEnable(LCD_SSI_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LCD_SSI_GPIO_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LCD_GPIO_SYSCTL_PERIPH);
+
+    // Configure the pin muxing for SSI functions on port
+    GPIOPinConfigure(GPIO_PD0_SSI1CLK);
+    GPIOPinConfigure(GPIO_PD3_SSI1TX); // MOSI
+
+    // Configure the GPIO settings for the SSI pins.  This function also gives
+    // control of these pins to the SSI hardware.
+    GPIOPinTypeSSI(LCD_SSI_GPIO_PORTBASE, LCD_SSI_PINS);
+
+    // Configure and enable the SSI port for SPI master mode.
+    // Use SSI, system clock supply, idle clock level high and active low clock in
+    // freescale SPI mode, master mode, 1MHz SSI frequency, and 8-bit data.
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 10000000, 8);
+    // Enable the SSI module.
+    SSIEnable(LCD_SSI_BASE);
+
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_A0);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_CS);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_RST);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_VDD);
+
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
+    lcd_init();
+
+    UARTprintf("%s\n",__FUNCTION__);
+}
+
 /**
  *
  *

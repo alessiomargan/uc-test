@@ -8,7 +8,8 @@
 
 --retain=g_pfnVectors
 
-#define FLASH_APP 	0x00005000
+//#define FLASH_APP 	0x00005000
+#define FLASH_APP   0x00000000
 
 MEMORY
 {

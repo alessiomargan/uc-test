@@ -55,12 +55,11 @@ void main(void)
     UARTprintf("SysCtlClockGet %d\n", SysCtlClockGet() );
     //
     ConfigureLed();
-    // Set up ET1100 PDI interface 
     ConfigureEcatPDI();
-    //
+    Configure_LCD();
     Configure_ADC();
     //
-    init_PWM();
+    //init_PWM();
     // should be the last configure ...
     ConfigureTimer();
 
@@ -72,6 +71,8 @@ void main(void)
 
     //
     soes_init();
+
+    lcd_self_test();
 
     while (1) {
         // do nothing .. just loop

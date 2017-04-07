@@ -29,6 +29,7 @@
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
+static char buf[64];
 
 /**
  * 
@@ -76,9 +77,14 @@ void Timer0AIntHandler(void) {
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle 
         HWREGBITB(&toggle, 0) ^= 1;
-        //ROM_IntMasterDisable();
+
+        //sprintf( buf, "tmr0: %d %d", timer0_cnt, toggle );
         UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle );
-        //ROM_IntMasterEnable();
+        if ( toggle ) {
+        	lcd_printf(0, 25, "cazzo");
+        } else {
+        	lcd_self_test();
+        }
     }
 
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, toggle << 3 );
