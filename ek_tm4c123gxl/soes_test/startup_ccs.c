@@ -34,11 +34,6 @@ static void NmiSR(void);
 static void FaultISR(void);
 static void IntDefaultHandler(void);
 
-extern void Timer0AIntHandler(void);
-//extern void GPIOAIntHandler(void);
-extern void GPIOBIntHandler(void);
-extern void ADC2IntHandler(void);
-extern void PWM1_1IntHandler(void);
 //*****************************************************************************
 //
 // External declaration for the reset handler that is to be called when the
@@ -89,7 +84,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // The PendSV handler
     IntDefaultHandler,                      // The SysTick handler
 	IntDefaultHandler,                      // GPIO Port A
-	GPIOBIntHandler,                      // GPIO Port B
+	IntDefaultHandler,                      // GPIO Port B
     IntDefaultHandler,                      // GPIO Port C
     IntDefaultHandler,                      // GPIO Port D
     IntDefaultHandler,                      // GPIO Port E
@@ -104,10 +99,10 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // Quadrature Encoder 0
 	IntDefaultHandler,                      // ADC Sequence 0
     IntDefaultHandler,                      // ADC Sequence 1
-	ADC2IntHandler,                      // ADC Sequence 2
+	IntDefaultHandler,                      // ADC Sequence 2
 	IntDefaultHandler,                      // ADC Sequence 3
     IntDefaultHandler,                      // Watchdog timer
-	Timer0AIntHandler,                      // Timer 0 subtimer A
+	IntDefaultHandler,                      // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
 	IntDefaultHandler,                      // Timer 1 subtimer A
     IntDefaultHandler,                      // Timer 1 subtimer B
@@ -223,7 +218,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // GPIO Port R
     IntDefaultHandler,                      // GPIO Port S
 	IntDefaultHandler,                      // PWM 1 Generator 0
-	PWM1_1IntHandler,                      // PWM 1 Generator 1
+	IntDefaultHandler,                      // PWM 1 Generator 1
     IntDefaultHandler,                      // PWM 1 Generator 2
     IntDefaultHandler,                      // PWM 1 Generator 3
     IntDefaultHandler                       // PWM 1 Fault

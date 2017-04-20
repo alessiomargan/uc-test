@@ -16,8 +16,6 @@
     #define ORDER(a,b) if( a > b ) { int c = a; a = b; b = c; }
 #endif
 
-const unsigned char DOGMLCD_on[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
-const unsigned char DOGMLCD_off[]= { 254, 253, 251, 247, 239, 223, 191, 127 };
 
 /// Bit mpath operation (raster)
 typedef enum{ poke, wipe, inv } doggy_op;

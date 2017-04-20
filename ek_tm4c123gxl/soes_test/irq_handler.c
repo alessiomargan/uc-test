@@ -24,19 +24,20 @@
 #include "soes_hook.h"
 #include "peripherals.h"
 //#include "pwm_ctrl.h"
+#include "dog_LCD/doggy.h"
 
 
+volatile uint32_t timer0_cnt = 0;
+volatile uint32_t timer1_cnt = 0;
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
-
-static char buf[64];
 
 /**
  * 
  *
  * @author amargan (7/4/2014)
  */
-void GPIOBIntHandler(void) {
+void GPIOB_IntHandler(void) {
 
 	GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0);
 	GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
@@ -52,48 +53,57 @@ void GPIOBIntHandler(void) {
 
 /**
  * 
- *
- * @author amargan (7/4/2014)
  */
-void Timer0AIntHandler(void) {
+void Timer0A_IntHandler(void) {
 
-    static uint32_t timer0_cnt;
-    static volatile uint32_t  toggle;
-
+	static volatile uint32_t toggle = 0;
     // Clear the timer interrupt.
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-
     timer0_cnt++;
-
-    read_sensors();
 
     if ( ! DC_activation() ) {
         ecat_process_pdo();
     }
 	soes_loop();
 
-
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle 
         HWREGBITB(&toggle, 0) ^= 1;
-
-        //sprintf( buf, "tmr0: %d %d", timer0_cnt, toggle );
         UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle );
-        if ( toggle ) {
-        	lcd_printf(0, 25, "cazzo");
-        } else {
-        	lcd_self_test();
-        }
     }
 
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, toggle << 3 );
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, toggle ? GPIO_PIN_3 : 0 );
 }
 
 /**
  * 
  */
-void PWM1_1IntHandler(void) {
+void Timer1A_IntHandler(void) {
+
+	static volatile uint32_t toggle = 0;
+
+    // Clear the timer interrupt.
+    TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);
+    timer1_cnt++;
+
+    read_sensors();
+
+    // every 250 cycles
+	if ( (timer1_cnt % 250) == 0 ) {
+		//sprintf( buf, "timer1 %d", timer1_cnt);
+		HWREGBITB(&toggle, 0) ^= 1;
+		lcd_self_sprint();
+		Flush();
+	}
+
+	GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, toggle ? GPIO_PIN_1 : 0 );
+}
+
+/**
+ *
+ */
+void PWM11_IntHandler(void) {
 
     static int toggle;
     // Clear the PWM interrupt.  This is done twice since the clear will be
@@ -128,7 +138,7 @@ void PWM1_1IntHandler(void) {
 
 }
 
-void ADC2IntHandler(void) {
+void ADC2_IntHandler(void) {
 
     uint32_t    adc_buff[1];
     float fTemp;
@@ -139,7 +149,7 @@ void ADC2IntHandler(void) {
     uint32_t ADCmV = (uint32_t)((adc_buff[0] * 3300) / 4096);
     fTemp = (float)(147500 - 75 * ADCmV) / 1000; //((1475 * 1023) - (2250 * adc_buff[0])) / 10230;
 
-    tx_pdo.temperature = fTemp;
+    tx_pdo.temperature = (uint16_t)fTemp;
 
 }
 

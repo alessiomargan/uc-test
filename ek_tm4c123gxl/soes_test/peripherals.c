@@ -52,7 +52,7 @@ void disable_peripheral_irq(void)
  *
  * @author amargan (7/4/2014)
  */
-void ConfigureUART(void)
+void Configure_UART(void)
 {
     // Enable the GPIO Peripheral used by the UART.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -70,10 +70,8 @@ void ConfigureUART(void)
 
 /**
  *
- *
- * @author amargan (7/4/2014)
  */
-void ConfigureEcatPDI (void)
+void Configure_EcatPDI (void)
 {
 	// SSI2 and GPIOB on PORTB
     // peripheralsz must be enabled for use.
@@ -104,9 +102,10 @@ void ConfigureEcatPDI (void)
     GPIOIntTypeSet(SPI_ECAT_SSI_PORT, SPI_ECAT_IRQ_PIN, GPIO_FALLING_EDGE);
 
     GPIOIntEnable(SPI_ECAT_SSI_PORT, SPI_ECAT_IRQ_PIN);
-    IntEnable(INT_GPIOB);
+    IntRegister(INT_GPIOB, GPIOB_IntHandler);
+	IntEnable(INT_GPIOB);
 
-    DPRINT("%s\n",__FUNCTION__);
+	UARTprintf("%s\n",__FUNCTION__);
 
 }
 
@@ -129,7 +128,7 @@ void Configure_LCD (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level high and active low clock in
     // freescale SPI mode, master mode, 1MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 10000000, 8);
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 5000000, 8);
     // Enable the SSI module.
     SSIEnable(LCD_SSI_BASE);
 
@@ -138,9 +137,12 @@ void Configure_LCD (void)
     GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_RST);
     GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_VDD);
 
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS);
     GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
     GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
-    lcd_init();
+
+    Lcd_init();
 
     UARTprintf("%s\n",__FUNCTION__);
 }
@@ -150,7 +152,7 @@ void Configure_LCD (void)
  *
  * @author amargan (7/4/2014)
  */
-void ConfigureLed(void)
+void Configure_Led(void)
 {
     // Enable the GPIO port that is used for the on-board LED.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
@@ -159,29 +161,45 @@ void ConfigureLed(void)
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
 
-    DPRINT("%s\n",__FUNCTION__);
+    UARTprintf("%s\n",__FUNCTION__);
 }
 
 /**
  *
- *
- * @author amargan (7/4/2014)
  */
-void ConfigureTimer(void)
+void Configure_Timer_0A(void)
 {
     // Enable peripheral TIMER0.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
     // Configure the two 32-bit periodic timer.
     TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
     // 1ms period
-    TimerLoadSet(TIMER0_BASE, TIMER_A, ROM_SysCtlClockGet()/1000);
+    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet()/1000);
     // Setup the interrupts for the timer timeouts.
     IntEnable(INT_TIMER0A);
     TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    IntRegister(INT_TIMER0A, Timer0A_IntHandler);
     // Enable the timer.
     TimerEnable(TIMER0_BASE, TIMER_A);
 
-    DPRINT("%s\n",__FUNCTION__);
+    UARTprintf("%s\n",__FUNCTION__);
+}
+void Configure_Timer_1A(void)
+{
+    // Enable peripheral TIMER1.
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER1);
+    // Configure the two 32-bit periodic timer.
+    TimerConfigure(TIMER1_BASE, TIMER_CFG_PERIODIC);
+    // 2 msec timer
+    TimerLoadSet(TIMER1_BASE, TIMER_A, SysCtlClockGet()/500);
+    // Setup the interrupts for the timer timeouts.
+    IntEnable(INT_TIMER1A);
+    TimerIntEnable(TIMER1_BASE, TIMER_TIMA_TIMEOUT);
+    IntRegister(INT_TIMER1A, Timer1A_IntHandler);
+    // Enable the timer.
+    TimerEnable(TIMER1_BASE, TIMER_A);
+
+    UARTprintf("%s\n",__FUNCTION__);
 }
 
 
@@ -200,9 +218,10 @@ void Configure_ADC(void)
     ADCSequenceEnable(ADC0_BASE, ADC0_SEQ_NR);
     ADCIntClear(ADC0_BASE, ADC0_SEQ_NR);
     ADCIntEnable(ADC0_BASE, ADC0_SEQ_NR);
+    IntRegister(INT_ADC0SS2, ADC2_IntHandler);
     IntEnable(INT_ADC0SS2);
 
-    DPRINT("%s\n",__FUNCTION__);
+    UARTprintf("%s\n",__FUNCTION__);
 
 }
 

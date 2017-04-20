@@ -8,7 +8,7 @@
 #include "osal.h"
 
 //#define DPRINT(...)
-#define DPRINT UARTprintf
+//#define DPRINT UARTprintf
 
 rx_pdo_t    rx_pdo;
 tx_pdo_t    tx_pdo;

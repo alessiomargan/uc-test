@@ -1,7 +1,10 @@
 #ifndef XFONT_8_H
 #define XFONT_8_H
 
-const XGlyph xfont_8[] = {
+#include "xfont.h"
+
+#pragma DATA_SECTION(xfont_8,".font_8")
+XGlyph xfont_8[] = {
     {  0, 5, 8, 0, 0, 0, 0, (const char[]){ 0xFF, 0x81, 0x81, 0x81, 0xFF } },
     { 32, 2, 8, 0, 0, 0, 0, (const char[]){ 0x00, 0x00 } },
     { 33, 1, 8, 0, 0, 0, 0, (const char[]){ 0x2F } },                         //  !

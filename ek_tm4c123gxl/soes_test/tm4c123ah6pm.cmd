@@ -43,6 +43,15 @@ SECTIONS
     .bss    :   > SRAM
     .sysmem :   > SRAM
     .stack  :   > SRAM
+
+    .lcd    :   > SRAM
+    .font_8 :   > SRAM
+    .font_11:   > SRAM
+
+    // see http://processors.wiki.ti.com/index.php/Placing_functions_in_RAM
+    .TI.ramfunc : {} load=FLASH, run=SRAM, table(BINIT)
+    .binit : {} > FLASH
+
 }
 
-__STACK_TOP = __stack + 512;
+__STACK_TOP = __stack + 1024;

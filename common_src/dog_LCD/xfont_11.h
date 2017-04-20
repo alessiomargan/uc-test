@@ -1,7 +1,10 @@
 #ifndef XFONT_11_H
 #define XFONT_11_H
 
-const XGlyph xfont_11[] = {
+#include "xfont.h"
+
+#pragma DATA_SECTION(xfont_11,".font_11")
+XGlyph xfont_11[] = {
     {   0, 6, 11, 0, 0, 0, 0, (const char[]){ 0xFF, 0x03, 0x10, 0x02, 0x10, 0x02, 0x10, 0x02, 0x10, 0x02, 0xFF, 0x03 } },
     {  32, 2, 11, 0, 0, 0, 0, (const char[]){ 0x00, 0x00, 0x00, 0x00 } },
     {  33, 2, 11, 0, 0, 0, 0, (const char[]){ 0xBE, 0x01, 0xBE, 0x01 } },
