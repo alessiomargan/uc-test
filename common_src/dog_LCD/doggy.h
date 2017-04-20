@@ -8,6 +8,48 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+
+///////////////////////////////////////////////////////////////////////////////
+// non portable function
+#include <inc/hw_types.h>
+#include <inc/hw_memmap.h>
+#include <driverlib/ssi.h>
+#include <driverlib/gpio.h>
+#include <driverlib/sysctl.h>
+#include "pins.h"
+
+#ifdef PART_TM4C123AH6PM
+inline void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet() / (4*1000000)) * us);  }
+#else
+//inline void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet(SYSTEM_CLOCK_SPEED) / (4*1000000)) * us);  }
+inline void wait_us(uint32_t us) { return;  }
+#endif
+
+inline void cs_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS); }
+inline void cs_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, 0); }
+inline void a0_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, LCD_A0); }
+inline void a0_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0); }
+#if 0
+inline void rst_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, LCD_RST); }
+inline void rst_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0); }
+inline void pwr_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, LCD_VDD); }
+inline void pwr_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0); }
+#else
+inline void rst_up(void) 	{ ; }
+inline void rst_dn(void) 	{ ; }
+inline void pwr_up(void) 	{ ; }
+inline void pwr_dn(void) 	{ ; }
+#endif
+inline void lcd_spi_write(uint8_t data) {
+    SSIDataPut(LCD_SSI_BASE, data);
+    while( SSIBusy(LCD_SSI_BASE) ) { }
+}
+inline int32_t abs(int32_t x)  {
+	if (x<0) return (-x);
+	else return x;
+}
+
 
 //#include "mbed.h"
 #include "globaldefs.h"

@@ -1,31 +1,5 @@
 #include "doggy.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// non portable function
-#include <inc/hw_types.h>
-#include <inc/hw_memmap.h>
-#include <driverlib/ssi.h>
-#include <driverlib/gpio.h>
-#include <driverlib/sysctl.h>
-#include "pins.h"
-
-inline void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet() / 1000000) * us);  }
-
-inline void cs_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS); }
-inline void cs_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, 0); }
-inline void a0_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, LCD_A0); }
-inline void a0_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0); }
-inline void rst_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, LCD_RST); }
-inline void rst_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0); }
-inline void pwr_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, LCD_VDD); }
-inline void pwr_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0); }
-
-inline void lcd_spi_write(uint8_t data) {
-    uint32_t ret = 0;
-    SSIDataPut(LCD_SSI_BASE, data);
-    while( SSIBusy(LCD_SSI_BASE) ) { }
-    SSIDataGet(LCD_SSI_BASE, &ret);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -36,8 +10,7 @@ void DogMLCD::init(void)
 {
     //b_ = (char*)calloc( 1024, 1 );
 	XFont = xfont_8;
-    memset((void*)w_, 0, sizeof(w_));
-	b_ = w_;
+    b_ = w_;
     Clear();
     const unsigned char c[] = { 
         0x40,       // display start line + 0-63
@@ -45,19 +18,14 @@ void DogMLCD::init(void)
         0xc0,       // common output mode + 0 = normal / + 0xF  reverse
         0xa6,       // dispaly mode 0xA6 + 0 = normal / 1 = reverse
         0xa2,       // set bias 0xa20 + 0 = 1/9 / +1 = 1/7
-        //0x2f,       // power control: 4 booster on + 2 regulator on + 1 follower on
+		0x2b,       // power control: booster off + 2 regulator on + 1 follower on
+		//0x2f,       // power control: 4 booster on + 2 regulator on + 1 follower on
         //0xf8, 0x00, // set booster ratio , value 0=4x, 1=5x, 2=6x
-		0x2b,       // power control: 4 booster off + 2 regulator on + 1 follower on
-		//0xf8, 0x00, // set booster ratio , value 0=4x, 1=5x, 2=6x
 		0x27,       // set voltage regulator (0x20) to 7
         0x81, 0x14, // set electronic volume , value
         0xac, 0x00, // static indicator set 0xAC +0 = off / +1 = on , 0 = flash mode
         0xaf        // display 0xAE +0 = off / +1 = on
     };
-    rst_dn();
-    pwr_up();
-    wait_us(1);
-    rst_up();
     cs_dn(); //cs_ = 0;
     a0_dn(); //a0_ = 0;
     wait_us( DOGMLCD_TIME );

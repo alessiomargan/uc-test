@@ -1,5 +1,4 @@
 #include "doggy.h"
-#include <math.h>
 
 void DogMLCD::LineH( int x0, int y, int x1, doggy_op raster )
 {
@@ -41,12 +40,12 @@ void DogMLCD::LineV( int x, int y0, int y1, doggy_op raster )
 }
 void DogMLCD::Line( int x0, int y0, int x1, int y1, doggy_op raster )
 {
-    bool steep = fabs( y1 - y0 ) > fabs( x1 - x0 );
+    bool steep = abs( y1 - y0 ) > abs( x1 - x0 );
     if( steep ) { SWAP( x0, y0 ) SWAP( x1, y1 ) }
     if( x0 > x1) { SWAP( x0, x1 ) SWAP( y0, y1 ) }
 
     int dx = x1 - x0;
-    int dy = fabs( y1 - y0 );
+    int dy = abs( y1 - y0 );
     int e = dx / 2;
     int ystep = y0 < y1 ? 1 : -1;
     RasterOp op = ((RasterOp[]){ &DogMLCD::Poke, &DogMLCD::Wipe, &DogMLCD::Inv })[raster];

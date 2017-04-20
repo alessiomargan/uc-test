@@ -4,7 +4,7 @@
 /// SPI frequency for method DogMLCD::Flush()
 #define DOGMLCD_MHZ 5000000
 // Wait time after changing state of A0 in uS
-#define DOGMLCD_TIME 8
+#define DOGMLCD_TIME 1
 
 #ifndef BOUND
     #define BOUND(a,b,c) if( a < b ) a = b; else if( a > c ) a = c;
