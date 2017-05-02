@@ -57,7 +57,6 @@ void Timer0A_IntHandler(void) {
 
     //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
 
-
 	if ( ! DC_activation() ) {
         ecat_process_pdo();
     }
@@ -94,9 +93,13 @@ void Timer1A_IntHandler(void) {
 
     //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
 
-    read_sensors();
-	//Process_ADC_EXT_AD7680();
+    //Process_ADC_EXT_AD7680();
     //Process_Link_encoder_read();
+
+    if ( (timer1_cnt % 500) == 0 ) {
+    	//lcd_test_sprint();
+    	//Flush();
+    }
 
     //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, 0);
 

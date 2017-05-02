@@ -29,10 +29,12 @@
 
 #include <ethercat.h>
 #include <soes/soes.h>
-
 #include <pins.h>
 #include <shared_ram.h>
 #include <peripherals.h>
+#ifdef _LCD
+#include <dog_LCD/DogLcd_test.h>
+#endif
 
 #ifdef _FLASH
 // These are defined by the linker (see device linker command file)
@@ -102,10 +104,16 @@ int main(void)
     //
     Configure_UART();
     Configure_Led();
+#ifdef _LCD
+    Configure_LCD();
+#endif
     Configure_EcatPDI();
-	Configure_Timer();
-	Configure_LCD();
-    //Configure_Link_Enc_BissC();
+    // ecat timer
+	Configure_Timer_0A();
+	// sensor & lcd timer
+	Configure_Timer_1A();
+
+	//Configure_Link_Enc_BissC();
     //Configure_AD7680();
 
 #ifdef CONTROL_CARD
@@ -163,13 +171,24 @@ int main(void)
 	// ecat initialization
 	soes_init();
 
+#ifdef _LCD
+	lcd_test_2d();
+	lcd_test_char();
+	lcd_test_string();
+	Flush();
+#endif
 	// Loop forever while the timers run.
 	ulLoop = 0;
     while (1) {
-        // do nothing .. just loop
 
-    	// 100 msec
-        SysCtlDelay( (SysCtlClockGet(SYSTEM_CLOCK_SPEED) / 1000) * 100 );
+#ifdef _LCD
+    	lcd_test_sprint();
+    	Flush();
+#endif
+    	// 500 msec ?!?
+        SysCtlDelay( (SysCtlClockGet(SYSTEM_CLOCK_SPEED) / 1000) * 500 );
+        //SysCtlDelay( 1000 );
+
 	}
 }
 

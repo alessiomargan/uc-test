@@ -26,16 +26,14 @@
 #include "pins.h"
 #include "soes_hook.h"
 #include "peripherals.h"
-
 #include "soes/utypes.h"
 #include "soes/esc.h"
+#include <dog_LCD/DogLcd_test.h>
 
 extern void EcatIntHandler(void);
 extern void Timer0A_IntHandler(void);
 extern void Timer1A_IntHandler(void);
 
-extern void lcd_init(void);
-extern void lcd_self_test(void);
 
 void disable_peripheral_irq(void)
 {
@@ -101,7 +99,7 @@ void Configure_EcatPDI (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level low and active low clock in
     // freescale SPI mode, master mode, 8MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(ECAT_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 8000000, 8);
+    SSIConfigSetExpClk(ECAT_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 7500000, 8);
     // Enable the SSI module.
     SSIEnable(ECAT_SSI_BASE);
 
@@ -136,9 +134,13 @@ void Configure_LCD (void)
 	SysCtlPeripheralEnable(LCD_GPIO_SYSCTL_PERIPH);
 
     // Configure the pin muxing for SSI functions on port
-    GPIOPinConfigure(GPIO_PE2_SSI1CLK);
+#ifdef CONTROL_CARD
+	GPIOPinConfigure(GPIO_PE2_SSI1CLK);
     GPIOPinConfigure(GPIO_PE0_SSI1TX); // MOSI
-
+#else
+	GPIOPinConfigure(GPIO_PL2_SSI1CLK);
+    GPIOPinConfigure(GPIO_PL0_SSI1TX); // MOSI
+#endif
     // Configure the GPIO settings for the SSI pins.  This function also gives
     // control of these pins to the SSI hardware.
     GPIOPinTypeSSI(LCD_SSI_GPIO_PORTBASE, LCD_SSI_PINS);
@@ -146,18 +148,21 @@ void Configure_LCD (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level high and active low clock in
     // freescale SPI mode, master mode, 1MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 1000000, 8);
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 10000000, 8);
     // Enable the SSI module.
     SSIEnable(LCD_SSI_BASE);
 
     GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_A0);
     GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_CS);
-    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_RST);
-    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_VDD);
+    //GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_RST);
+    //GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_VDD);
 
-    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
-    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
-    lcd_init();
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0);
+    //GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
+    //GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
+
+    Lcd_init();
 
     UARTprintf("%s\n",__FUNCTION__);
 }
@@ -260,7 +265,7 @@ void Configure_Led(void)
  *
  * @author amargan (7/4/2014)
  */
-void Configure_Timer(void)
+void Configure_Timer_0A(void)
 {
     // Enable peripheral TIMER0.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
@@ -275,7 +280,11 @@ void Configure_Timer(void)
     // Enable the timer.
     TimerEnable(TIMER0_BASE, TIMER_A);
 
-#if 1
+    UARTprintf("%s\n",__FUNCTION__);
+}
+
+void Configure_Timer_1A(void)
+{
     // Enable peripheral TIMER1.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER1);
     // Configure the two 32-bit periodic timer.
@@ -287,8 +296,6 @@ void Configure_Timer(void)
     IntRegister(INT_TIMER1A, Timer1A_IntHandler);
     // Enable the timer.
     TimerEnable(TIMER1_BASE, TIMER_A);
-#endif
-
 
     UARTprintf("%s\n",__FUNCTION__);
 }
@@ -308,6 +315,3 @@ void Watchdog0Reset(void)
 }
 
 
-void read_sensors(void) {
-
-}

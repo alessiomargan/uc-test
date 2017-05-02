@@ -56,13 +56,13 @@
 
 #define LCD_SSI_PINS          		(LCD_SSI_TX_MOSI | LCD_SSI_CLK)
 
-#define LCD_GPIO_PORTBASE           GPIO_PORTG_BASE
-#define LCD_GPIO_SYSCTL_PERIPH  	SYSCTL_PERIPH_GPIOG
+#define LCD_GPIO_PORTBASE           GPIO_PORTE_BASE
+#define LCD_GPIO_SYSCTL_PERIPH  	SYSCTL_PERIPH_GPIOE
 
-#define LCD_A0						GPIO_PIN_4
-#define LCD_CS						GPIO_PIN_5
-#define LCD_RST						GPIO_PIN_6
-#define LCD_VDD						GPIO_PIN_7
+#define LCD_A0						GPIO_PIN_1
+#define LCD_CS						GPIO_PIN_3
+#define LCD_RST						GPIO_PIN_4
+#define LCD_VDD						GPIO_PIN_5
 
 //*****************************************************************************
 //
@@ -219,6 +219,30 @@
 #define DEFL_ENC_SSI_RX_MISO            GPIO_PIN_1
 
 #define DEFL_ENC_SSI_PINS          		(DEFL_ENC_SSI_RX_MISO | DEFL_ENC_SSI_CLK)
+
+//*****************************************************************************
+//
+//  M3 LCD EA DOGM128-6
+//
+//*****************************************************************************
+#define LCD_SSI_BASE               	SSI1_BASE
+#define LCD_SSI_SYSCTL_PERIPH   	SYSCTL_PERIPH_SSI1
+
+#define LCD_SSI_GPIO_PORTBASE		GPIO_PORTL_BASE
+#define LCD_SSI_GPIO_SYSCTL_PERIPH	SYSCTL_PERIPH_GPIOL
+
+#define LCD_SSI_CLK               	GPIO_PIN_2
+#define LCD_SSI_TX_MOSI           	GPIO_PIN_0
+
+#define LCD_SSI_PINS          		(LCD_SSI_TX_MOSI | LCD_SSI_CLK)
+
+#define LCD_GPIO_PORTBASE           GPIO_PORTL_BASE
+#define LCD_GPIO_SYSCTL_PERIPH  	SYSCTL_PERIPH_GPIOL
+
+#define LCD_A0						GPIO_PIN_1
+#define LCD_CS						GPIO_PIN_3
+//#define LCD_RST						GPIO_PIN_4
+//#define LCD_VDD						GPIO_PIN_5
 
 //*****************************************************************************
 //

@@ -12,12 +12,14 @@
 
 #include "doggy.h"
 
-char lcd_test_buf[32];
 const char formula[] = { 159, '(', 'x', ')', '=', '2', 227, '+', 's', 'i', 'n', '(', 224, ')', '/', 251, 'x', 0 };
 const char ciao[] = "Ciao Stronzo !!";
 
+#pragma DATA_SECTION(lcd_test_buf,".lcd")
+char lcd_test_buf[32];
+
 __attribute__((ramfunc))
-void lcd_self_sprint(void) {
+void lcd_test_sprint(void) {
 
 	XFont = xfont_8;
 
@@ -40,7 +42,7 @@ void lcd_self_sprint(void) {
 
 
 __attribute__((ramfunc))
-void lcd_self_string(void) {
+void lcd_test_string(void) {
 
 	XFont = xfont_11;
 	// create text with symbols:
@@ -50,9 +52,9 @@ void lcd_self_string(void) {
 }
 
 __attribute__((ramfunc))
-void lcd_self_char(void) {
+void lcd_test_char(void) {
 
-	int i, x, y;
+	int x, y;
 
 	// select font to use:
 	XFont = xfont_8;
@@ -61,7 +63,6 @@ void lcd_self_char(void) {
 	y = 0;
 	const char * p = ciao;
 	while ( *p ) {
-	//for (i=0; i<sizeof(ciao); i++ ) {
 		XChar(x, y, *p, poke);
 		x += 8;
 		p++;
@@ -70,7 +71,7 @@ void lcd_self_char(void) {
 }
 
 __attribute__((ramfunc))
-void lcd_self_2d(void) {
+void lcd_test_2d(void) {
 
 	// paint rectangles with built-in patterns:
 	Rect(  0, 48,  15, 63, DOGMLCD_full, poke );

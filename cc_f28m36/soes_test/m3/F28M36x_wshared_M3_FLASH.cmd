@@ -115,26 +115,29 @@ SECTIONS
     .pinit  :       > FLASH_E,  ALIGN(8)
     .init_array :   > FLASH_E,  ALIGN(8)
 
-    .vtable :   >  C0 | C1 | C2 | C3
+    .vtable :   >  C0
+    .stack  :   >  C0
     .data   :   >  C2 | C3
     .bss    :   >> C2 | C3
-    .sysmem :   >  C0 | C1 | C2 | C3
-    .stack  :   >  C0 | C1 | C2 | C3
+    .sysmem :   >  C2 | C3
     
+    .lcd    :   >  C4
+    .font_8 :   >> C4
+    .font_11:   >> C4
+
     .z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
     .z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)
     .z2secvalues  :   >  CSM_ECSL_Z2, ALIGN(8)
     .z2_csm_rsvd  :   >  CSM_RSVD_Z2, ALIGN(8)
     
-    ramfuncs            : LOAD = FLASH_E,
-                           RUN = C0,
-                           LOAD_START(RamfuncsLoadStart),
-                           LOAD_SIZE(RamfuncsLoadSize),
-                           LOAD_END(RamfuncsLoadEnd),
-                           RUN_START(RamfuncsRunStart),
-                           RUN_SIZE(RamfuncsRunSize),
-                           RUN_END(RamfuncsRunEnd),
-                           PAGE = 0, ALIGN(8)
+    ramfuncs : LOAD = FLASH_E, RUN = C1,
+               LOAD_START(RamfuncsLoadStart), LOAD_SIZE(RamfuncsLoadSize), LOAD_END(RamfuncsLoadEnd),
+               RUN_START(RamfuncsRunStart), RUN_SIZE(RamfuncsRunSize), RUN_END(RamfuncsRunEnd),
+               PAGE = 0, ALIGN(8)
+
+    // see http://processors.wiki.ti.com/index.php/Placing_functions_in_RAM
+    .TI.ramfunc : {} load=FLASH_E, run=C1, table(BINIT)
+    .binit : {} > FLASH_E
                            
     FLS_APP_CRC : > FLS_E_CRC
 
@@ -159,4 +162,4 @@ SECTIONS
 }
 
 
-__STACK_TOP = __stack + 256;
+__STACK_TOP = __stack +  __STACK_SIZE;

@@ -5,7 +5,8 @@ void Configure_UART(void);
 void Configure_EcatPDI(void);
 void Configure_Link_Enc_BissC(void);
 void Configure_Led(void);
-void Configure_Timer(void);
+void Configure_Timer_0A(void);
+void Configure_Timer_1A(void);
 void Configure_LCD(void);
 void Watchdog0Reset(void);
 
