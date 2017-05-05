@@ -35,6 +35,8 @@
 #include "soes/utypes.h"
 #include "soes/esc.h"
 
+extern void Lcd_init( void );
+
 
 void disable_peripheral_irq(void)
 {
@@ -91,7 +93,7 @@ void Configure_EcatPDI (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI2, system clock supply, idle clock level low and active low clock in
     // freescale SPI mode, master mode, 8MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(SSI_ECAT_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 8000000, 8);
+    SSIConfigSetExpClk(SSI_ECAT_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 7500000, 8);
     // Enable the SSI2 module.
     SSIEnable(SSI_ECAT_BASE);
     // Configure the SPI INT pin as an input.
@@ -128,7 +130,7 @@ void Configure_LCD (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level high and active low clock in
     // freescale SPI mode, master mode, 1MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 5000000, 8);
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 10000000, 8);
     // Enable the SSI module.
     SSIEnable(LCD_SSI_BASE);
 

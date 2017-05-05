@@ -1,0 +1,59 @@
+/* 
+ * libmbed-graphics 2D and wireframe 3D graphics library for the MBED
+ * microcontroller platform
+ * Copyright (C) <2009> Michael Sheldon <mike@mikeasoft.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
+
+#ifndef MBED_TRIMESHOBJECT_H
+#define MBED_TRIMESHOBJECT_H
+
+#include "Object3D.h"
+
+/* Class: TrimeshObject
+ * Constructs 3D objects from triangle meshes specified by lists of
+ * vertices and faces.
+ */
+class TrimeshObject : public Object3D {
+
+    public:
+        /* Constructor: TrimeshObject
+         * Instantiate a trimesh object.
+         *
+         * Parameters:
+         * vertices - A multidimensional array containing a list of vertices.
+         * faces - A multidimensional array containing a list of faces, connecting vertices together to form triangles.
+         * num_faces - The number of faces in the "faces" array.
+         */
+        TrimeshObject(int vertices[][3], int faces[][3], int num_faces);
+        
+        /* Function: render
+         * Draws the trimesh object to the specified graphical context.
+         *
+         * Parameters:
+         * g - The graphical context to which the trimesh object should be rendered.
+         */
+        virtual void render(Graphics &g);
+        
+    protected:
+        int (*_vertices)[3];
+        int (*_faces)[3];
+        int _num_faces;
+
+};
+
+#endif

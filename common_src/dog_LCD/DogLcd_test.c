@@ -12,8 +12,10 @@
 
 #include "doggy.h"
 
-const char formula[] = { 159, '(', 'x', ')', '=', '2', 227, '+', 's', 'i', 'n', '(', 224, ')', '/', 251, 'x', 0 };
-const char ciao[] = "Ciao Stronzo !!";
+#pragma DATA_SECTION(formula,".lcd")
+char formula[] = { 159, '(', 'x', ')', '=', '2', 227, '+', 's', 'i', 'n', '(', 224, ')', '/', 251, 'x', 0 };
+#pragma DATA_SECTION(ciao,".lcd")
+char ciao[] = "Ciao Stronzo !!";
 
 #pragma DATA_SECTION(lcd_test_buf,".lcd")
 char lcd_test_buf[32];

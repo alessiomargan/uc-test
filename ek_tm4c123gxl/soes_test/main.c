@@ -32,7 +32,20 @@
 
 #include <peripherals.h>
 
-extern volatile uint32_t timer1_cnt;
+
+#ifdef USE_LCD
+	#ifdef C_LCD
+		extern void lcd_test_2d( void );
+		extern void lcd_test_char( void );
+		extern void lcd_test_string( void );
+	#else
+		#include "cpp_dog_LCD/c_lcd_iface.h"
+		#include "cpp_dog_LCD/pics/hellombed.h"
+		#include "cpp_dog_LCD/pics/logo_BLH.h"
+		#include "cpp_dog_LCD/fonts/font_8x16.h"
+	#endif
+#endif
+
 /**
  * 
  * 
@@ -55,37 +68,46 @@ void main(void)
     UARTprintf("SysCtlClockGet %d\n", SysCtlClockGet() );
     //
     Configure_Led();
-    //Configure_EcatPDI();
+    Configure_EcatPDI();
+#ifdef USE_LCD
     Configure_LCD();
+#endif
     Configure_ADC();
     // should be the last configure ...
-    //Configure_Timer_0A();
+    Configure_Timer_0A(); // ecat
     Configure_Timer_1A();
 
     IntPrioritySet(INT_TIMER1A, 0x30);
-    //IntPrioritySet(INT_TIMER0A, 0x20);
-    //IntPrioritySet(INT_GPIOB,   0x20);
+    IntPrioritySet(INT_TIMER0A, 0x20);
+    IntPrioritySet(INT_GPIOB,   0x20);
 
+    //
+    soes_init();
+#ifdef USE_LCD
+#ifdef C_LCD
+    lcd_test_2d ();
+    lcd_test_char();
+    lcd_test_string();
+	Flush();
+#else
+	lcd_clear_screen();
+	//lcd_send_bitmap(pic_hellombed);
+	lcd_send_pic(0, 0, ea_logo);
+	lcd_string(0, 4, font_8x16, "Ciao bello !!");
+#endif
+#endif
     // Enable processor interrupts.
     IntMasterEnable();
 
-    //
-    //soes_init();
-	lcd_self_2d();
-    lcd_self_char();
-    lcd_self_string();
-	Flush();
 
     while (1) {
 
-    	GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3 );
-    	SysCtlDelay( 2000000 );
-
-        //lcd_self_sprint();
+    	//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3 );
+    	//SysCtlDelay( 2000000 );
+        //lcd_test_string();
     	//Flush();
-
-    	GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0 );
-		SysCtlDelay( 2000000 );
+    	//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0 );
+		//SysCtlDelay( 2000000 );
 	}
 
 

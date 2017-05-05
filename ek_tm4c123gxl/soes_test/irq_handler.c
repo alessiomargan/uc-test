@@ -26,6 +26,7 @@
 //#include "pwm_ctrl.h"
 #include "dog_LCD/doggy.h"
 
+extern void lcd_test_sprint( void );
 
 volatile uint32_t timer0_cnt = 0;
 volatile uint32_t timer1_cnt = 0;
@@ -93,8 +94,12 @@ void Timer1A_IntHandler(void) {
 	if ( (timer1_cnt % 250) == 0 ) {
 		//sprintf( buf, "timer1 %d", timer1_cnt);
 		HWREGBITB(&toggle, 0) ^= 1;
-		lcd_self_sprint();
-		Flush();
+#ifdef USE_LCD
+#ifdef C_LCD
+		//lcd_test_sprint();
+		//Flush();
+#endif
+#endif
 	}
 
 	GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, toggle ? GPIO_PIN_1 : 0 );
