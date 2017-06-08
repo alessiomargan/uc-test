@@ -24,6 +24,7 @@
 #include <driverlib/uart.h>
 #include <driverlib/timer.h>
 #include <driverlib/pwm.h>
+#include <grlib/grlib.h>
 
 #include <utils/uartstdio.h>
 
@@ -42,9 +43,13 @@
 		#include "cpp_dog_LCD/c_lcd_iface.h"
 		#include "cpp_dog_LCD/pics/hellombed.h"
 		#include "cpp_dog_LCD/pics/logo_BLH.h"
+		#include "cpp_dog_LCD/fonts/font_6x8.h"
+		#include "cpp_dog_LCD/fonts/font_8x8.h"
 		#include "cpp_dog_LCD/fonts/font_8x16.h"
+		#include "cpp_dog_LCD/fonts/font_16x32nums.h"
 	#endif
 #endif
+
 
 /**
  * 
@@ -72,6 +77,7 @@ void main(void)
 #ifdef USE_LCD
     Configure_LCD();
 #endif
+
     Configure_ADC();
     // should be the last configure ...
     Configure_Timer_0A(); // ecat
@@ -93,9 +99,12 @@ void main(void)
 	lcd_clear_screen();
 	//lcd_send_bitmap(pic_hellombed);
 	lcd_send_pic(0, 0, ea_logo);
-	lcd_string(0, 4, font_8x16, "Ciao bello !!");
+	lcd_string(60, 0, font_16x32num, "3");
+	lcd_string(0, 4, font_8x16, "Ciao bello ?");
+	lcd_string(0, 6, font_8x8, "Hello world !!");
 #endif
 #endif
+
     // Enable processor interrupts.
     IntMasterEnable();
 

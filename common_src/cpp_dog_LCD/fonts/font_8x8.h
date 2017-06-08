@@ -16,7 +16,8 @@ for more details (techik@lcd-module.de)
 
 #define FONT_8X8_LEN  776
 
-const byte font_8x8[FONT_8X8_LEN] __attribute__((section(".progmem.data"))) =
+#pragma DATA_SECTION(font_8x8,".fonts")
+unsigned char font_8x8[FONT_8X8_LEN] =
 {
    70, 86, 32,127,  8,  8,  1,  8,
     0,  0,  0,  0,  0,  0,  0,  0,

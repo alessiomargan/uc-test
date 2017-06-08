@@ -59,8 +59,9 @@ void DogLCD::_send_commands(const unsigned char* buf, size_t size)
 	lcs_dn(); //_cs = 0;
 	a0_dn();  //_a0 = 0;
 	while ( size-- > 0 ) {
-        lcd_spi_write(*buf++);
-    	//SSIDataPut(LCD_SSI_BASE, *buf++);
+        lcd_spi_write(*buf);
+    	//SSIDataPut(LCD_SSI_BASE, *buf);
+        buf++;
     }
     lcs_up();  //_cs = 1;
 }
@@ -72,8 +73,9 @@ void DogLCD::_send_data(const unsigned char* buf, size_t size)
 	lcs_dn(); //_cs = 0;
 	a0_up();  //_a0 = 1;
  	while ( size-- > 0 ) {
-        lcd_spi_write(*buf++);
-		//SSIDataPut(LCD_SSI_BASE, *buf++);
+        lcd_spi_write(*buf);
+		//SSIDataPut(LCD_SSI_BASE, *buf);
+        buf++;
 	}
     lcs_up(); //_cs = 1;
     a0_dn();  //_a0 = 0;

@@ -71,7 +71,7 @@ void Timer0A_IntHandler(void) {
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle 
         HWREGBITB(&toggle, 0) ^= 1;
-        UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle );
+        UARTprintf("\r tmr0: %d %d\t ecat_irq_cnt :", timer0_cnt, toggle, ecat_irq_cnt );
     }
 
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, toggle ? GPIO_PIN_3 : 0 );

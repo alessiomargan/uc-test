@@ -35,7 +35,7 @@
 #include "soes/utypes.h"
 #include "soes/esc.h"
 
-extern void Lcd_init( void );
+extern void lcd_init( void );
 
 
 void disable_peripheral_irq(void)
@@ -143,9 +143,9 @@ void Configure_LCD (void)
     GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS);
     GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
     GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
-
-    Lcd_init();
-
+#ifdef USE_LCD
+    lcd_init();
+#endif
     UARTprintf("%s\n",__FUNCTION__);
 }
 

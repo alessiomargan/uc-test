@@ -16,7 +16,8 @@ for more details (techik@lcd-module.de)
 
 #define FONT_16X32NUMS_LEN  1096
 
-const byte font_16x32nums[FONT_16X32NUMS_LEN] __attribute__((section(".progmem.data"))) =
+#pragma DATA_SECTION(font_16x32num,".fonts")
+unsigned char font_16x32num[FONT_16X32NUMS_LEN] =
 {
    70, 86, 42, 58, 16, 32,  4, 64,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,

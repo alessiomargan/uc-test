@@ -19,20 +19,40 @@
 #include "driverlib/rom.h"
 #include "driverlib/pin_map.h"
 #include "grlib/grlib.h"
-#include "drivers/cfal96x64x16.h"
+#include "dog128x64x1.h"
 
+#include <pins.h>
 
+#define LCDWIDTH 128
+#define LCDHEIGHT 64
+#define LCDPAGES  (LCDHEIGHT+7)/8
+
+uint8_t _framebuffer[LCDWIDTH*LCDPAGES];
+int _updating = 0;
 //*****************************************************************************
 //
 // An array that holds a set of commands that are sent to the display when
 // it is initialized.
 //
 //*****************************************************************************
-static
-uint8_t g_ui8DisplayInitCommands[] =
-{
-
+static const uint8_t g_ui8DisplayInitCommands[] = {
+	0x40,    //Display start line 0
+	0xa1,    //ADC reverse
+	0xc0,    //Normal COM0...COM63
+	0xa6,    //Display normal
+	0xa2,    //Set Bias 1/9 (Duty 1/65)
+	0x2b,    //Booster Off, Regulator and Follower On
+	//0x2f,    //Booster, Regulator and Follower On
+	//0xf8,    //Set internal Booster to 4x
+	//0x00,
+	0x27,    //Contrast set
+	0x81,
+	0x16,
+	0xac,    //No indicator
+	0x00,
+	0xaf,    //Display on
 };
+
 #define NUM_INIT_BYTES sizeof(g_ui8DisplayInitCommands)
 
 //*****************************************************************************
@@ -63,92 +83,55 @@ uint8_t g_ui8DisplayInitCommands[] =
                                  (((c) & 0x000000c0) >> 6))
 #define DPYCOLORTRANSLATE DPYCOLORTRANSLATE8
 
-//*****************************************************************************
-//
-//! Write a set of command bytes to the display controller.
-//
-//! \param pi8Cmd is a pointer to a set of command bytes.
-//! \param ui32Count is the count of command bytes.
-//!
-//! This function provides a way to send multiple command bytes to the display
-//! controller.  It can be used for single commands, or multiple commands
-//! chained together in a buffer.  It will wait for any previous operation to
-//! finish, and then copy all the command bytes to the controller.  It will
-//! not return until the last command byte has been written to the SSI FIFO,
-//! but data could still be shifting out to the display controller when this
-//! function returns.
-//!
-//! \return None.
-//
-//*****************************************************************************
-static void
-dogWriteCommand(const uint8_t *pi8Cmd, uint32_t ui32Count)
-{
-    //
-    // Wait for any previous SSI operation to finish.
-    //
-    while(ROM_SSIBusy(DISPLAY_SSI_BASE))
-    {
-    }
+inline void lcs_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS); }
+inline void lcs_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, 0); }
+inline void a0_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, LCD_A0); }
+inline void a0_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0); }
 
-    //
-    // Set the D/C pin low to indicate command
-    //
-    ROM_GPIOPinWrite(DISPLAY_D_C_PORT, DISPLAY_D_C_PIN, 0);
-
-    //
-    // Send all the command bytes to the display
-    //
-    while(ui32Count--)
-    {
-        ROM_SSIDataPut(DISPLAY_SSI_BASE, *pi8Cmd);
-        pi8Cmd++;
-    }
+inline void lcd_spi_write(uint8_t data) {
+    SSIDataPut(LCD_SSI_BASE, data);
+    while( SSIBusy(LCD_SSI_BASE) ) { }
 }
 
-//*****************************************************************************
-//
-//! Write a set of data bytes to the display controller.
-//
-//! \param pi8Data is a pointer to a set of data bytes, containing pixel data.
-//! \param ui32Count is the count of command bytes.
-//!
-//! This function provides a way to send a set of pixel data to the display.
-//! The data will draw pixels according to whatever the most recent col, row
-//! settings are for the display.  It will wait for any previous operation to
-//! finish, and then copy all the data bytes to the controller.  It will
-//! not return until the last data byte has been written to the SSI FIFO,
-//! but data could still be shifting out to the display controller when this
-//! function returns.
-//!
-//! \return None.
-//
-//*****************************************************************************
-static void
-CFAL96x64x16WriteData(const uint8_t *pi8Data, uint32_t ui32Count)
+static void _send_commands(const uint8_t *pi8Cmd, uint32_t ui32Count)
 {
-    //
-    // Wait for any previous SSI operation to finish.
-    //
-    while(ROM_SSIBusy(DISPLAY_SSI_BASE))
-    {
-    }
-
-    //
-    // Set the D/C pin high to indicate data
-    //
-    ROM_GPIOPinWrite(DISPLAY_D_C_PORT, DISPLAY_D_C_PIN, DISPLAY_D_C_PIN);
-
-    //
-    // Send all the data bytes to the display
-    //
-    while(ui32Count--)
-    {
-        ROM_SSIDataPut(DISPLAY_SSI_BASE, *pi8Data);
-        pi8Data++;
-    }
+    // for commands, A0 is low
+	while( SSIBusy(LCD_SSI_BASE) ) { }
+	lcs_dn(); //_cs = 0;
+	a0_dn();  //_a0 = 0;
+	while ( ui32Count-- > 0 ) {
+		lcd_spi_write(*pi8Cmd);
+	    //SSIDataPut(LCD_SSI_BASE, *pi8Cmd);
+	    pi8Cmd++;
+	}
+	lcs_up();  //_cs = 1;
 }
 
+static void _send_data(const uint8_t *pi8Data, uint32_t ui32Count)
+{
+    // for data, A0 is high
+ 	while( SSIBusy(LCD_SSI_BASE) ) { }
+	lcs_dn(); //_cs = 0;
+	a0_up();  //_a0 = 1;
+ 	while ( ui32Count-- > 0 ) {
+        lcd_spi_write(*pi8Data);
+		//SSIDataPut(LCD_SSI_BASE, *pi8Data);
+		pi8Data++;
+	}
+    lcs_up(); //_cs = 1;
+    a0_dn();  //_a0 = 0;
+}
+
+// set column and page number
+static void _set_xy(int32_t i32X, int32_t i32Y)
+{
+	uint8_t cmd[3];
+	int page = i32Y/8;
+    cmd[0] = 0xB0 | (page&0xF);
+    cmd[1] = 0x10 | (i32X&0xF);
+    cmd[2] = (i32X>>4)&0xF;
+    _send_commands(cmd, 3);
+}
 //*****************************************************************************
 //
 //! Draws a pixel on the screen.
@@ -165,35 +148,21 @@ CFAL96x64x16WriteData(const uint8_t *pi8Data, uint32_t ui32Count)
 //! \return None.
 //
 //*****************************************************************************
-static void
-CFAL96x64x16PixelDraw(void *pvDisplayData, int32_t i32X, int32_t i32Y,
+static void DogPixelDraw(void *pvDisplayData, int32_t i32X, int32_t i32Y,
                       uint32_t ui32Value)
 {
-    uint8_t ui8Cmd[8];
-
-    //
-    // Load column command, start and end column
-    //
-    ui8Cmd[0] = 0x15;
-    ui8Cmd[1] = (uint8_t)i32X;
-    ui8Cmd[2] = (uint8_t)i32X;
-
-    //
-    // Load row command, start and end row
-    //
-    ui8Cmd[3] = 0x75;
-    ui8Cmd[4] = (uint8_t)i32Y;
-    ui8Cmd[5] = (uint8_t)i32Y;
-
-    //
-    // Send the column, row commands to the display
-    //
-    CFAL96x64x16WriteCommand(ui8Cmd, 6);
-
-    //
-    // Send the data value representing the pixel to the display
-    //
-    CFAL96x64x16WriteData((uint8_t *)&ui32Value, 1);
+	int page = i32Y/8;
+	uint8_t mask = 1<<(i32Y%8);
+	uint8_t *byte = &_framebuffer[page*LCDWIDTH + i32X];
+	if ( ui32Value == 0 )
+		*byte &= ~mask; // clear pixel
+	else
+		*byte |= mask; // set pixel
+//	if ( !_updating )
+//	{
+//		_set_xy(i32X, page);
+//		_send_data(byte, 1);
+//	}
 }
 
 //*****************************************************************************
@@ -222,192 +191,12 @@ CFAL96x64x16PixelDraw(void *pvDisplayData, int32_t i32X, int32_t i32Y,
 //! \return None.
 //
 //*****************************************************************************
-static void
-CFAL96x64x16PixelDrawMultiple(void *pvDisplayData, int32_t i32X, int32_t i32Y, int32_t i32X0,
-                              int32_t i32Count, int32_t i32BPP,
-                              const uint8_t *pui8Data,
-                              const uint8_t *pui8Palette)
+static void DogPixelDrawMultiple(void *pvDisplayData,
+		               	   	   	 int32_t i32X, int32_t i32Y, int32_t i32X0,
+                                 int32_t i32Count, int32_t i32BPP,
+                                 const uint8_t *pui8Data,
+                                 const uint8_t *pui8Palette)
 {
-    uint32_t ui32Byte;
-    uint8_t ui8Cmd[8];
-
-    //
-    // Load column command.  Use the specified X for the start and just set
-    // the end to the rightmost column since we dont know where the data ends.
-    //
-    ui8Cmd[0] = 0x15;
-    ui8Cmd[1] = (uint8_t)i32X;
-    ui8Cmd[2] = 95;
-
-    //
-    // Load row command.  Use the specified Y for the start row and just set
-    // the end row to the bottom row since we dont know where the data ends.
-    //
-    ui8Cmd[3] = 0x75;
-    ui8Cmd[4] = (uint8_t)i32Y;
-    ui8Cmd[5] = 63;
-
-    //
-    // Send the column, row commands to the display
-    //
-    CFAL96x64x16WriteCommand(ui8Cmd, 6);
-
-    //
-    // Determine how to interpret the pixel data based on the number of bits
-    // per pixel.
-    //
-    switch(i32BPP & 0xFF)
-    {
-        //
-        // The pixel data is in 1 bit per pixel format.
-        //
-        case 1:
-        {
-            //
-            // Loop while there are more pixels to draw.
-            //
-            while(i32Count)
-            {
-                //
-                // Get the next byte of image data.
-                //
-                ui32Byte = *pui8Data++;
-
-                //
-                // Loop through the pixels in this byte of image data.
-                //
-                for(; (i32X0 < 8) && i32Count; i32X0++, i32Count--)
-                {
-                    //
-                    // Draw this pixel in the appropriate color.
-                    //
-                    uint8_t ui8BPP = ((uint32_t *)pui8Palette)
-                                            [(ui32Byte >> (7 - i32X0)) & 1];
-                    CFAL96x64x16WriteData(&ui8BPP, 1);
-                }
-
-                //
-                // Start at the beginning of the next byte of image data.
-                //
-                i32X0 = 0;
-            }
-
-            //
-            // The image data has been drawn.
-            //
-            break;
-        }
-
-        //
-        // The pixel data is in 4 bit per pixel format.
-        //
-        case 4:
-        {
-            //
-            // Loop while there are more pixels to draw.  "Duff's device" is
-            // used to jump into the middle of the loop if the first nibble of
-            // the pixel data should not be used.  Duff's device makes use of
-            // the fact that a case statement is legal anywhere within a
-            // sub-block of a switch statement.  See
-            // http://en.wikipedia.org/wiki/Duff's_device for detailed
-            // information about Duff's device.
-            //
-            switch(i32X0 & 1)
-            {
-                case 0:
-                    while(i32Count)
-                    {
-                        uint8_t ui8Color;
-
-                        //
-                        // Get the upper nibble of the next byte of pixel data
-                        // and extract the corresponding entry from the
-                        // palette.
-                        //
-                        ui32Byte = (*pui8Data >> 4) * 3;
-                        ui32Byte = (*(uint32_t *)(pui8Palette + ui32Byte) &
-                                  0x00ffffff);
-
-                        //
-                        // Translate this palette entry and write it to the
-                        // screen.
-                        //
-                        ui8Color = DPYCOLORTRANSLATE(ui32Byte);
-                        CFAL96x64x16WriteData(&ui8Color, 1);
-
-                        //
-                        // Decrement the count of pixels to draw.
-                        //
-                        i32Count--;
-
-                        //
-                        // See if there is another pixel to draw.
-                        //
-                        if(i32Count)
-                        {
-                case 1:
-                            //
-                            // Get the lower nibble of the next byte of pixel
-                            // data and extract the corresponding entry from
-                            // the palette.
-                            //
-                            ui32Byte = (*pui8Data++ & 15) * 3;
-                            ui32Byte = (*(uint32_t *)(pui8Palette + ui32Byte) &
-                                      0x00ffffff);
-
-                            //
-                            // Translate this palette entry and write it to the
-                            // screen.
-                            //
-                            ui8Color = DPYCOLORTRANSLATE(ui32Byte);
-                            CFAL96x64x16WriteData(&ui8Color, 1);
-
-                            //
-                            // Decrement the count of pixels to draw.
-                            //
-                            i32Count--;
-                        }
-                    }
-            }
-
-            //
-            // The image data has been drawn.
-            //
-            break;
-        }
-
-        //
-        // The pixel data is in 8 bit per pixel format.
-        //
-        case 8:
-        {
-            //
-            // Loop while there are more pixels to draw.
-            //
-            while(i32Count--)
-            {
-                uint8_t ui8Color;
-
-                //
-                // Get the next byte of pixel data and extract the
-                // corresponding entry from the palette.
-                //
-                ui32Byte = *pui8Data++ * 3;
-                ui32Byte = *(uint32_t *)(pui8Palette + ui32Byte) & 0x00ffffff;
-
-                //
-                // Translate this palette entry and write it to the screen.
-                //
-                ui8Color = DPYCOLORTRANSLATE(ui32Byte);
-                CFAL96x64x16WriteData(&ui8Color, 1);
-            }
-
-            //
-            // The image data has been drawn.
-            //
-            break;
-        }
-    }
 }
 
 //*****************************************************************************
@@ -427,40 +216,9 @@ CFAL96x64x16PixelDrawMultiple(void *pvDisplayData, int32_t i32X, int32_t i32Y, i
 //! \return None.
 //
 //*****************************************************************************
-static void
-CFAL96x64x16LineDrawH(void *pvDisplayData, int32_t i32X1, int32_t i32X2, int32_t i32Y,
-                      uint32_t ui32Value)
+static void DogLineDrawH(void *pvDisplayData, int32_t i32X1, int32_t i32X2, int32_t i32Y,
+                      	 uint32_t ui32Value)
 {
-    uint8_t ui8LineBuf[16];
-    unsigned int uIdx;
-
-    //
-    // Send command for starting row and column
-    //
-    ui8LineBuf[0] = 0x15;
-    ui8LineBuf[1] = i32X1 < i32X2 ? i32X1 : i32X2;
-    ui8LineBuf[2] = 95;
-    ui8LineBuf[3] = 0x75;
-    ui8LineBuf[4] = i32Y;
-    ui8LineBuf[5] = 63;
-    CFAL96x64x16WriteCommand(ui8LineBuf, 6);
-
-    //
-    // Use buffer of pixels to draw line, so multiple bytes can be sent at
-    // one time.  Fill the buffer with the line color.
-    //
-    for(uIdx = 0; uIdx < sizeof(ui8LineBuf); uIdx++)
-    {
-        ui8LineBuf[uIdx] = ui32Value;
-    }
-
-    uIdx = (i32X1 < i32X2) ? (i32X2 - i32X1) : (i32X1 - i32X2);
-    uIdx += 1;
-    while(uIdx)
-    {
-        CFAL96x64x16WriteData(ui8LineBuf, (uIdx < 16) ? uIdx : 16);
-        uIdx -= (uIdx < 16) ? uIdx : 16;
-    }
 }
 
 //*****************************************************************************
@@ -480,50 +238,9 @@ CFAL96x64x16LineDrawH(void *pvDisplayData, int32_t i32X1, int32_t i32X2, int32_t
 //! \return None.
 //
 //*****************************************************************************
-static void
-CFAL96x64x16LineDrawV(void *pvDisplayData, int32_t i32X, int32_t i32Y1, int32_t i32Y2,
-                      uint32_t ui32Value)
+static void DogLineDrawV(void *pvDisplayData, int32_t i32X, int32_t i32Y1, int32_t i32Y2,
+                         uint32_t ui32Value)
 {
-    uint8_t ui8LineBuf[16];
-    unsigned int uIdx;
-
-    //
-    // Send command for starting row and column.  Also, set vertical
-    // address increment.
-    //
-    ui8LineBuf[0] = 0x15;
-    ui8LineBuf[1] = i32X;
-    ui8LineBuf[2] = 95;
-    ui8LineBuf[3] = 0x75;
-    ui8LineBuf[4] = i32Y1 < i32Y2 ? i32Y1 : i32Y2;
-    ui8LineBuf[5] = 63;
-    ui8LineBuf[6] = 0xA0;
-    ui8LineBuf[7] = 0x21;
-    CFAL96x64x16WriteCommand(ui8LineBuf, 8);
-
-    //
-    // Use buffer of pixels to draw line, so multiple bytes can be sent at
-    // one time.  Fill the buffer with the line color.
-    //
-    for(uIdx = 0; uIdx < sizeof(ui8LineBuf); uIdx++)
-    {
-        ui8LineBuf[uIdx] = ui32Value;
-    }
-
-    uIdx = (i32Y1 < i32Y2) ? (i32Y2 - i32Y1) : (i32Y1 - i32Y2);
-    uIdx += 1;
-    while(uIdx)
-    {
-        CFAL96x64x16WriteData(ui8LineBuf, (uIdx < 16) ? uIdx : 16);
-        uIdx -= (uIdx < 16) ? uIdx : 16;
-    }
-
-    //
-    // Restore horizontal address increment
-    //
-    ui8LineBuf[0] = 0xA0;
-    ui8LineBuf[1] = 0x20;
-    CFAL96x64x16WriteCommand(ui8LineBuf, 2);
 }
 
 //*****************************************************************************
@@ -543,17 +260,85 @@ CFAL96x64x16LineDrawV(void *pvDisplayData, int32_t i32X, int32_t i32Y1, int32_t 
 //! \return None.
 //
 //*****************************************************************************
-static void
-CFAL96x64x16RectFill(void *pvDisplayData, const tRectangle *pRect,
-                     uint32_t ui32Value)
+static void DogRectFill(void *pvDisplayData, const tRectangle *pRect, uint32_t ui32Value)
 {
-    unsigned int uY;
+	uint32_t x = pRect->i16XMin;
+	uint32_t y = pRect->i16YMin;
+	uint32_t width = pRect->i16XMax - pRect->i16XMin;
+	uint32_t height = pRect->i16YMax - pRect->i16YMin;
 
-    for(uY = pRect->i16YMin; uY <= pRect->i16YMax; uY++)
-    {
-        CFAL96x64x16LineDrawH(0, pRect->i16XMin, pRect->i16XMax, uY, ui32Value);
-    }
+	/*
+	  If we need to fill partial pages at the top:
+
+	  ......+---+---+.....
+	   ^    | = | = |     = : don't touch
+	   |    | = | = |     * : update
+	  y%8   | = | = |
+	   |    | = | = |
+	   v    | = | = |
+	y---->  | * | * |
+			| * | * |
+			| * | * |
+			+---+---+
+	*/
+	//printf("fill(x=%d, y=%d, width=%d, height=%d, colour=%x)\n",  x, y, width, height, colour);
+	//CLAMP(x, 0, LCDWIDTH-1);
+	//CLAMP(y, 0, LCDHEIGHT-1);
+	//CLAMP(width, 0, LCDWIDTH - x);
+	//CLAMP(height, 0, LCDHEIGHT - y);
+	int page = y/8;
+	int firstpage = page;
+	int partpage = y%8;
+	if ( partpage != 0 )
+	{
+		// we need to process partial bytes in the top page
+		unsigned char mask = (1<<partpage) - 1; // this mask has 1s for bits we need to leave
+		unsigned char *bytes = &_framebuffer[page*LCDWIDTH + x];
+		for ( int i = 0; i < width; i++, bytes++ )
+		{
+		  // clear "our" bits
+		  *bytes &= mask;
+		  if ( ui32Value != 0 )
+			*bytes |= ~mask; // set our bits
+		}
+		height -= partpage;
+		page++;
+	}
+	while ( height >= 8 )
+	{
+		memset(&_framebuffer[page*LCDWIDTH + x], ui32Value == 0 ? 0 : 0xFF, width);
+		page++;
+		height -= 8;
+	}
+	if ( height != 0 )
+	{
+		// we need to process partial bytes in the bottom page
+		unsigned char mask = ~((1<<partpage) - 1); // this mask has 1s for bits we need to leave
+		unsigned char *bytes = &_framebuffer[page*LCDWIDTH + x];
+		for ( int i = 0; i < width; i++, bytes++ )
+		{
+		  // clear "our" bits
+		  *bytes &= mask;
+		  if ( ui32Value != 0 )
+			*bytes |= ~mask; // set our bits
+		}
+		page++;
+	}
+	//printf("_updating=%d\n", _updating);
+	if ( !_updating )
+	{
+		int laststpage = page;
+		for ( page = firstpage; page < laststpage; page++)
+		{
+			//printf("setting x=%d, page=%d\n", x, page);
+			_set_xy(x, page);
+			//printf("sending %d bytes at offset %x\n", width, page*LCDWIDTH + x);
+			_send_data(&_framebuffer[page*LCDWIDTH + x], width);
+		}
+	}
 }
+
+
 
 //*****************************************************************************
 //
@@ -572,8 +357,7 @@ CFAL96x64x16RectFill(void *pvDisplayData, const tRectangle *pRect,
 //! \return Returns the display-driver specific color.
 //
 //*****************************************************************************
-static uint32_t
-CFAL96x64x16ColorTranslate(void *pvDisplayData, uint32_t ui32Value)
+static uint32_t DogColorTranslate(void *pvDisplayData, uint32_t ui32Value)
 {
     //
     // Translate from a 24-bit RGB color to a 3-3-2 RGB color.
@@ -596,33 +380,36 @@ CFAL96x64x16ColorTranslate(void *pvDisplayData, uint32_t ui32Value)
 //! \return None.
 //
 //*****************************************************************************
-static void
-CFAL96x64x16Flush(void *pvDisplayData)
+static void DogFlush(void *pvDisplayData)
 {
-    //
-    // There is nothing to be done.
-    //
+	//ASSERT(pvDisplayData);
+    for (int i=0; i<LCDPAGES; i++)
+    {
+        _set_xy(0, i);
+        _send_data(&_framebuffer[i*LCDWIDTH], LCDWIDTH);
+    }
+
 }
 
 //*****************************************************************************
 //
-//! The display structure that describes the driver for the Crystalfontz
+//! The display structure that describes the driver for the DOG EA
 //! CFAL9664-F-B1 OLED panel with SSD 1332 controller.
 //
 //*****************************************************************************
-const tDisplay g_sCFAL96x64x16 =
+const tDisplay g_sDog128x64x1 =
 {
     sizeof(tDisplay),
     0,
     128,
     64,
-    CFAL96x64x16PixelDraw,
-    CFAL96x64x16PixelDrawMultiple,
-    CFAL96x64x16LineDrawH,
-    CFAL96x64x16LineDrawV,
-    CFAL96x64x16RectFill,
-    CFAL96x64x16ColorTranslate,
-    CFAL96x64x16Flush
+    DogPixelDraw,
+    DogPixelDrawMultiple,
+    DogLineDrawH,
+    DogLineDrawV,
+    DogRectFill,
+    DogColorTranslate,
+    DogFlush
 };
 
 //*****************************************************************************
@@ -635,87 +422,50 @@ const tDisplay g_sCFAL96x64x16 =
 //! \return None.
 //
 //*****************************************************************************
-void
-CFAL96x64x16Init(void)
+void Dog128x64x1Init(void)
 {
     tRectangle sRect;
 
-    //
-    // Enable the peripherals used by this driver
-    //
-    ROM_SysCtlPeripheralEnable(DISPLAY_SSI_PERIPH);
-    ROM_SysCtlPeripheralEnable(DISPLAY_SSI_GPIO_PERIPH);
-    ROM_SysCtlPeripheralEnable(DISPLAY_RST_GPIO_PERIPH);
+	// peripherals must be enabled for use.
+	SysCtlPeripheralEnable(LCD_SSI_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LCD_SSI_GPIO_SYSCTL_PERIPH);
+	SysCtlPeripheralEnable(LCD_GPIO_SYSCTL_PERIPH);
 
-    //
-    // Select the SSI function for the appropriate pins
-    //
-    ROM_GPIOPinConfigure(DISPLAY_PINCFG_SSICLK);
-    ROM_GPIOPinConfigure(DISPLAY_PINCFG_SSIFSS);
-    ROM_GPIOPinConfigure(DISPLAY_PINCFG_SSITX);
+    // Configure the pin muxing for SSI functions on port
+    GPIOPinConfigure(GPIO_PD0_SSI1CLK);
+    GPIOPinConfigure(GPIO_PD3_SSI1TX); // MOSI
 
+    // Configure the GPIO settings for the SSI pins.  This function also gives
+    // control of these pins to the SSI hardware.
+    GPIOPinTypeSSI(LCD_SSI_GPIO_PORTBASE, LCD_SSI_PINS);
 
-    //
-    // Configure the pins for the SSI function
-    //
-    ROM_GPIOPinTypeSSI(DISPLAY_SSI_PORT, DISPLAY_SSI_PINS);
+    // Configure and enable the SSI port for SPI master mode.
+    // Use SSI, system clock supply, idle clock level high and active low clock in
+    // freescale SPI mode, master mode, 1MHz SSI frequency, and 8-bit data.
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 10000000, 8);
+    // Enable the SSI module.
+    SSIEnable(LCD_SSI_BASE);
 
-    //
-    // Configure display control pins as GPIO output
-    //
-    ROM_GPIOPinTypeGPIOOutput(DISPLAY_RST_PORT, DISPLAY_RST_PIN);
-    ROM_GPIOPinTypeGPIOOutput(DISPLAY_ENV_PORT, DISPLAY_ENV_PIN);
-    ROM_GPIOPinTypeGPIOOutput(DISPLAY_D_C_PORT, DISPLAY_D_C_PIN);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_A0);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_CS);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_RST);
+    GPIOPinTypeGPIOOutput(LCD_GPIO_PORTBASE, LCD_VDD);
 
-    //
-    // Reset pin high, power off
-    //
-    ROM_GPIOPinWrite(DISPLAY_RST_PORT, DISPLAY_RST_PIN, DISPLAY_RST_PIN);
-    ROM_GPIOPinWrite(DISPLAY_ENV_PORT, DISPLAY_ENV_PIN, 0);
-    ROM_SysCtlDelay(1000);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
+    GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
 
-    //
-    // Drive the reset pin low while we do other stuff
-    //
-    ROM_GPIOPinWrite(DISPLAY_RST_PORT, DISPLAY_RST_PIN, 0);
-
-    //
-    // Configure the SSI port
-    //
-    ROM_SSIDisable(DISPLAY_SSI_BASE);
-    ROM_SSIConfigSetExpClk(DISPLAY_SSI_BASE, ROM_SysCtlClockGet(),
-                           SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER,
-                           DISPLAY_SSI_CLOCK, 8);
-    ROM_SSIEnable(DISPLAY_SSI_BASE);
-
-    //
-    // Take the display out of reset
-    //
-    ROM_SysCtlDelay(1000);
-    ROM_GPIOPinWrite(DISPLAY_RST_PORT, DISPLAY_RST_PIN, DISPLAY_RST_PIN);
-    ROM_SysCtlDelay(1000);
-
-    //
-    // Enable display power supply
-    //
-    ROM_GPIOPinWrite(DISPLAY_ENV_PORT, DISPLAY_ENV_PIN, DISPLAY_ENV_PIN);
-    ROM_SysCtlDelay(1000);
-
-    //
     // Send the initial configuration command bytes to the display
-    //
-    CFAL96x64x16WriteCommand(g_ui8DisplayInitCommands,
-                             sizeof(g_ui8DisplayInitCommands));
-    ROM_SysCtlDelay(1000);
+    _send_commands(g_ui8DisplayInitCommands, sizeof(g_ui8DisplayInitCommands));
+    SysCtlDelay(1000);
 
-    //
     // Fill the entire display with a black rectangle, to clear it.
-    //
     sRect.i16XMin = 0;
-    sRect.i16XMax = 95;
+    sRect.i16XMax = 127;
     sRect.i16YMin = 0;
     sRect.i16YMax = 63;
-    CFAL96x64x16RectFill(0, &sRect, 0);
+    DogRectFill(0, &sRect, 0);
 }
 
 //*****************************************************************************

@@ -5,7 +5,7 @@
 DogLCD dog;
 Graphics g(&dog);
 
-void Lcd_init(void) {
+void lcd_init(void) {
 	dog.init();
 }
 
