@@ -84,7 +84,7 @@ void Configure_C28_Timer(void)
 void Configure_C28_Gpio(void)
 {
 	EALLOW;
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
 	// control card led_0
 	GpioG1CtrlRegs.GPADIR.bit.GPIO31 = 1;
     // debug pin

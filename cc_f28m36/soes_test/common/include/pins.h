@@ -1,7 +1,7 @@
 #ifndef __PINS_H__
 #define __PINS_H__
 
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
 
 //*****************************************************************************
 // GPIO for the user LEDs

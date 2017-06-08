@@ -24,12 +24,6 @@
 #include "c28/include/definitions.h"
 #include "common/include/shared_ram.h"
 
-#ifdef _FLASH
-// These are defined by the linker (see device linker command file)
-extern Uint16 RamfuncsLoadStart;
-extern Uint16 RamfuncsLoadSize;
-extern Uint16 RamfuncsRunStart;
-#endif
 
 void main(void)
 {
@@ -48,12 +42,7 @@ void main(void)
    DINT;
 
 #ifdef _FLASH
-   // Copy time critical code and Flash setup code to RAM
-   // This includes the following functions: InitFlash();
-   // The  RamfuncsLoadStart, RamfuncsLoadEnd, and RamfuncsRunStart
-   // symbols are created by the linker. Refer to the device .cmd file.
-   memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (size_t)&RamfuncsLoadSize);
-
+   // .binit section copy table in RAM
    // Call Flash Initialization to setup flash waitstates
    // This function must reside in RAM
    InitFlash();

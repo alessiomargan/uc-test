@@ -51,7 +51,7 @@ void disable_peripheral_irq(void)
  */
 void Configure_UART(void)
 {
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     GPIOPinConfigure(GPIO_PE4_U0RX);
     GPIOPinConfigure(GPIO_PE5_U0TX);
@@ -84,7 +84,7 @@ void Configure_EcatPDI (void)
 	GPIOPinTypeGPIOOutput(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS);
     GPIOPinWrite(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS, ECAT_SSI_CS);
     // Configure the pin muxing for SSI functions on port
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
     GPIOPinConfigure(GPIO_PD2_SSI0CLK);
     GPIOPinConfigure(GPIO_PD1_SSI0RX); // MISO
     GPIOPinConfigure(GPIO_PD0_SSI0TX); // MOSI
@@ -114,7 +114,7 @@ void Configure_EcatPDI (void)
 	GPIOPinTypeGPIOInput(ECAT_GPIO_PORTBASE, ECAT_BOOT);
 
     GPIOPinIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
     IntRegister(INT_GPIOG, EcatIntHandler);
     IntEnable(INT_GPIOG);
 #else
@@ -134,7 +134,7 @@ void Configure_LCD (void)
 	SysCtlPeripheralEnable(LCD_GPIO_SYSCTL_PERIPH);
 
     // Configure the pin muxing for SSI functions on port
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
 	GPIOPinConfigure(GPIO_PE2_SSI1CLK);
     GPIOPinConfigure(GPIO_PE0_SSI1TX); // MOSI
 #else
@@ -228,7 +228,7 @@ void Configure_AD7680 (void)
 void Configure_Led(void)
 {
     // Enable the GPIO port that is used for the on-board LED.
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
     // Enable the GPIO port that is used for the on-board LED.
     SysCtlPeripheralEnable(LED_1_PERIPH);
     SysCtlPeripheralEnable(LED_0_PERIPH);

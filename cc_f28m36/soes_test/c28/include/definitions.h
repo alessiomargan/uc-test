@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
 
 #define DEBUG_PIN_ON		GpioDataRegs.GPCSET.bit.GPIO70 = 1;
 #define DEBUG_PIN_OFF		GpioDataRegs.GPCCLEAR.bit.GPIO70 = 1;

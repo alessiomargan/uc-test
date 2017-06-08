@@ -71,7 +71,7 @@ void Timer0A_IntHandler(void) {
         UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle);
     }
 
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
     GPIOPinWrite(LED_1_BASE, LED_1_PIN, toggle ? LED_1_PIN : 0 );
 #else
     GPIOPinWrite(LED_GRN_BASE, LED_GRN_PIN, toggle ? LED_GRN_PIN : 0 );
