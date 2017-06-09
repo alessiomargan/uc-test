@@ -24,7 +24,6 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
 #include "driverlib/ram.h"
-
 #include "utils/uartstdio.h"
 
 #include <ethercat.h>
@@ -32,15 +31,9 @@
 #include <pins.h>
 #include <shared_ram.h>
 #include <peripherals.h>
+#include <flash_utils.h>
 #ifdef _LCD
 #include <dog_LCD/DogLcd_test.h>
-#endif
-
-#ifdef _FLASH
-// These are defined by the linker (see device linker command file)
-extern unsigned long RamfuncsLoadStart;
-extern unsigned long RamfuncsRunStart;
-extern unsigned long RamfuncsLoadSize;
 #endif
 
 //*****************************************************************************
@@ -86,14 +79,13 @@ int main(void)
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
 #ifdef _FLASH
+    // .binit copy table do the job ....
     // Copy time critical code and Flash setup code to RAM
-    // This includes the following functions:  InitFlash();
-    // The  RamfuncsLoadStart, RamfuncsLoadSize, and RamfuncsRunStart
-    // symbols are created by the linker. Refer to the device .cmd file.
-    memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (size_t)&RamfuncsLoadSize);
+
     // Call Flash Initialization to setup flash waitstates
     // This function must reside in RAM
     FlashInit();
+    Test_EraseWrite_flash(0x002F0000); // FLASH_B
 #endif
 
     // assign S1 of the shared ram for use by the M3

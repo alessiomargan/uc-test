@@ -40,25 +40,25 @@
 MEMORY
 {
     /* Flash Block 0, Sector 0 Z1 CSM */
-    CSM_ECSL_Z1     : origin = 0x00200000, length = 0x0024
-    CSM_RSVD_Z1     : origin = 0x00200024, length = 0x000C
+    //CSM_ECSL_Z1     : origin = 0x00200000, length = 0x0024
+    //CSM_RSVD_Z1     : origin = 0x00200024, length = 0x000C
     
     /* Flash Block 0, Sector 0 */
-    //RESETISR (RX)   : origin = 0x00200030, length = 0x0008   /* Reset ISR is mapped to boot to Flash location */
+    //RESETISR (RX)   : origin = 0x00200030, length = 0x0008
     //INTVECS (RX)    : origin = 0x00201000, length = 0x0258
     
     //FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8   /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
     //FLASH_M (RX)    : origin = 0x00208000, length = 0x8000   /* Bootloader */
     //FLASH_L (RX)    : origin = 0x00210000, length = 0x8000
     //!!FLASH_K (RX)    : origin = 0x00218000, length = 0x8000
-    FLS_E_CRC (RX)  : origin = 0x00218000, length = 0x0004   /* App crc */
+    //FLS_E_CRC (RX)  : origin = 0x00218000, length = 0x0004   /* App crc */
     //FLASH_J (RX)    : origin = 0x00220000, length = 0x20000
     //FLASH_I (RX)    : origin = 0x00240000, length = 0x20000
     //FLASH_H (RX)    : origin = 0x00260000, length = 0x20000
     //FLASH_G (RX)    : origin = 0x00280000, length = 0x20000
     //FLASH_F (RX)    : origin = 0x002A0000, length = 0x20000
     //!!FLASH_E (RX)    : origin = 0x002C0000, length = 0x20000
-    RESETISR (RX)   : origin = 0x002C0000, length = 0x0008   /* Reset ISR is mapped to boot to Flash location */
+    RESETISR (RX)   : origin = 0x002C0000, length = 0x0008   /* App Reset ISR is mapped to boot to Flash location */
     INTVECS (RX)    : origin = 0x002C1000, length = 0x0258
     FLASH_E (RX)    : origin = 0x002C2000, length = 0x1DFFF  /* Application */
     //FLASH_D (RX)    : origin = 0x002E0000, length = 0x8000
@@ -67,8 +67,8 @@ MEMORY
     //FLASH_A (RX)    : origin = 0x002F8000, length = 0x7E00
     
     /* Flash Block 0, Sector 13 Z2 CSM*/
-    CSM_RSVD_Z2     : origin = 0x002FFE00, length = 0x01DC
-    CSM_ECSL_Z2     : origin = 0x002FFFDC, length = 0x0024
+    //CSM_RSVD_Z2     : origin = 0x002FFE00, length = 0x01DC
+    //CSM_ECSL_Z2     : origin = 0x002FFFDC, length = 0x0024
     
     /* RAM */
     C0 (RWX)        : origin = 0x20000000, length = 0x2000
@@ -113,33 +113,33 @@ SECTIONS
     .const  :       > FLASH_E,  ALIGN(8)
     .cinit  :       > FLASH_E,  ALIGN(8)
     .pinit  :       > FLASH_E,  ALIGN(8)
-    .init_array :   > FLASH_E,  ALIGN(8)
+    //.init_array :   > FLASH_E,  ALIGN(8)
+    //FLS_APP_CRC :   > FLS_E_CRC
 
     .vtable :   >  C0
     .stack  :   >  C0
     .data   :   >  C2 | C3
     .bss    :   >> C2 | C3
-    .sysmem :   >  C2 | C3
+    //.sysmem :   >  C2 | C3
     
     .lcd    :   >  C4
     .font_8 :   >> C4
     .font_11:   >> C4
 
-    .z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
-    .z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)
-    .z2secvalues  :   >  CSM_ECSL_Z2, ALIGN(8)
-    .z2_csm_rsvd  :   >  CSM_RSVD_Z2, ALIGN(8)
-    
+    //.z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
+    //.z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)
+    //.z2secvalues  :   >  CSM_ECSL_Z2, ALIGN(8)
+    //.z2_csm_rsvd  :   >  CSM_RSVD_Z2, ALIGN(8)
+
+/*
     ramfuncs : LOAD = FLASH_E, RUN = C1,
                LOAD_START(RamfuncsLoadStart), LOAD_SIZE(RamfuncsLoadSize), LOAD_END(RamfuncsLoadEnd),
                RUN_START(RamfuncsRunStart), RUN_SIZE(RamfuncsRunSize), RUN_END(RamfuncsRunEnd),
                PAGE = 0, ALIGN(8)
-
+*/
     // see http://processors.wiki.ti.com/index.php/Placing_functions_in_RAM
     .TI.ramfunc : {} load=FLASH_E, run=C1, table(BINIT)
     .binit : {} > FLASH_E
-                           
-    FLS_APP_CRC : > FLS_E_CRC
 
     RAM_S0  : > S0
     RAM_S1  : > S1

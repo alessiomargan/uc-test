@@ -8,14 +8,14 @@
 	uint8_t dataBuff[2560];
 #endif
 
-#pragma CODE_SECTION(Example_Error,"ramfuncs");
+#pragma CODE_SECTION(Example_Error,".TI.ramfunc");
 void Example_Error(Fapi_StatusType status)
 {
     //  Error code will be in the status parameter
         for(;;);
 }
 
-#pragma CODE_SECTION(Configure_flashAPI,"ramfuncs");
+#pragma CODE_SECTION(Configure_flashAPI,".TI.ramfunc");
 void Configure_flashAPI(void) {
 
     Fapi_StatusType            oReturnCheck;
@@ -79,7 +79,7 @@ void Configure_flashAPI(void) {
 }
 
 
-#pragma CODE_SECTION(Erase_flash_sector,"ramfuncs");
+#pragma CODE_SECTION(Erase_flash_sector,".TI.ramfunc");
 Fapi_StatusType Erase_flash_sector(uint32_t address) {
 
 	Fapi_StatusType            oReturnCheck;
@@ -110,7 +110,7 @@ Fapi_StatusType Erase_flash_sector(uint32_t address) {
 }
 
 
-#pragma CODE_SECTION(Write_flash,"ramfuncs");
+#pragma CODE_SECTION(Write_flash,".TI.ramfunc");
 #ifdef _C28X
 Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint16_t * dataBuffer, uint32_t dataBufferSize) {
 #else
@@ -181,6 +181,7 @@ Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint8_t * dataBuffer, uint32
 
 }
 
+#pragma CODE_SECTION(Test_EraseWrite_flash,".TI.ramfunc");
 Fapi_StatusType Test_EraseWrite_flash(uint32_t sectorAddr)
 {
 	Fapi_StatusType       		oReturnCheck = Fapi_Error_Fail;

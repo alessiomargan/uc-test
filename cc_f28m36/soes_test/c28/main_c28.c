@@ -46,6 +46,7 @@ void main(void)
    // Call Flash Initialization to setup flash waitstates
    // This function must reside in RAM
    InitFlash();
+   Test_EraseWrite_flash(0x100000); // FLASH_B
 #endif
 
 	// Initialize the PIE control registers to their default state.

@@ -143,10 +143,10 @@ SECTIONS
 		LOAD_START(_init_load), RUN_START(_init_run), SIZE(_init_size),
 		ALIGN(4)
 */
-
+/*
 	GROUP
 	{
-		ramfuncs { -l F021_API_C28x_FPU32.lib }
+		ramfuncs // { -l F021_API_C28x_FPU32.lib }
 	}	LOAD = FLASHE, PAGE = 0
      	RUN = RAML2L3, PAGE = 1
         LOAD_START(_RamfuncsLoadStart),
@@ -156,11 +156,15 @@ SECTIONS
         RUN_SIZE(_RamfuncsRunSize),
         RUN_END(_RamfuncsRunEnd),
         ALIGN(4)
+*/
+    // see http://processors.wiki.ti.com/index.php/Placing_functions_in_RAM
+    .TI.ramfunc : {} load=FLASHE, PAGE=0, run=RAML2L3, PAGE=1, table(BINIT)
+    .binit : {} > FLASHE
 
-   //flashexeonly        : > FLASH_EXE_ONLY_P0 PAGE = 0, ALIGN(4)
-   //ecslpasswds         : > ECSL_PWL_P0 PAGE = 0, ALIGN(4)
-   //csmpasswds          : > CSM_PWL_P0  PAGE = 0, ALIGN(4)
-   //csm_rsvd            : > CSM_RSVD    PAGE = 0, ALIGN(4)
+    //flashexeonly        : > FLASH_EXE_ONLY_P0 PAGE = 0, ALIGN(4)
+    //ecslpasswds         : > ECSL_PWL_P0 PAGE = 0, ALIGN(4)
+    //csmpasswds          : > CSM_PWL_P0  PAGE = 0, ALIGN(4)
+    //csm_rsvd            : > CSM_RSVD    PAGE = 0, ALIGN(4)
 
    
    /* The following section definitions are required when using the IPC API Drivers */ 
