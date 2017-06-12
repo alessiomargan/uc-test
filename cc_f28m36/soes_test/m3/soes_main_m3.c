@@ -74,7 +74,12 @@ int main(void)
     SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xF) |
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
                          SYSCTL_XCLKDIV_4);
-
+/*
+    // Sets up PLL, M3 running at 125MHz and C28 running at 125MHz
+    SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xC) | (SYSCTL_SPLLFMULT_M & 0x2) |
+                       	 SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_1 |
+                         SYSCTL_XCLKDIV_4);
+*/
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
@@ -108,7 +113,7 @@ int main(void)
 	//Configure_Link_Enc_BissC();
     //Configure_AD7680();
 
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
     // Enable C28 Peripherals
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA); // ePWM
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC); //
@@ -147,7 +152,7 @@ int main(void)
     //where N is 3 for the Concerto family
     IntPrioritySet(INT_TIMER0A, (char)(3)<<5); // middle prio soes loop
     IntPrioritySet(INT_TIMER1A, (char)(2)<<5); // higher prio sensor
-#ifdef CONTROL_CARD
+#ifdef _CONTROL_CARD
     IntPrioritySet(INT_GPIOG,   (char)(3)<<5); // middle prio pdi ecat irq
 #else
     IntPrioritySet(INT_GPIOK,   (char)(3)<<5); // middle prio pdi ecat irq
