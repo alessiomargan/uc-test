@@ -58,6 +58,8 @@ const char fw_ver[8] = "xXx/\\xXx";
 m3_to_c28_data_t	m3_rw_data;
 c28_to_m3_data_t	c28_ro_data;
 
+
+
 // map to RAM S1
 #pragma DATA_SECTION(m3_rw_data,"RAM_S1");
 // map to RAM S5
@@ -83,6 +85,13 @@ int main(void)
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
+#ifdef _USBOTG
+    // Setup USB clock tree for 60MHz
+    // 20MHz * 12 / 4 = 60
+    SysCtlUSBPLLConfigSet((SYSCTL_UPLLIMULT_M & 12) |
+    		              SYSCTL_UPLLCLKSRC_X1 | SYSCTL_UPLLEN);
+#endif
+
 #ifdef _FLASH
     // .binit copy table do the job ....
     // Copy time critical code and Flash setup code to RAM
@@ -104,6 +113,10 @@ int main(void)
 #ifdef _LCD
     Configure_LCD();
 #endif
+#ifdef _USBOTG
+    Configure_USB_host();
+#endif
+
     Configure_EcatPDI();
     // ecat timer
 	Configure_Timer_0A();
@@ -178,13 +191,14 @@ int main(void)
 	ulLoop = 0;
     while (1) {
 
-#ifdef _LCD
-    	lcd_test_sprint();
-    	Flush();
+#ifdef _USBOTG
+    	usb_handler();
 #endif
-    	// 500 msec ?!?
-        SysCtlDelay( (SysCtlClockGet(SYSTEM_CLOCK_SPEED) / 1000) * 500 );
-        //SysCtlDelay( 1000 );
+
+#ifdef _LCD
+    	//lcd_test_sprint();
+    	//Flush();
+#endif
 
 	}
 }

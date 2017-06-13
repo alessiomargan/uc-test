@@ -25,7 +25,8 @@
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
-
+volatile unsigned long g_ulSysTickCount;
+volatile unsigned long g_ulLastTick;
 
 /**
  * 
@@ -68,7 +69,7 @@ void Timer0A_IntHandler(void) {
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle
         HWREGBITB(&toggle, 0) ^= 1;
-        UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle);
+        //UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle);
     }
 
 #ifdef _CONTROL_CARD
@@ -106,6 +107,11 @@ void Timer1A_IntHandler(void) {
 }
 
 
+void SysTick_IntHandler(void)
+{
+    // Update our tick counter.
+    g_ulSysTickCount++;
+}
 
 
 

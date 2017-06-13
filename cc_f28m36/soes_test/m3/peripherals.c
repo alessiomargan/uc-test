@@ -33,7 +33,10 @@
 extern void EcatIntHandler(void);
 extern void Timer0A_IntHandler(void);
 extern void Timer1A_IntHandler(void);
+extern void SysTick_IntHandler(void);
 
+extern volatile unsigned long g_ulSysTickCount;
+extern volatile unsigned long g_ulLastTick;
 
 void disable_peripheral_irq(void)
 {
@@ -64,8 +67,42 @@ void Configure_UART(void)
     GPIOPinTypeUART(GPIO_PORTG_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     UARTStdioInit(2);
 #endif
-    UARTprintf("************************\n");
+    for(int i=0;i<10;i++) {
+    	UARTprintf("************************");
+    }
+	UARTprintf("\n");
     UARTprintf("%s\n",__FUNCTION__);
+}
+
+#define TICKS_PER_SECOND 100
+#define MS_PER_SYSTICK (1000 / TICKS_PER_SECOND)
+void Configure_SysTick( void )
+{
+	// Configure SysTick for a 100Hz interrupt.
+	SysTickPeriodSet(SysCtlClockGet(SYSTEM_CLOCK_SPEED) / TICKS_PER_SECOND);
+	SysTickEnable();
+	SysTickIntEnable();
+	IntRegister(FAULT_SYSTICK, SysTick_IntHandler);
+}
+
+unsigned long GetTickms(void)
+{
+    unsigned long ulRetVal;
+    unsigned long ulSaved;
+
+    ulRetVal = g_ulSysTickCount;
+    ulSaved = ulRetVal;
+
+    if(ulSaved > g_ulLastTick) {
+        ulRetVal = ulSaved - g_ulLastTick;
+    } else {
+        ulRetVal = g_ulLastTick - ulSaved;
+    }
+    // This could miss a few milliseconds but the timings here are on a
+    // much larger scale.
+    g_ulLastTick = ulSaved;
+    // Return the number of milliseconds since the last time this was called.
+    return(ulRetVal * MS_PER_SYSTICK);
 }
 
 /**

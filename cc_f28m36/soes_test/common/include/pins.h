@@ -37,7 +37,7 @@
 
 #define ECAT_IRQ                		GPIO_PIN_0
 #define ECAT_EEPROM_LOADED      		GPIO_PIN_1
-#define ECAT_BOOT						GPIO_PIN_2
+#define ECAT_BOOT						GPIO_PIN_3
 
 
 //*****************************************************************************
