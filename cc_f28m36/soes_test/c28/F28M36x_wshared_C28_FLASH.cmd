@@ -133,18 +133,6 @@ SECTIONS
 
 /*
 	GROUP
-    {
-    	.cinit
-    	.econst
-    	.switch
-    	.text
-	}	LOAD = FLASHE , PAGE = 0
-		RUN  = RAML2L3 , PAGE = 1
-		LOAD_START(_init_load), RUN_START(_init_run), SIZE(_init_size),
-		ALIGN(4)
-*/
-/*
-	GROUP
 	{
 		ramfuncs // { -l F021_API_C28x_FPU32.lib }
 	}	LOAD = FLASHE, PAGE = 0
@@ -157,9 +145,13 @@ SECTIONS
         RUN_END(_RamfuncsRunEnd),
         ALIGN(4)
 */
-    // see http://processors.wiki.ti.com/index.php/Placing_functions_in_RAM
-    .TI.ramfunc : {} load=FLASHE, PAGE=0, run=RAML2L3, PAGE=1, table(BINIT)
+    GROUP
+    {
+        .TI.ramfunc { }
+        ramfuncs { -l F021_API_C28x_FPU32.lib }
+    }   LOAD = FLASHE, run=RAML0L1, table(BINIT)
     .binit : {} > FLASHE
+
 
     //flashexeonly        : > FLASH_EXE_ONLY_P0 PAGE = 0, ALIGN(4)
     //ecslpasswds         : > ECSL_PWL_P0 PAGE = 0, ALIGN(4)

@@ -99,7 +99,6 @@ int main(void)
     // Call Flash Initialization to setup flash waitstates
     // This function must reside in RAM
     FlashInit();
-    Test_EraseWrite_flash(0x002F0000); // FLASH_B
 #endif
 
     // assign S1 of the shared ram for use by the M3
@@ -110,6 +109,12 @@ int main(void)
     //
     Configure_UART();
     Configure_Led();
+
+    Configure_flashAPI();
+    if ( Test_EraseWrite_flash(0x002F0000) == Fapi_Status_Success ) {
+    	UARTprintf("Test_EraseWrite_flash(0x002F0000)\n");
+    }
+
 #ifdef _LCD
     Configure_LCD();
 #endif

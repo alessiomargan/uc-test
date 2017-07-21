@@ -1,22 +1,3 @@
-//###########################################################################
-// FILE:   blinky_c28.c
-// TITLE:  Blinky Example for F28M36x.
-//
-// This Dual Core Blinky Example demonstrates how to run and
-// implement a standalone application on both cores.  Due to an errata in
-// the bootROM this example may not run correctly with the debugger connected.
-// To run the example, program both cores with their respective project and
-// then disconnect the debugger.  Set SW3 switch 1 to the down position
-// (disconnect TRSTn) as well as setting all 4 switches on SW1 to the down
-// position.  Cycle power and both LEDs should begin to blink.
-//
-//###########################################################################
-// $TI Release: F28M36x Support Library v207 $
-// $Release Date: Mon Sep 21 16:44:39 CDT 2015 $
-// $Copyright: Copyright (C) 2012-2015 Texas Instruments Incorporated -
-//             http://www.ti.com/ ALL RIGHTS RESERVED $
-//###########################################################################
-
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
 
 #include <string.h>
@@ -46,7 +27,6 @@ void main(void)
    // Call Flash Initialization to setup flash waitstates
    // This function must reside in RAM
    InitFlash();
-   Test_EraseWrite_flash(0x100000); // FLASH_B
 #endif
 
 	// Initialize the PIE control registers to their default state.
@@ -72,6 +52,7 @@ void main(void)
 	Configure_C28_Timer();
 	//Configure_C28_ePWM();
 	Configure_flashAPI();
+	Test_EraseWrite_flash(0x100000); // FLASH_B
 	Configure_C28_Ipc();
 
 	// Enable global Interrupts and higher priority real-time debug events:

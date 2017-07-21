@@ -137,8 +137,11 @@ SECTIONS
                RUN_START(RamfuncsRunStart), RUN_SIZE(RamfuncsRunSize), RUN_END(RamfuncsRunEnd),
                PAGE = 0, ALIGN(8)
 */
-    // see http://processors.wiki.ti.com/index.php/Placing_functions_in_RAM
-    .TI.ramfunc : {} load=FLASH_E, run=C1, table(BINIT)
+    GROUP
+    {
+        .TI.ramfunc { }
+        ramfuncs { -l F021_API_CortexM3_LE.lib }
+    }   LOAD = FLASH_E, run=C1, table(BINIT)
     .binit : {} > FLASH_E
 
     RAM_S0  : > S0
