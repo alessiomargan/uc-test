@@ -55,7 +55,7 @@ public:
     {
     }
     // initialize and turn on the display
-    void init();
+    void init(unsigned char);
     // send a 128x64 picture for the whole screen
     void send_pic(const unsigned char* data);
     // clear screen

@@ -8,6 +8,8 @@
 #include "globaldefs.h"
 #include "xfont.h"
 
+#define BOOSTER_ON 	0x2F
+#define BOOSTER_OFF 0x2B
 
 extern const unsigned char DOGMLCD_full[];
 extern const unsigned char DOGMLCD_dark[];
@@ -22,7 +24,7 @@ extern XGlyph xfont_11[];
 //
 // implementation in doggy.cpp:
 
-void Lcd_init(void);
+void Lcd_init(uint8_t booster);
 
 /// Use custom screen buffer
 ///

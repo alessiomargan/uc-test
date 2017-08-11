@@ -21,7 +21,7 @@
 #include "peripherals.h"
 #include "shared_ram.h"
 
-
+volatile uint16_t write_lcd = 0;
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
@@ -98,6 +98,7 @@ void Timer1A_IntHandler(void) {
     //Process_Link_encoder_read();
 
     if ( (timer1_cnt % 500) == 0 ) {
+    	write_lcd = 1;
     	//lcd_test_sprint();
     	//Flush();
     }

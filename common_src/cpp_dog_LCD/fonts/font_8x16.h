@@ -1,3 +1,6 @@
+#ifndef __EA_FONT_8x16_H__
+#define __EA_FONT_8x16_H__
+
 /* File '8X16neu.FV' as include
 The font was generated with EA FontEditor. Please contact ELECTRONIC ASSEMBLY
 for more details (techik@lcd-module.de)
@@ -16,7 +19,8 @@ for more details (techik@lcd-module.de)
 
 #define FONT_8X16_LEN  1544
 
-#pragma DATA_SECTION(font_8x16,".fonts")
+//#pragma DATA_SECTION(font_8x16,".fonts")
+#pragma DATA_SECTION(".fonts")
 unsigned char font_8x16[FONT_8X16_LEN] =
 {
    70, 86, 32,127,  8, 16,  2, 16,
@@ -117,3 +121,5 @@ unsigned char font_8x16[FONT_8X16_LEN] =
   192, 96,224,192,128,128,224,  0,  1,  0,  0,  1,  1,  1,  0,  0,
     0,  0,128,224,224,128,  0,  0, 24, 30, 19, 16, 16, 19, 30, 24
 };
+
+#endif

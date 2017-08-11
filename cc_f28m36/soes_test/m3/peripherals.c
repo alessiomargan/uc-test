@@ -199,7 +199,11 @@ void Configure_LCD (void)
     //GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
     //GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
 
-    Lcd_init();
+#if 0
+    Lcd_init(BOOSTER_OFF);
+#else
+    lcd_init(BOOSTER_OFF);
+#endif
 
     UARTprintf("%s\n",__FUNCTION__);
 }
@@ -341,13 +345,15 @@ void Watchdog0Reset(void)
 {
 	WatchdogUnlock(WATCHDOG0_BASE);
 	// Set the period of the watchdog timer.
-	WatchdogReloadSet(WATCHDOG0_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED));
+	WatchdogReloadSet(WATCHDOG0_BASE, 0x100);
 	// Enable reset generation from the watchdog timer.
 	WatchdogResetEnable(WATCHDOG0_BASE);
 	// Enable the watchdog timer.
 	WatchdogEnable(WATCHDOG0_BASE);
 	// Lock subsequent writes to watchdog configuration.
 	WatchdogLock(WATCHDOG0_BASE);
+
+	while(1) {}
 
 }
 

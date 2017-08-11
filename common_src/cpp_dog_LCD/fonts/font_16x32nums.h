@@ -1,3 +1,6 @@
+#ifndef __EA_FONT_16x32NUM_H__
+#define __EA_FONT_16x32NUM_H__
+
 /* File '16X32_numbers.FV' as include
 The font was generated with EA FontEditor. Please contact ELECTRONIC ASSEMBLY
 for more details (techik@lcd-module.de)
@@ -16,7 +19,8 @@ for more details (techik@lcd-module.de)
 
 #define FONT_16X32NUMS_LEN  1096
 
-#pragma DATA_SECTION(font_16x32num,".fonts")
+//#pragma DATA_SECTION(font_16x32num,".fonts")
+#pragma DATA_SECTION(".fonts")
 unsigned char font_16x32num[FONT_16X32NUMS_LEN] =
 {
    70, 86, 42, 58, 16, 32,  4, 64,
@@ -89,3 +93,5 @@ unsigned char font_16x32num[FONT_16X32NUMS_LEN] =
     0,  0,  0,  0,  0,  0,248,248,248,248,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 };
+
+#endif

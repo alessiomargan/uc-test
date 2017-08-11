@@ -1,3 +1,6 @@
+#ifndef __EA_FONT_8x8_H__
+#define __EA_FONT_8x8_H__
+
 /* File '8X8.FV' as include
 The font was generated with EA FontEditor. Please contact ELECTRONIC ASSEMBLY
 for more details (techik@lcd-module.de)
@@ -16,7 +19,8 @@ for more details (techik@lcd-module.de)
 
 #define FONT_8X8_LEN  776
 
-#pragma DATA_SECTION(font_8x8,".fonts")
+//#pragma DATA_SECTION(font_8x8,".fonts")
+#pragma DATA_SECTION(".fonts")
 unsigned char font_8x8[FONT_8X8_LEN] =
 {
    70, 86, 32,127,  8,  8,  1,  8,
@@ -117,3 +121,5 @@ unsigned char font_8x8[FONT_8X8_LEN] =
    12,  6,  6, 12, 24, 24, 12,  0,
     0, 96,120, 94, 70, 88, 96,  0
 };
+
+#endif

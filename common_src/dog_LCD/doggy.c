@@ -19,7 +19,7 @@
 
 #pragma DATA_SECTION(wrk_scr,".lcd")
 char  	wrk_scr[1024];                                    // work screen
-static char * 	b_;                                               // currently used screen
+static char * 	b_;                                       // currently used screen
 /// Xfont assignment, assign example:  XFont = xfont_8; , values { xfont_8 (default), xfont_11 }
 const XGlyph *	XFont;
 
@@ -36,10 +36,10 @@ void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet() / (4*1000000)) * us);
 void wait_us(uint32_t us) { return;  }
 #endif
 
-void lcs_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS); }
-void lcs_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, 0); }
-void a0_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, LCD_A0); }
-void a0_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0); }
+void lcs_up(void) 	{ GPIOPinWrite(LCD_CS_BASE, LCD_CS, LCD_CS); }
+void lcs_dn(void) 	{ GPIOPinWrite(LCD_CS_BASE, LCD_CS, 0); }
+void a0_up(void) 	{ GPIOPinWrite(LCD_A0_BASE, LCD_A0, LCD_A0); }
+void a0_dn(void) 	{ GPIOPinWrite(LCD_A0_BASE, LCD_A0, 0); }
 #if 0
 void rst_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, LCD_RST); }
 void rst_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0); }
@@ -63,26 +63,29 @@ inline int32_t abs(int32_t x)  {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void Lcd_init(void)
+void Lcd_init(uint8_t power_ctrl)
 {
     int i;
 	//b_ = (char*)calloc( 1024, 1 );
 	XFont = xfont_8;
     b_ = wrk_scr;
-    const unsigned char c[] = { 
+    unsigned char c[] = {
         0x40,       // display start line + 0-63
-        0xa1,       // ADC set 0xA1 + 0 = normal (for reverse view) / +1 = reverse (for normal view)
-        0xc0,       // common output mode + 0 = normal / + 0xF  reverse
-        0xa6,       // dispaly mode 0xA6 + 0 = normal / 1 = reverse
-        0xa2,       // set bias 0xa20 + 0 = 1/9 / +1 = 1/7
-		0x2b,       // power control: booster off + 2 regulator on + 1 follower on
-		//0x2f,       // power control: 4 booster on + 2 regulator on + 1 follower on
-        //0xf8, 0x00, // set booster ratio , value 0=4x, 1=5x, 2=6x
+        0xA1,       // ADC set 0xA1 + 0 = normal (for reverse view) / +1 = reverse (for normal view)
+        0xC0,       // common output mode + 0 = normal / + 0xF  reverse
+        0xA6,       // dispaly mode 0xA6 + 0 = normal / 1 = reverse
+        0xA2,       // set bias 0xa20 + 0 = 1/9 / +1 = 1/7
+		//0x2B,       // power control: booster off + 2 regulator on + 1 follower on
+		0x2F,       // power control: 4 booster on + 2 regulator on + 1 follower on
+        0xF8, 0x00, // set booster ratio , value 0=4x, 1=5x, 2=6x
 		0x27,       // set voltage regulator (0x20) to 7
         0x81, 0x14, // set electronic volume , value
-        0xac, 0x00, // static indicator set 0xAC +0 = off / +1 = on , 0 = flash mode
-        0xaf        // display 0xAE +0 = off / +1 = on
+        0xAC, 0x00, // static indicator set 0xAC +0 = off / +1 = on , 0 = flash mode
+        0xAF        // display 0xAE +0 = off / +1 = on
     };
+
+    if ( power_ctrl == BOOSTER_OFF ) c[5] = BOOSTER_OFF;
+
     lcs_dn(); //cs_ = 0;
     a0_dn(); //a0_ = 0;
     wait_us( DOGMLCD_TIME );

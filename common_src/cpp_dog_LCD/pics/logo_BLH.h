@@ -1,3 +1,6 @@
+#ifndef __EA_LOGO_H__
+#define __EA_LOGO_H__
+
 /* File 'EA_Arduino.BMP' as include
 
  the array starts with a 2 byte header:
@@ -7,7 +10,8 @@
 
 #define EA_LOGO_LEN  209
 
-#pragma DATA_SECTION(ea_logo,".pics")
+//#pragma DATA_SECTION(ea_logo,".pics")
+#pragma DATA_SECTION(".pics")
 unsigned char ea_logo[EA_LOGO_LEN] =
 {
    69, 24,
@@ -25,3 +29,5 @@ unsigned char ea_logo[EA_LOGO_LEN] =
   112,224,225,225,225,225,225,224,112,120, 60, 30, 15,  7, 15, 30,
    60,120,112,225,225,231,231,225,225,240,112,120, 63, 31,  7
 };
+
+#endif

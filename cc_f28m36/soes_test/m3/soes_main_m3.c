@@ -33,7 +33,11 @@
 #include <peripherals.h>
 #include <flash_utils.h>
 #ifdef _LCD
-#include <dog_LCD/DogLcd_test.h>
+	#if 0
+		#include <dog_LCD/DogLcd_test.h>
+	#else
+		#include <cpp_dog_LCD/c_lcd_iface.h>
+	#endif
 #endif
 
 //*****************************************************************************
@@ -58,7 +62,7 @@ const char fw_ver[8] = "xXx/\\xXx";
 m3_to_c28_data_t	m3_rw_data;
 c28_to_m3_data_t	c28_ro_data;
 
-
+extern volatile uint16_t write_lcd;
 
 // map to RAM S1
 #pragma DATA_SECTION(m3_rw_data,"RAM_S1");
@@ -82,7 +86,8 @@ int main(void)
                        	 SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_1 |
                          SYSCTL_XCLKDIV_4);
 */
-    SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG0);
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
 #ifdef _USBOTG
@@ -187,10 +192,17 @@ int main(void)
 	soes_init();
 
 #ifdef _LCD
+#if 0
 	lcd_test_2d();
 	lcd_test_char();
 	lcd_test_string();
 	Flush();
+#else
+	lcd_clear_screen();
+	lcd_send_bitmap(pic_hellombed);
+	lcd_send_pic(0,0,ea_logo);
+	lcd_string(0,6,font_8x16,"suca !!");
+#endif
 #endif
 	// Loop forever while the timers run.
 	ulLoop = 0;
@@ -201,8 +213,15 @@ int main(void)
 #endif
 
 #ifdef _LCD
-    	//lcd_test_sprint();
-    	//Flush();
+    	if(write_lcd == 1) {
+#if 0
+    		lcd_test_sprint();
+    		Flush();
+#else
+    		//lcd_sprint(64,6,font_8x16);
+#endif
+    		write_lcd = 0;
+    	}
 #endif
 
 	}

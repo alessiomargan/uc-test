@@ -64,6 +64,10 @@
 #define LCD_RST						GPIO_PIN_4
 #define LCD_VDD						GPIO_PIN_5
 
+#define LCD_CS_BASE					LCD_SSI_GPIO_PORTBASE
+#define LCD_A0_BASE					LCD_GPIO_PORTBASE
+#define LCD_RST_BASE				LCD_GPIO_PORTBASE
+
 //*****************************************************************************
 //
 //  M3 Link Encoder BissC SSI interface

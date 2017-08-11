@@ -1,8 +1,9 @@
 #ifndef __DOGLCD_TEST_H__
 #define __DOGLCD_TEST_H__
 
-extern void Lcd_init(void);
-extern void Flush(void);
+#include "doggy.h"
+//extern void Lcd_init(void);
+//extern void Flush(void);
 
 void lcd_test_sprint(void);
 void lcd_test_string(void);

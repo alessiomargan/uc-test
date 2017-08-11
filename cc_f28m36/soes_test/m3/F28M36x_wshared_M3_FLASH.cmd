@@ -85,18 +85,20 @@ MEMORY
     S6 (RWX)        : origin = 0x20014000, length = 0x2000
     S7 (RWX)        : origin = 0x20016000, length = 0x2000
     
-    C4  (RWX)        : origin = 0x20018000, length = 0x2000
-    C5  (RWX)        : origin = 0x2001A000, length = 0x2000
-    C6  (RWX)        : origin = 0x2001C000, length = 0x2000
-    C7  (RWX)        : origin = 0x2001E000, length = 0x2000
-    C8  (RWX)        : origin = 0x20020000, length = 0x2000
-    C9  (RWX)        : origin = 0x20022000, length = 0x2000
-    C10 (RWX)        : origin = 0x20024000, length = 0x2000
-    C11 (RWX)        : origin = 0x20026000, length = 0x2000
-    C12 (RWX)        : origin = 0x20028000, length = 0x2000
-    C13 (RWX)        : origin = 0x2002A000, length = 0x2000
-    C14 (RWX)        : origin = 0x2002C000, length = 0x2000
-    C15 (RWX)        : origin = 0x2002E000, length = 0x2000
+    C4C8  (RWX)        : origin = 0x20018000, length = 0xA000
+//    C5  (RWX)        : origin = 0x2001A000, length = 0x2000
+//    C6  (RWX)        : origin = 0x2001C000, length = 0x2000
+//    C7  (RWX)        : origin = 0x2001E000, length = 0x2000
+//    C8  (RWX)        : origin = 0x20020000, length = 0x2000
+
+    C9C15 (RWX)       : origin = 0x20022000, length = 0xE000
+//    C9  (RWX)       : origin = 0x20022000, length = 0x2000
+//    C10 (RWX)       : origin = 0x20024000, length = 0x2000
+//    C11 (RWX)       : origin = 0x20026000, length = 0x2000
+//    C12 (RWX)       : origin = 0x20028000, length = 0x2000
+//    C13 (RWX)       : origin = 0x2002A000, length = 0x2000
+//    C14 (RWX)       : origin = 0x2002C000, length = 0x2000
+//    C15 (RWX)       : origin = 0x2002E000, length = 0x2000
     
     CTOMRAM (RX)    : origin = 0x2007F000, length = 0x0800
     MTOCRAM (RWX)   : origin = 0x2007F800, length = 0x0800
@@ -113,18 +115,21 @@ SECTIONS
     .const  :       > FLASH_E,  ALIGN(8)
     .cinit  :       > FLASH_E,  ALIGN(8)
     .pinit  :       > FLASH_E,  ALIGN(8)
-    //.init_array :   > FLASH_E,  ALIGN(8)
+    .init_array :   > FLASH_E,  ALIGN(8)
     //FLS_APP_CRC :   > FLS_E_CRC
 
     .vtable :   >  C0
     .stack  :   >  C0
-    .data   :   >  C2 | C3
+    .sysmem :   >  C2 | C3
+    .data   :   >  C9C15 //C2 | C3
     .bss    :   >> C2 | C3
-    //.sysmem :   >  C2 | C3
     
-    .lcd    :   >  C4
-    .font_8 :   >> C4
-    .font_11:   >> C4
+    .lcd    :   >  C4C8
+    //.font_8 :   >> C4
+    //.font_11:   >> C4
+
+    .fonts  :   >> C4C8
+    .pics   :   >> C4C8
 
     //.z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
     //.z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)

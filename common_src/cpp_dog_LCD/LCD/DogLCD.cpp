@@ -22,11 +22,10 @@ void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet() / (4*1000000)) * us);
 //inline void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet(SYSTEM_CLOCK_SPEED) / (4*1000000)) * us);  }
 void wait_us(uint32_t us) { return;  }
 #endif
-
-void lcs_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, LCD_CS); }
-void lcs_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_CS, 0); }
-void a0_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, LCD_A0); }
-void a0_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_A0, 0); }
+void lcs_up(void) 	{ GPIOPinWrite(LCD_CS_BASE, LCD_CS, LCD_CS); }
+void lcs_dn(void) 	{ GPIOPinWrite(LCD_CS_BASE, LCD_CS, 0); }
+void a0_up(void) 	{ GPIOPinWrite(LCD_A0_BASE, LCD_A0, LCD_A0); }
+void a0_dn(void) 	{ GPIOPinWrite(LCD_A0_BASE, LCD_A0, 0); }
 #if 0
 void rst_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, LCD_RST); }
 void rst_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0); }
@@ -95,25 +94,26 @@ void DogLCD::_set_xy(int x, int y)
 }
 
 // initialize and turn on the display
-void DogLCD::init()
+void DogLCD::init(unsigned char power_ctrl)
 {
-    const unsigned char init_seq[] = {
-        0x40,    //Display start line 0
-        0xa1,    //ADC reverse
-        0xc0,    //Normal COM0...COM63
-        0xa6,    //Display normal
-        0xa2,    //Set Bias 1/9 (Duty 1/65)
-        0x2b,    //Booster Off, Regulator and Follower On
-		//0x2f,    //Booster, Regulator and Follower On
-        //0xf8,    //Set internal Booster to 4x
-        //0x00,
-        0x27,    //Contrast set
-        0x81,
-        0x16,
-        0xac,    //No indicator
-        0x00,
-        0xaf,    //Display on
-    };        
+    unsigned char init_seq[] = {
+            0x40,       // display start line + 0-63
+            0xA1,       // ADC set 0xA1 + 0 = normal (for reverse view) / +1 = reverse (for normal view)
+            0xC0,       // common output mode + 0 = normal / + 0xF  reverse
+            0xA6,       // dispaly mode 0xA6 + 0 = normal / 1 = reverse
+            0xA2,       // set bias 0xa20 + 0 = 1/9 / +1 = 1/7
+    		0x00,
+			//0x2B,     // power control: booster off + 2 regulator on + 1 follower on
+    		//0x2F,     // power control: 4 booster on + 2 regulator on + 1 follower on
+            0xF8, 0x00, // set booster ratio , value 0=4x, 1=5x, 2=6x
+    		0x27,       // set voltage regulator (0x20) to 7
+            0x81, 0x14, // set electronic volume , value
+            0xAC, 0x00, // static indicator set 0xAC +0 = off / +1 = on , 0 = flash mode
+            0xAF        // display 0xAE +0 = off / +1 = on
+    };
+
+    init_seq[5] = power_ctrl;
+
     //printf("Reset=L\n");
     _reset = 0;
     //printf("Power=H\n");

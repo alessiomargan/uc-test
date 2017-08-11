@@ -18,7 +18,7 @@ char formula[] = { 159, '(', 'x', ')', '=', '2', 227, '+', 's', 'i', 'n', '(', 2
 char ciao[] = "Ciao Stronzo !!";
 
 #pragma DATA_SECTION(lcd_test_buf,".lcd")
-char lcd_test_buf[32];
+char lcd_test_buf[128];
 
 __attribute__((ramfunc))
 void lcd_test_sprint(void) {
@@ -33,12 +33,14 @@ void lcd_test_sprint(void) {
 	Rect(  50, 35,  120, 44, DOGMLCD_full, wipe );
 
 	//bzero(lcd_test_buf,sizeof(lcd_test_buf));
-	sprintf( lcd_test_buf, "%s = %.3f", "A", 3.1456);
-	XString( 0, 35, lcd_test_buf , poke );
-	sprintf( lcd_test_buf, "%d", c++);
+	//sprintf( lcd_test_buf, "%s = %f", "A", 3.1456);
+	//XString( 0, 35, lcd_test_buf , poke );
+	sprintf( lcd_test_buf, "c=%d", c++);
 	XString( 60, 35, lcd_test_buf , poke );
-	sprintf( lcd_test_buf, "%.3f", f);
-	XString( 85, 35, lcd_test_buf , poke );
+	sprintf( lcd_test_buf, "c=%d", c++);
+	XString( 60, 35, lcd_test_buf , poke );
+	//sprintf( lcd_test_buf, "%.3f", f);
+	//XString( 85, 35, lcd_test_buf , poke );
 
 }
 
