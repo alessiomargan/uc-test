@@ -58,11 +58,13 @@ __error__(char *pcFilename, unsigned long ulLine)
 //*****************************************************************************
 
 const char fw_ver[8] = "xXx/\\xXx";
+char lcd_print_buff[128];
 
 m3_to_c28_data_t	m3_rw_data;
 c28_to_m3_data_t	c28_ro_data;
 
 extern volatile uint16_t write_lcd;
+extern void usb_handler(void);
 
 // map to RAM S1
 #pragma DATA_SECTION(m3_rw_data,"RAM_S1");
@@ -76,6 +78,9 @@ int main(void)
     // Disable Protection
     HWREG(SYSCTL_MWRALLOW) =  0xA5A5A5A5;
 
+    // Disable all interrupts
+    IntMasterDisable();
+
     // Sets up PLL, M3 running at 75MHz and C28 running at 150MHz
     SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xF) |
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
@@ -87,8 +92,6 @@ int main(void)
                          SYSCTL_XCLKDIV_4);
 */
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
-    SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
 #ifdef _USBOTG
     // Setup USB clock tree for 60MHz
@@ -168,7 +171,7 @@ int main(void)
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
     //IpcSync(IPC_FLAG18);
     //	Wait for CTOM IPC Flag
-    while((HWREG(MTOCIPC_BASE + IPC_O_CTOMIPCSTS) & IPC_FLAG18) == 0) {}
+    //while((HWREG(MTOCIPC_BASE + IPC_O_CTOMIPCSTS) & IPC_FLAG18) == 0) {}
 #endif
 
     //The hardware priority mechanism will only look at the upper N bits of the priority level
@@ -180,6 +183,9 @@ int main(void)
 #else
     IntPrioritySet(INT_GPIOK,   (char)(3)<<5); // middle prio pdi ecat irq
 #endif
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
+    SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);
 
     // Enable processor interrupts.
     IntMasterEnable();
@@ -218,7 +224,8 @@ int main(void)
     		lcd_test_sprint();
     		Flush();
 #else
-    		//lcd_sprint(64,6,font_8x16);
+    		sprintf( lcd_print_buff, "%f", 3.1456);
+			lcd_string(0,6,font_8x16, lcd_print_buff);
 #endif
     		write_lcd = 0;
     	}

@@ -8,6 +8,16 @@
 	#include "driverlib/device.h"
 #endif
 
+//RAM Function Linker Section
+#ifdef __TI_COMPILER_VERSION__
+	#if __TI_COMPILER_VERSION__ >= 15009000
+		#define ramFuncSection ".TI.ramfunc"
+	#else
+		#error "MeRDa"
+		#define ramFuncSection "ramfuncs"
+	#endif
+#endif
+
 
 
 struct PROC_FAULT {

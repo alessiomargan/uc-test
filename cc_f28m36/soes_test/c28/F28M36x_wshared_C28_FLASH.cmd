@@ -147,8 +147,7 @@ SECTIONS
 */
     GROUP
     {
-        .TI.ramfunc { }
-        ramfuncs { -l F021_API_C28x_FPU32.lib }
+        .TI.ramfunc { -l F021_API_C28x_FPU32.lib }
     }   LOAD = FLASHE, run=RAML0L1, table(BINIT)
     .binit : {} > FLASHE
 

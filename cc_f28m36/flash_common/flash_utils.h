@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #ifdef _C28X
-	#include "c28/include/definitions.h"
+	//#include "c28/include/definitions.h"
     #include "F021_Concerto_C28x.h"
 	#include "F28M36x_Device.h"
 	#include "F28M36x_GlobalPrototypes.h"
@@ -12,13 +12,26 @@
 	#define DPRINT(...)
 	#define  FLS_BANK_WIDTH	8
 #else
-	#include "m3/include/definitions.h"
+	//#include "m3/include/definitions.h"
 	#include "F021_Concerto_Cortex.h"
 	#include "driverlib/device.h"
 	#include "driverlib/flash.h"
 	#define  FLS_BANK_WIDTH	16
 #endif
 
+#if (CPU_FRQ_150MHZ || DSP28_F28M36Px_150MHZ || DSP28_F28M36Hx_150MHZ)
+     #define CPU_FRQ    150
+#elif (CPU_FRQ_125MHZ || DSP28_F28M36Px_125MHZ)
+     #define CPU_FRQ    125
+#elif (CPU_FRQ_100MHZ || DSP28_F28M36Hx_100MHZ)
+     #define CPU_FRQ    100
+#elif CPU_FRQ_75MHZ
+     #define CPU_FRQ    75
+#elif CPU_FRQ_60MHZ
+     #define CPU_FRQ    60
+#else
+     #error CPU_FREQ
+#endif
 
 void Configure_flashAPI(void);
 
