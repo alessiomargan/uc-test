@@ -21,7 +21,7 @@
 #endif  /* ESC_DEBUG */
 
 esc_cfg_t 	esc_config = { 0, 0 };
-foe_cfg_t 	foe_config = { 0, 0 };
+foe_cfg_t 	foe_config = { 0, 0, 0 ,0 ,0 };
 uint8		foe_buffer[FLASH_PAGE_SIZE];
 extern foe_writefile_cfg_t      firmware_foe_files[];
 extern uint32 foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8 * data);

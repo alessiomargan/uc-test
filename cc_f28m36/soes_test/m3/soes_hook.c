@@ -6,38 +6,35 @@
 #include <soes/esc_foe.h>
 #include <soes/soes.h>
 
-#include "shared_ram.h"
-#include "peripherals.h"
 #include "soes_hook.h"
 #include "osal.h"
+#include "math.h"
+
+//#include "shared_ram.h"
+//#include "peripherals.h"
 
 #define DPRINT(...)
 
+extern const _objd SDO8002[];
+extern const _objd SDO8003[];
 
-rx_pdo_t	rx_pdo;
-tx_pdo_t    tx_pdo;
-aux_pdo_t   aux_pdo;
-sdo_t		sdo;
-
-extern const char fw_ver[8];
+rx_pdo_t    	rx_pdo;
+tx_pdo_t    	tx_pdo;
+aux_pdo_rx_t	aux_pdo_rx;
+aux_pdo_tx_t	aux_pdo_tx;
+sdo_t			sdo = {
+					.board_id = 69,
+					.fw_ver = "_(@)(@)_",
+};
 
 esc_cfg_t 	esc_config = { 0, 0 };
+
+extern void jump_to_bootloader(void);
 
 
 /**
  */
-static void jump_to_bootloader(void) {
-
-    DPRINT ("Jump to bootloader\n");
-
-    // Return control to the boot loader.
-    Watchdog0Reset();
-}
-
 static void on_PREOP(void) {
-
-	memcpy(sdo.fw_ver, fw_ver, sizeof(sdo.fw_ver));
-	sdo.board_id = 69;
 
 	memset((void*)&tx_pdo,0,sizeof(tx_pdo));
 }
@@ -147,75 +144,79 @@ void setup_esc_configs(void) {
 }
 
 
-#define AUX_PDO_OP_SET 0xFB
-#define AUX_PDO_OP_GET 0xBF
-#define AUX_PDO_OP_ACK 0x00
-#define AUX_PDO_OP_NAC 0xEE
+//#pragma CODE_SECTION(handle_aux_pdo_rx,ramFuncSection);
+static void handle_aux_pdo_rx(void) {
 
-#define AUX_PDO_EE_INVALID_OP	0xE1
-#define AUX_PDO_EE_INVALID_IDX	0xE2
-#define AUX_PDO_EE_READONLY 	0xE3
-extern const _objd SDO8002[];
+    const 		_objd * pobjrx = SDO8003;
+    uint16_t 	idx_rx = ((rx_pdo.op_idx_aux & 0x7F00)>> 8); 	// 7 bits of write index - XWWWWWW 00000000 --> III = index write
 
-void handle_aux_pdo(void) {
+    //UARTprintf("%s %d %d\n", __FUNCTION__, op, idx );
 
-	const _objd * pobjd;
-	uint8 op  = rx_pdo.op_idx_aux >> 8;
-	uint8 idx = rx_pdo.op_idx_aux & 0xFF;
+    // check valid idx_rx
+    if((idx_rx > pobjrx->value)||(idx_rx == 0)) {
+    	// invalid idx_rx
+        tx_pdo.op_idx_ack = ((idx_rx | 0x80) << 8);
+    } else {
+    	// valid idx_rx
+		tx_pdo.op_idx_ack = (idx_rx << 8);
+    	pobjrx += idx_rx;
+    	*(float*)(pobjrx->data) = rx_pdo.aux;
+    }
+}
+
+//#pragma CODE_SECTION(handle_aux_pdo_tx,ramFuncSection);
+static void handle_aux_pdo_tx(void) {
+
+	const 		_objd * pobjtx = SDO8002;
+	uint16_t 	idx_tx = (rx_pdo.op_idx_aux & 0x007F);			// 7 bits of read index  - 0000000 XRRRRRRR --> III = index read
 
 	//UARTprintf("%s %d %d\n", __FUNCTION__, op, idx );
 
-	if ( ! (op == AUX_PDO_OP_SET || op == AUX_PDO_OP_GET) ) {
-		tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
-		tx_pdo.aux = (float)AUX_PDO_EE_INVALID_OP;
-		return;
+	// check valid idx_rd
+	if((idx_tx > pobjtx->value)||(idx_tx == 0)) {
+		// invalid idx_rd
+		tx_pdo.op_idx_ack |= (idx_tx | 0x80);
+		tx_pdo.aux = NAN;
+	} else {
+		// valid idx_rd
+		tx_pdo.op_idx_ack |= idx_tx;
+		pobjtx += idx_tx;
+		tx_pdo.aux = *(float*)(pobjtx->data);
 	}
-	pobjd = SDO8002;
-	if ( idx < 1 || idx > pobjd->value ) {
-		tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
-		tx_pdo.aux = (float)AUX_PDO_EE_INVALID_IDX;
-		return;
-	}
-	pobjd = SDO8002+idx;
-	if ( op == AUX_PDO_OP_SET && pobjd->access == ATYPE_RO ) {
-		tx_pdo.op_idx_ack = (AUX_PDO_OP_NAC << 8) | idx;
-		tx_pdo.aux = (float)AUX_PDO_EE_READONLY;
-		return;
-	}
-	// op & idx are valid
-	tx_pdo.op_idx_ack = (AUX_PDO_OP_ACK << 8) | idx;
-	if ( op == AUX_PDO_OP_SET ) {
-		*(float*)(pobjd->data) = rx_pdo.aux;
-		tx_pdo.aux = rx_pdo.aux;
-	}
-	if ( op == AUX_PDO_OP_GET ) {
-		tx_pdo.aux = *(float*)(pobjd->data);
-	}
-
 }
+
 
 /**
  *
+ *
+ * @author amargan (7/4/2014)
  */
 void ecat_process_pdo(void) {
 
 	if ( (ESCvar.ALstatus & 0x0f) == ESCop ) {
-	      RXPDO_update();
+		RXPDO_update();
+		if (rx_pdo.op_idx_aux != 0 ) {
+			handle_aux_pdo_rx();
+		}
 	}
 
-	// RO aux_pod
-	aux_pdo.pos_ref_fb = rx_pdo.pos_ref;
+	// set RO aux
+	aux_pdo_tx.pos_ref_fb =  0;
+	aux_pdo_tx.volt_ref = 0;
+	aux_pdo_tx.vout = 0;
+	aux_pdo_tx.current = 0;
+	aux_pdo_tx.rtt = aux_pdo_rx.ts;
 
-	if ( rx_pdo.op_idx_aux != 0 ) {
-		handle_aux_pdo();
+	if (rx_pdo.op_idx_aux != 0 ) {
+		handle_aux_pdo_tx();
 	}
 
-	tx_pdo.link_pos = rx_pdo.pos_ref;
-	tx_pdo.motor_pos = rx_pdo.pos_ref;
-	tx_pdo.torque = 0;
-	tx_pdo.temperature = 21;
-	tx_pdo.rtt = rx_pdo.ts;
+    tx_pdo.link_pos = rx_pdo.pos_ref;
+    tx_pdo.motor_pos = rx_pdo.pos_ref;
+    tx_pdo.link_vel = 0;
+    tx_pdo.motor_vel = 0;
+    tx_pdo.torque = 0;
+    tx_pdo.rtt = rx_pdo.ts;
 
-	TXPDO_update();
+    TXPDO_update();
 }
-

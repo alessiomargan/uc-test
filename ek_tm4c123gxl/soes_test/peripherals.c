@@ -48,6 +48,20 @@ void disable_peripheral_irq(void)
 
 }
 
+void jump_to_bootloader(void) {
+
+    // disable periphearals irq ....
+	disable_peripheral_irq();
+
+    DPRINT ("Jump to bootloader\n");
+    //
+    // Return control to the boot loader.  This is a call to the SVC
+    // handler in the boot loader.
+    //
+    (*((void (*)(void))(*(uint32_t *)0x2c)))();
+
+}
+
 
 /**
  * This function sets up UART0 to be used for a console to display information

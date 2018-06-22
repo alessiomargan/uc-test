@@ -51,14 +51,16 @@ PAGE 0:    /* Program Memory */
    //FLASHM      : origin = 0x102000, length = 0x002000     /* on-chip FLASH */
    //FLASHL      : origin = 0x104000, length = 0x002000     /* on-chip FLASH */
    //!!FLASHK      : origin = 0x106000, length = 0x002000     /* on-chip FLASH */
-   FLASHE_CRC  : origin = 0x106000, length = 0x000002     /* App CRC */
+   //FLASHE_CRC  : origin = 0x106000, length = 0x000002     /* App CRC */
    //FLASHJ      : origin = 0x108000, length = 0x008000     /* on-chip FLASH */
    //FLASHI      : origin = 0x110000, length = 0x008000     /* on-chip FLASH */
    //FLASHH      : origin = 0x118000, length = 0x008000     /* on-chip FLASH */
    //FLASHG      : origin = 0x120000, length = 0x008000     /* on-chip FLASH */
+   FLASH_APP     : origin = 0x120000, length = 0x007FF0     /* App */
+   FLASH_APP_BGN : origin = 0x127FF0, length = 0x000002     /* App codestart */
    //FLASHF      : origin = 0x128000, length = 0x008000     /* on-chip FLASH */
-   FLASHE      : origin = 0x130000, length = 0x007FF0     /* App */
-   FLASHE_BGN  : origin = 0x137FF0, length = 0x000002     /* App codestart */
+   //FLASHE      : origin = 0x130000, length = 0x007FF0     /* App */
+   //FLASHE_BGN  : origin = 0x137FF0, length = 0x000002     /* App codestart */
    //FLASHD      : origin = 0x138000, length = 0x002000     /* on-chip FLASH */
    //FLASHC      : origin = 0x13A000, length = 0x002000     /* on-chip FLASH */
    //FLASHA      : origin = 0x13E000, length = 0x001F80     /* Bootloader */
@@ -115,10 +117,10 @@ SECTIONS
 {
 
 	/* Allocate program areas: */
-   	.cinit              : > FLASHE      PAGE = 0, ALIGN(4)
-   	.pinit              : > FLASHE,     PAGE = 0, ALIGN(4)
-   	.text               : > FLASHE      PAGE = 0, ALIGN(4)
-   	codestart           : > FLASHE_BGN  PAGE = 0, ALIGN(4)
+   	.cinit              : > FLASH_APP      PAGE = 0, ALIGN(4)
+   	.pinit              : > FLASH_APP,     PAGE = 0, ALIGN(4)
+   	.text               : > FLASH_APP      PAGE = 0, ALIGN(4)
+   	codestart           : > FLASH_APP_BGN  PAGE = 0, ALIGN(4)
 	//copysections		: > FLASHE,		PAGE = 0, ALIGN(4)
 
    	/* Allocate uninitalized data sections: */
@@ -128,8 +130,8 @@ SECTIONS
 
    	/* Initalized sections go in Flash */
    	/* For SDFlash to program these, they must be allocated to page 0 */
-   	.econst             : > FLASHE      PAGE = 0, ALIGN(4)
-   	.switch             : > FLASHE      PAGE = 0, ALIGN(4)
+   	.econst             : > FLASH_APP      PAGE = 0, ALIGN(4)
+   	.switch             : > FLASH_APP      PAGE = 0, ALIGN(4)
 
 /*
 	GROUP
@@ -148,8 +150,8 @@ SECTIONS
     GROUP
     {
         .TI.ramfunc { -l F021_API_C28x_FPU32.lib }
-    }   LOAD = FLASHE, run=RAML0L1, table(BINIT)
-    .binit : {} > FLASHE
+    }   LOAD = FLASH_APP, run=RAML0L1, table(BINIT)
+    .binit : {} > FLASH_APP
 
 
     //flashexeonly        : > FLASH_EXE_ONLY_P0 PAGE = 0, ALIGN(4)
@@ -174,7 +176,7 @@ SECTIONS
    }   
    
    /* Allocate IQ math areas: */
-   IQmath              : > FLASHE      PAGE = 0, ALIGN(4)       /* Math Code */
+   IQmath              : > FLASH_APP   PAGE = 0, ALIGN(4)       /* Math Code */
    IQmathTables        : > IQTABLES,   PAGE = 0, TYPE = NOLOAD
 
    /* Allocate FPU math areas: */

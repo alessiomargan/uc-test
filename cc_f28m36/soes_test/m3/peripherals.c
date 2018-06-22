@@ -38,14 +38,19 @@ extern void SysTick_IntHandler(void);
 extern volatile unsigned long g_ulSysTickCount;
 extern volatile unsigned long g_ulLastTick;
 
+
 void disable_peripheral_irq(void)
 {
-
 	IntDisable(INT_TIMER0A);
     //IntDisable(INT_GPIOB);
-
 }
 
+void jump_to_bootloader(void) {
+
+	UARTprintf("Jump to bootloader\n");
+    // Return control to the boot loader.
+    Watchdog0Reset();
+}
 
 /**
  * This function sets up UART0 to be used for a console to display information
@@ -199,12 +204,10 @@ void Configure_LCD (void)
     //GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0);
     //GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_VDD, 0);
 
-#ifdef _LCD
 #if 0
     Lcd_init(BOOSTER_OFF);
 #else
     lcd_init(BOOSTER_OFF);
-#endif
 #endif
 
     UARTprintf("%s\n",__FUNCTION__);

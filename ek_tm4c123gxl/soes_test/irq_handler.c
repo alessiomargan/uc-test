@@ -19,9 +19,9 @@
 
 #include <ethercat.h>
 #include <soes/soes.h>
+#include <soes_hook.h>
 
 #include "pins.h"
-#include "soes_hook.h"
 #include "peripherals.h"
 //#include "pwm_ctrl.h"
 #include "dog_LCD/doggy.h"

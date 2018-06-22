@@ -100,7 +100,7 @@ const _objd SDO6000[] =
 	{0x5, DTYPE_REAL32,   	 32, ATYPE_RO, "Torque", 			0, &tx_pdo.torque},
 	{0x6, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Temperature", 		0, &tx_pdo.temperature},
 	{0x7, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Fault", 			0, &tx_pdo.fault},
-	{0x8, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Rtt", 				0, &tx_pdo.rtt},
+	{0x8, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Round_rip_time", 	0, &tx_pdo.rtt},
 	{0x9, DTYPE_UNSIGNED16,  16, ATYPE_RO, "Op_idx_ack", 		0, &tx_pdo.op_idx_ack},
 	{0xa, DTYPE_REAL32,  	 32, ATYPE_RO, "Aux", 				0, &tx_pdo.aux},
 };
@@ -117,7 +117,7 @@ const _objd SDO7000[] =
 	{0x7, DTYPE_REAL32, 	32, ATYPE_RW, "Gain_3", 		0, &rx_pdo.gains[3]},
 	{0x8, DTYPE_REAL32, 	32, ATYPE_RW, "Gain_4", 		0, &rx_pdo.gains[4]},
 	{0x9, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Fault_Ack", 		0, &rx_pdo.fault_ack},
-	{0xa, DTYPE_UNSIGNED16, 16, ATYPE_RW, "ts", 			0, &rx_pdo.ts},
+	{0xa, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Timestamp", 		0, &rx_pdo.ts},
 	{0xb, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Op_idx_aux", 	0, &rx_pdo.op_idx_aux},
 	{0xc, DTYPE_REAL32,     32, ATYPE_RW, "Aux",			0, &rx_pdo.aux},
 };
@@ -141,13 +141,21 @@ const _objd SDO8001[] =
 
 const _objd SDO8002[] =
 {
-  {0x0,  DTYPE_UNSIGNED8,    8, ATYPE_RO, "NumElem",  	5, 0},
-  {0x1,  DTYPE_REAL32,      32, ATYPE_RO, "pos_ref_fb", 0, &aux_pdo.pos_ref_fb},
-  {0x2,  DTYPE_REAL32,      32, ATYPE_RO, "current", 	0, &aux_pdo.current},
-  {0x3,  DTYPE_REAL32,      32, ATYPE_RO, "volt_ref",   0, &aux_pdo.volt_ref},
-  {0x4,  DTYPE_REAL32,      32, ATYPE_RO, "vout",     	0, &aux_pdo.vout},
-  {0x5,  DTYPE_REAL32,      32, ATYPE_RW, "pwm_duty",   0, &aux_pdo.pwm_duty},
+  {0x0,  DTYPE_UNSIGNED8,    8, ATYPE_RO, "NumElem",  	4, 0},
+  {0x1,  DTYPE_REAL32,      32, ATYPE_RO, "aux_rtt",	0, &aux_pdo_tx.rtt},
+  {0x2,  DTYPE_REAL32,      32, ATYPE_RO, "pos_ref_fb", 0, &aux_pdo_tx.pos_ref_fb},
+  {0x3,  DTYPE_REAL32,      32, ATYPE_RO, "current", 	0, &aux_pdo_tx.current},
+  {0x4,  DTYPE_REAL32,      32, ATYPE_RO, "volt_ref",   0, &aux_pdo_tx.volt_ref},
+  {0x5,  DTYPE_REAL32,      32, ATYPE_RO, "vout",     	0, &aux_pdo_tx.vout},
 };
+
+const _objd SDO8003[] =
+{
+  {0x0,  DTYPE_UNSIGNED8,    8, ATYPE_RO, "NumElem",  	2, 0},
+  {0x1,  DTYPE_REAL32,      32, ATYPE_RW, "aux_ts",		0, &aux_pdo_rx.ts},
+  {0x2,  DTYPE_REAL32,      32, ATYPE_RW, "pwm_duty",   0, &aux_pdo_rx.pwm_duty},
+};
+
 
 const _objectlist SDOobjects[] =
 {
@@ -165,8 +173,9 @@ const _objectlist SDOobjects[] =
   {0x7000, OTYPE_RECORD, 	 12, 0, "Outputs", SDO7000},
   {0x8000, OTYPE_RECORD, 	 1,  0, "Flash Parameters", SDO8000},
   {0x8001, OTYPE_RECORD, 	 6,  0, "Ram Parameters", SDO8001},
-  {0x8002, OTYPE_RECORD,     5,  0, "AuxPdo",   SDO8002},
-  {0xffff, 0xff, 0xff, 0xff, 0,  0}
+  {0x8002, OTYPE_RECORD,     4,  0, "AuxPdo RO",   SDO8002},
+  {0x8003, OTYPE_RECORD,     1,  0, "AuxPdo WR",   SDO8003},
+    {0xffff, 0xff, 0xff, 0xff, 0,  0}
 };
 
 #endif

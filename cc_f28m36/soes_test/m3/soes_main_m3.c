@@ -171,7 +171,7 @@ int main(void)
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
     //IpcSync(IPC_FLAG18);
     //	Wait for CTOM IPC Flag
-    //while((HWREG(MTOCIPC_BASE + IPC_O_CTOMIPCSTS) & IPC_FLAG18) == 0) {}
+    while((HWREG(MTOCIPC_BASE + IPC_O_CTOMIPCSTS) & IPC_FLAG18) == 0) {}
 #endif
 
     //The hardware priority mechanism will only look at the upper N bits of the priority level
@@ -224,7 +224,7 @@ int main(void)
     		lcd_test_sprint();
     		Flush();
 #else
-    		sprintf( lcd_print_buff, "%f", 3.1456);
+    		sprintf( lcd_print_buff, "%.3f", 3.1456);
 			lcd_string(0,6,font_8x16, lcd_print_buff);
 #endif
     		write_lcd = 0;

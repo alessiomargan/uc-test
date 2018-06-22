@@ -22,10 +22,12 @@ void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet() / (4*1000000)) * us);
 //inline void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet(SYSTEM_CLOCK_SPEED) / (4*1000000)) * us);  }
 void wait_us(uint32_t us) { return;  }
 #endif
+
 void lcs_up(void) 	{ GPIOPinWrite(LCD_CS_BASE, LCD_CS, LCD_CS); }
 void lcs_dn(void) 	{ GPIOPinWrite(LCD_CS_BASE, LCD_CS, 0); }
 void a0_up(void) 	{ GPIOPinWrite(LCD_A0_BASE, LCD_A0, LCD_A0); }
 void a0_dn(void) 	{ GPIOPinWrite(LCD_A0_BASE, LCD_A0, 0); }
+
 #if 0
 void rst_up(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, LCD_RST); }
 void rst_dn(void) 	{ GPIOPinWrite(LCD_GPIO_PORTBASE, LCD_RST, 0); }
@@ -37,6 +39,7 @@ void rst_dn(void) 	{ ; }
 void pwr_up(void) 	{ ; }
 void pwr_dn(void) 	{ ; }
 #endif
+
 inline void lcd_spi_write(uint8_t data) {
     SSIDataPut(LCD_SSI_BASE, data);
     while( SSIBusy(LCD_SSI_BASE) ) { }

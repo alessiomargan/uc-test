@@ -7,6 +7,7 @@
 
 #define Image_iit_LEN  610
 
+#pragma DATA_SECTION(".pics")
 unsigned char Image_iit[Image_iit_LEN] =
 {
    76, 64,

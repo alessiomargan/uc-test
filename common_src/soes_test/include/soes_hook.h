@@ -53,17 +53,25 @@ typedef IAR_PACKED struct {
 
 typedef IAR_PACKED struct {
     // 0x8002 aux param
+	float rtt;
     float volt_ref;
     float current;
     float vout;
     float pos_ref_fb;
+
+} CCS_PACKED aux_pdo_tx_t;
+
+typedef IAR_PACKED struct {
+    // 0x8003 aux param
+	float ts;
     float pwm_duty;
 
-} CCS_PACKED aux_pdo_t;
+} CCS_PACKED aux_pdo_rx_t;
 
 extern tx_pdo_t tx_pdo;
 extern rx_pdo_t rx_pdo;
-extern aux_pdo_t aux_pdo;
+extern aux_pdo_rx_t aux_pdo_rx;
+extern aux_pdo_tx_t aux_pdo_tx;
 extern sdo_t sdo;
 
 void setup_esc_configs(void);
