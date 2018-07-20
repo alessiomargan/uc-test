@@ -21,8 +21,6 @@
 #include "soes/utypes.h"
 #include "soes/esc.h"
 
-#define BSL_PARAM			BSL_DEFAULT_PARAM // I2C slave address = 0x48, Interface selection = Auto
-
 /*
  * SPI master Config
  */
@@ -56,14 +54,6 @@ const eUSCI_UART_Config uartConfig =
         EUSCI_A_UART_MODE,                       // UART mode
         EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
 };
-
-
-void jump_to_bootloader(void) {
-
-	ResetCtl_initiateHardReset();
-
-}
-
 
 /**
  * This function sets up UART0 to be used for a console to display information
@@ -128,11 +118,11 @@ void Configure_EcatPDI (void)
     // Configure the SPI EPROM_LOADED pin as an input.
     // Set P5.0 P5.2 to input direction
     GPIO_setAsInputPin(ECAT_GPIO_PORT, ECAT_IRQ_PIN | ECAT_EEL_PIN);
-    GPIO_interruptEdgeSelect(ECAT_GPIO_PORT, ECAT_IRQ_PIN, GPIO_HIGH_TO_LOW_TRANSITION);
-    GPIO_enableInterrupt(ECAT_GPIO_PORT, ECAT_IRQ_PIN);
-    Interrupt_enableInterrupt(INT_PORT5);
+    //GPIO_interruptEdgeSelect(ECAT_GPIO_PORT, ECAT_IRQ_PIN, GPIO_HIGH_TO_LOW_TRANSITION);
+    //GPIO_enableInterrupt(ECAT_GPIO_PORT, ECAT_IRQ_PIN);
+    //Interrupt_enableInterrupt(INT_PORT5);
 
-	UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 
 }
 
@@ -150,11 +140,11 @@ void Configure_Led(void)
     // Set P3.6 to output direction
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
     GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
-    // Set P3.6 to output direction
+    // Set P4.6 to output direction
     GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN6);
     GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /*
@@ -164,12 +154,12 @@ void Configure_Switch(void)
 {
     /* Configuring P1.[1,4] as an input and enabling interrupts */
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
-    GPIO_interruptEdgeSelect(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4, GPIO_LOW_TO_HIGH_TRANSITION);
-    GPIO_clearInterruptFlag(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
-    GPIO_enableInterrupt(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
-    Interrupt_enableInterrupt(INT_PORT1);
+    //GPIO_interruptEdgeSelect(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4, GPIO_LOW_TO_HIGH_TRANSITION);
+    //GPIO_clearInterruptFlag(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
+    //GPIO_enableInterrupt(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
+    //Interrupt_enableInterrupt(INT_PORT1);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /*
@@ -184,7 +174,7 @@ void Configure_Timer(void)
     Timer32_setCount(TIMER32_0_BASE,48000);
     Timer32_startTimer(TIMER32_0_BASE, false);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 

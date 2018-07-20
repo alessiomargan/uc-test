@@ -13,11 +13,13 @@
 #include "pins.h"
 #include "peripherals.h"
 
-
 volatile uint32_t timer0_cnt = 0;
 volatile uint32_t timer1_cnt = 0;
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
+
+extern bool jumpToBsl;
+
 
 /*
  * Ecat PDI irq
@@ -56,6 +58,8 @@ void PORT1_IRQHandler(void)
     if(status & GPIO_PIN4)
     {
         GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN1);
+        jumpToBsl = true;
+
     }
 
 }
@@ -86,7 +90,7 @@ void T32_INT1_IRQHandler(void)
     if ( (timer0_cnt % 1000) == 0 ) {
         // Toggle P1.0 output
         GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        //UARTprintf("\r tmr0: %d %d\t ecat_irq_cnt :", timer0_cnt, toggle, ecat_irq_cnt );
+        DPRINT("\r tmr_cnt: %d ecat_irq_cnt: %d", timer0_cnt, ecat_irq_cnt );
     }
 
 }
