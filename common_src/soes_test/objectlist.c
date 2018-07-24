@@ -174,7 +174,7 @@ const _objectlist SDOobjects[] =
   {0x8000, OTYPE_RECORD, 	 1,  0, "Flash Parameters", SDO8000},
   {0x8001, OTYPE_RECORD, 	 6,  0, "Ram Parameters", SDO8001},
   {0x8002, OTYPE_RECORD,     4,  0, "AuxPdo RO",   SDO8002},
-  {0x8003, OTYPE_RECORD,     1,  0, "AuxPdo WR",   SDO8003},
+  {0x8003, OTYPE_RECORD,     2,  0, "AuxPdo WR",   SDO8003},
   {0xffff, 0xff, 0xff, 0xff, 0,  0}
 };
 

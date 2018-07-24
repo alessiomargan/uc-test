@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <soes/utypes.h>
 #include <soes/esc.h>
 #include <soes/esc_coe.h>
@@ -31,7 +33,10 @@ extern void jump_to_bootloader(void);
 
 /**
  */
+static void on_PREOP(void) {
 
+	memset((void*)&tx_pdo,0,sizeof(tx_pdo));
+}
 
 /** Mandatory: Hook called from the slave stack SDO Download handler to act on
  * user specified Index and Sub-index.
@@ -110,6 +115,9 @@ static void RXPDO_update (void)
 void pre_state_change_hook (uint8 * as, uint8 * an)
 {
     DPRINT ("pre_state_change_hook 0x%02X %d\n", *as, *an);
+    if ( (*as == INIT_TO_PREOP) && (*an & ESCerror ) == 0 ) {
+    	on_PREOP();
+    }
 }
 
 /** Optional: Hook called AFTER state change for application
