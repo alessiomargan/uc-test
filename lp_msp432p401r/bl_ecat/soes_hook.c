@@ -123,7 +123,7 @@ void post_state_change_hook (uint8 * as, uint8 * an)
     	//ESC_ALstatus (ESCinit);
     	ESC_ALerror (ALERR_NONE);
 
-    	DPRINT ("RESET 0x%02X %d\n", *as, *an);
+    	DPRINT ("RESET 0x%02X %d\n\n\n\n\n", *as, *an);
 
     	ResetCtl_initiateHardReset();
 

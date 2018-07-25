@@ -6,8 +6,9 @@
 #include <stdbool.h>
 
 #include "pins.h"
+#include "osal.h"
 #include "peripherals.h"
-//#include "flashmailbox.h"
+#include "foe_flash.h"
 
 
 #include "BSL432_API.h"
@@ -18,7 +19,9 @@
 #else
 #endif
 
-const char morse_boot[] = "boot ";
+const char 	morse_boot[] = "boot ";
+uint32_t 	calc_crc;
+
 
 extern void soes_init(void);
 extern void soes_loop(void);
@@ -33,7 +36,7 @@ static void jump2app(void) {
 	Interrupt_disableMaster(); // disable interrupts
 	// redirect the vector table
     // initialize the vector table offset
-    SCB->VTOR = 0x0020000;
+    SCB->VTOR = FLASH_APP_START;
 
 	// Load the stack pointer from the application's vector table.
 	__asm(" ldr r1, [r0, #0]\n"
@@ -49,7 +52,8 @@ static uint8_t test_jump2app(void) {
 	// poll switch
 	uint8_t sw = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
 
-	return (!sw);
+	bool ret = ( !sw ) | ( calc_crc==CRC_App );
+	return (ret);
 }
 
 
@@ -57,8 +61,8 @@ void main(uint32_t bslParams)
 {
     int 	i = 0;
     char * 	pchar = 0;
-    uint32_t	loop_cnt;
-    uint8_t		test_jump = 0;
+    volatile uint32_t	loop_cnt;
+    volatile uint8_t	test_jump = 0;
 
     //if(CheckFlashMailbox(COMMAND_BSL_CONFIG) != BOOT_OVERRIDE_AND_MAILBOX_OPERATIONS_SUCCESS) {
     //
@@ -69,6 +73,11 @@ void main(uint32_t bslParams)
     Configure_EcatPDI();
     //Configure_Timer();
     Configure_Switch();
+
+    calc_crc = calc_CRC(0x20000, 0x20000);
+    DPRINT("bldr ver %d.%d\n", BLDR_Version[0],BLDR_Version[1]);
+    DPRINT("CRC : calc 0x%04X flash 0x%04X\n", calc_crc, CRC_App);
+
 
     soes_init();
 
@@ -92,7 +101,7 @@ void main(uint32_t bslParams)
 #endif
         soes_loop();
 
-        if ( ! (loop_cnt++ % 10) ) {
+        if ( ! (loop_cnt++ % 1000) ) {
             GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
             GPIO_toggleOutputOnPin(GPIO_PORT_P4, GPIO_PIN6);
         }
