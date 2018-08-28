@@ -98,14 +98,14 @@ void APP_safeoutput (void)
  */
 static void TXPDO_update (void)
 {
-    ESC_write (SM3_sma, &tx_pdo, TXPDOsize, (void *) &ESCvar.ALevent);
+    ESC_write (SM3_sma, &tx_pdo, TXPDOsize);
 }
 
 /** Mandatory: Read Sync Manager 2 to local process data, Master Outputs.
  */
 static void RXPDO_update (void)
 {
-    ESC_read (SM2_sma, &rx_pdo, RXPDOsize, (void *) &ESCvar.ALevent);
+    ESC_read (SM2_sma, &rx_pdo, RXPDOsize);
 }
 
 

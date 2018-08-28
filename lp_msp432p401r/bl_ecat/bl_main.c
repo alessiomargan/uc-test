@@ -9,7 +9,7 @@
 #include "osal.h"
 #include "peripherals.h"
 #include "foe_flash.h"
-
+#include "tiva-morser/morse.h"
 
 #include "BSL432_API.h"
 #if defined (__MSP432P401R__) || defined (__MSP432P401M__)
@@ -19,7 +19,6 @@
 #else
 #endif
 
-const char 	morse_boot[] = "boot ";
 uint32_t 	calc_crc;
 
 
@@ -30,6 +29,7 @@ extern void ecat_process_pdo(void);
 extern void play_string(const char *);
 extern void play_char_string(const char c);
 
+void do_morse_led(void);
 
 static void jump2app(void) {
 
@@ -51,22 +51,17 @@ static uint8_t test_jump2app(void) {
 
 	// poll switch
 	uint8_t sw = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
-
-	bool ret = ( !sw ) | ( calc_crc==CRC_App );
+    bool ret = ( !sw ) | ( calc_crc==CRC_App );
 	return (ret);
 }
 
 
 void main(uint32_t bslParams)
 {
+	uint32_t value;
     int 	i = 0;
-    char * 	pchar = 0;
     volatile uint32_t	loop_cnt;
     volatile uint8_t	test_jump = 0;
-
-    //if(CheckFlashMailbox(COMMAND_BSL_CONFIG) != BOOT_OVERRIDE_AND_MAILBOX_OPERATIONS_SUCCESS) {
-    //
-    //}
 
     Configure_UART();
     Configure_Led();
@@ -78,8 +73,8 @@ void main(uint32_t bslParams)
     DPRINT("bldr ver %d.%d\n", BLDR_Version[0],BLDR_Version[1]);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", calc_crc, CRC_App);
 
-
-    soes_init();
+    ESC_init(0);
+    //soes_init();
 
     //Interrupt_setPriority(INT_T32_INT1, (char)(2)<<5);
     //Interrupt_enableMaster();
@@ -92,25 +87,61 @@ void main(uint32_t bslParams)
         	jump2app();
         }
 
-#if 0
-    	if ( ! *pchar ) {
-        	pchar = (char*)morse_boot;
-        }
-        play_char_string(*pchar);
-        pchar++;
-#endif
-        soes_loop();
+        //soes_loop();
+        //value = lan9252_read_32(0x64);
+        ESC_read(0x64, &value, 4);
+
+
 
         if ( ! (loop_cnt++ % 1000) ) {
-            GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            GPIO_toggleOutputOnPin(GPIO_PORT_P4, GPIO_PIN6);
+        	do_morse_led();
         }
 
-        // Delay .. 48 Mhz clock --> 1ms
-        for(i=48000; i>0; i--);
+        // Delay ...
+        for(i=50000; i>0; i--) {
+        	;
+        }
+        GPIO_toggleOutputOnPin(GPIO_PORT_P3, GPIO_PIN6);
 
     }
 
 }
 
+
+void do_morse_led(void) {
+
+    static volatile uint32_t  led_status;
+    static char * morser_string = "boot";
+    static bool sending;
+    static struct morser m;
+    enum OUTPUT res;
+
+    if (sending) {
+        res = tick(&m);
+        switch(res) {
+          case HIGH:
+        	  led_status = 1;
+			  break;
+          case LOW:
+        	  led_status = 0;
+			  break;
+          case END:
+        	  led_status = 0;
+			  sending = false;
+            break;
+        }
+    } else {
+		sending = true;
+		init_morser(&m, morser_string);
+    }
+    /////////////////////////////////////////////////////////////////
+
+    if ( led_status ) {
+        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
+        GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    } else {
+        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+        GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    }
+}
 

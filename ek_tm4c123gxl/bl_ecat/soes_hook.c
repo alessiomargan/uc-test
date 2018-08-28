@@ -146,7 +146,7 @@ void post_state_change_hook (uint8 * as, uint8 * an)
 void setup_esc_configs(void) {
 
     // Get the size of flash.
-    flashAddrEnd =  SysCtlFlashSizeGet();
+    flashAddrEnd = SysCtlFlashSizeGet();
 #ifdef FLASH_RSVD_SPACE
     flashAddrEnd -= FLASH_RSVD_SPACE;
 #endif
