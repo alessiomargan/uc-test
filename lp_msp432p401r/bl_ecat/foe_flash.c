@@ -99,6 +99,7 @@ uint32_t on_foe_open_cb ( uint8_t op ) {
 	// Unprotecting User Bank 1, Sectors 0 to 31 */
 	MAP_FlashCtl_unprotectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, ALL_FLASH_SECTORS);
 	ret = MAP_FlashCtl_performMassErase();
+    DPRINT("%s Erase application memory section\n",	__FUNCTION__);
 	// 0 on success
 	return (!ret);
 }

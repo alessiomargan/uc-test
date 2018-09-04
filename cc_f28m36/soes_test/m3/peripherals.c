@@ -190,7 +190,7 @@ void Configure_LCD (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level high and active low clock in
     // freescale SPI mode, master mode, 1MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 5000000, 8);
+    SSIConfigSetExpClk(LCD_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 15000000, 8);
     // Enable the SSI module.
     SSIEnable(LCD_SSI_BASE);
 
@@ -207,7 +207,7 @@ void Configure_LCD (void)
 #if 0
     Lcd_init(BOOSTER_OFF);
 #else
-    lcd_init(BOOSTER_OFF);
+    lcd_init(BOOSTER_ON);
 #endif
 
     UARTprintf("%s\n",__FUNCTION__);
@@ -231,7 +231,7 @@ void Configure_Link_Enc_BissC (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level high and active low clock in
     // freescale SPI mode, master mode, 5MHz SSI frequency, and 16-bit data.
-    SSIConfigSetExpClk(LINK_ENC_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_2, SSI_MODE_MASTER, 1000000, 16);
+    SSIConfigSetExpClk(LINK_ENC_SSI_BASE, SysCtlClockGet(SYSTEM_CLOCK_SPEED), SSI_FRF_MOTO_MODE_2, SSI_MODE_MASTER, 1500000, 16);
     // Enable the SSI module.
     SSIEnable(LINK_ENC_SSI_BASE);
 

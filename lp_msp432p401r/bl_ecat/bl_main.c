@@ -25,9 +25,7 @@ uint32_t 	calc_crc;
 extern void soes_init(void);
 extern void soes_loop(void);
 extern void ecat_process_pdo(void);
-//extern void do_morse_led(void);
-extern void play_string(const char *);
-extern void play_char_string(const char c);
+extern void do_morse_led(void);
 
 void do_morse_led(void);
 
@@ -91,22 +89,16 @@ void main(uint32_t bslParams)
         //value = lan9252_read_32(0x64);
         ESC_read(0x64, &value, 4);
 
-
-
-        if ( ! (loop_cnt++ % 1000) ) {
-        	do_morse_led();
+        if ( ! (loop_cnt++ % 100) ) {
+			do_morse_led();
         }
 
-        // Delay ...
-        for(i=50000; i>0; i--) {
-        	;
-        }
-        GPIO_toggleOutputOnPin(GPIO_PORT_P3, GPIO_PIN6);
+        // Delay .. 48 Mhz clock --> 1ms
+        for(i=2000; i>0; i--);
 
     }
 
 }
-
 
 void do_morse_led(void) {
 
@@ -137,11 +129,11 @@ void do_morse_led(void) {
     /////////////////////////////////////////////////////////////////
 
     if ( led_status ) {
-        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    	GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    	GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
     } else {
-        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    	GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    	GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
     }
 }
 
