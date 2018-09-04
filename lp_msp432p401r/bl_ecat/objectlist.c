@@ -90,8 +90,8 @@ const _objd SDO1C00[] =
 
 const _objd SDO1C12[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8,   ATYPE_RO, acName1C12_0, 0, 0},
-//  {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C12_1, 0x1600, 0},
+  {0x0, DTYPE_UNSIGNED8, 8,   ATYPE_RO, acName1C12_0, 1, 0},
+  {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C12_1, 0x1600, 0},
 };
 
 // RxPdo 1600 
@@ -102,8 +102,8 @@ const _objd SDO1600[] =
 
 const _objd SDO1C13[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C13_0, 0, 0},
-//  {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_1, 0x1A00, 0},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C13_0, 1, 0},
+  {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_1, 0x1A00, 0},
 };
 
 // TxPdo
@@ -143,11 +143,11 @@ const _objectlist SDOobjects[] =
   {0x1009, OTYPE_VAR, 	 0,  0, acName1009, SDO1009},
   {0x100A, OTYPE_VAR, 	 0,  0, acName100A, SDO100A},
   {0x1018, OTYPE_RECORD, 4,  0, acName1018, SDO1018},
-//  {0x1600, OTYPE_RECORD, 0,  0, acName1600, SDO1600},
-//  {0x1A00, OTYPE_RECORD, 0,  0, acName1A00, SDO1A00},
+  {0x1600, OTYPE_RECORD, 0,  0, acName1600, SDO1600},
+  {0x1A00, OTYPE_RECORD, 0,  0, acName1A00, SDO1A00},
   {0x1C00, OTYPE_ARRAY,  4,  0, acName1C00, SDO1C00},
-  {0x1C12, OTYPE_ARRAY,  0,  0, acName1C12, SDO1C12},
-  {0x1C13, OTYPE_ARRAY,  0,  0, acName1C13, SDO1C13},
+  {0x1C12, OTYPE_ARRAY,  1,  0, acName1C12, SDO1C12},
+  {0x1C13, OTYPE_ARRAY,  1,  0, acName1C13, SDO1C13},
   {0x6000, OTYPE_RECORD, 0,  0, acName6000, SDO6000},
   {0x7000, OTYPE_RECORD, 0,  0, acName7000, SDO7000},
   {0x8001, OTYPE_RECORD, 6,  0, acName8001, SDO8001},

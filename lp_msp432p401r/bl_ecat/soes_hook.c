@@ -9,6 +9,7 @@
 
 //#define ESC_DEBUG
 #ifdef ESC_DEBUG
+	#undef DPRINT
     #define DPRINT(...) OSAL_PRINT ("hook: "__VA_ARGS__)
     #define DEBUG_ASSERT(expression)    ASSERT(expression)
 #else

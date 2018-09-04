@@ -9,7 +9,7 @@
 #include "osal.h"
 #include "peripherals.h"
 #include "foe_flash.h"
-
+#include "tiva-morser/morse.h"
 
 #include "BSL432_API.h"
 #if defined (__MSP432P401R__) || defined (__MSP432P401M__)
@@ -19,16 +19,13 @@
 #else
 #endif
 
-const char 	morse_boot[] = "boot ";
 uint32_t 	calc_crc;
 
 
 extern void soes_init(void);
 extern void soes_loop(void);
 extern void ecat_process_pdo(void);
-//extern void do_morse_led(void);
-extern void play_string(const char *);
-extern void play_char_string(const char c);
+extern void do_morse_led(void);
 
 
 static void jump2app(void) {
@@ -60,7 +57,6 @@ static uint8_t test_jump2app(void) {
 void main(uint32_t bslParams)
 {
     int 	i = 0;
-    char * 	pchar = 0;
     volatile uint32_t	loop_cnt;
     volatile uint8_t	test_jump = 0;
 
@@ -92,25 +88,53 @@ void main(uint32_t bslParams)
         	jump2app();
         }
 
-#if 0
-    	if ( ! *pchar ) {
-        	pchar = (char*)morse_boot;
-        }
-        play_char_string(*pchar);
-        pchar++;
-#endif
         soes_loop();
 
-        if ( ! (loop_cnt++ % 1000) ) {
-            GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            GPIO_toggleOutputOnPin(GPIO_PORT_P4, GPIO_PIN6);
+        if ( ! (loop_cnt++ % 100) ) {
+			do_morse_led();
         }
 
         // Delay .. 48 Mhz clock --> 1ms
-        for(i=48000; i>0; i--);
+        for(i=2000; i>0; i--);
 
     }
 
 }
 
+void do_morse_led(void) {
+
+    static volatile uint32_t  led_status;
+    static char * morser_string = "boot";
+    static bool sending;
+    static struct morser m;
+    enum OUTPUT res;
+
+    if (sending) {
+        res = tick(&m);
+        switch(res) {
+          case HIGH:
+        	  led_status = 1;
+			  break;
+          case LOW:
+        	  led_status = 0;
+			  break;
+          case END:
+        	  led_status = 0;
+			  sending = false;
+            break;
+        }
+    } else {
+		sending = true;
+		init_morser(&m, morser_string);
+    }
+    /////////////////////////////////////////////////////////////////
+
+    if ( led_status ) {
+    	GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    	GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    } else {
+    	GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    	GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    }
+}
 
