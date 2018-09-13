@@ -21,16 +21,16 @@
 #ifndef _osal_
 #define _osal_
 
-extern void UARTprintf(const char *pcString, ...);
+extern int printf(const char *pcString, ...);
 
-#define OSAL_PRINT UARTprintf
+#define OSAL_PRINT printf
 
-#ifdef _DEBUG
+#ifdef ESC_DEBUG
 	#define DPRINT(...) OSAL_PRINT ("dbg: "__VA_ARGS__)
 	#define DEBUG_ASSERT(expression)    ASSERT(expression)
 #else
-#	define DPRINT(...)
-#	define DEBUG_ASSERT(expression)
+	#define DPRINT(...)
+	#define DEBUG_ASSERT(expression)
 #endif  /* DEBUG */
 
 #endif

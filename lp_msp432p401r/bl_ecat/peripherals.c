@@ -153,7 +153,9 @@ void Configure_Led(void)
  */
 void Configure_Switch(void)
 {
-    /* Configuring P1.[1,4] as an input and enabling interrupts */
+	/* Configuring P1.[1,4] as an input and enabling interrupts */
+	GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P6, GPIO_PIN0);
+	/* Configuring P1.[1,4] as an input and enabling interrupts */
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
     //GPIO_interruptEdgeSelect(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4, GPIO_LOW_TO_HIGH_TRANSITION);
     //GPIO_clearInterruptFlag(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);

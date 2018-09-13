@@ -30,8 +30,9 @@ const eUSCI_SPI_MasterConfig spiMasterConfig =
 {
         EUSCI_B_SPI_CLOCKSOURCE_SMCLK,             // SMCLK Clock Source
         48000000,                                  // SMCLK = DCO = 48MHZ
-        7500000,                                   // SPICLK = 7.5Mhz
-        EUSCI_B_SPI_MSB_FIRST,                     // MSB First
+        //7500000,                                 // SPICLK = 7.5Mhz
+		12000000,                                  // SPICLK = 12Mhz
+		EUSCI_B_SPI_MSB_FIRST,                     // MSB First
         EUSCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
         EUSCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
         EUSCI_B_SPI_3PIN                           // 3Wire SPI Mode
@@ -139,18 +140,21 @@ void Configure_EcatPDI (void)
 /*
  *
  */
-void Configure_Led(void)
+void Configure_Led_IO(void)
 {
-    // Set P1.0 to output direction
+    // Led
+	// Set P1.0 to output direction
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
     // Set P2.[0,1,2] to output direction
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
     GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
+
+    // IO
     // Set P3.6 to output direction
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
     GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
-    // Set P3.6 to output direction
+    // Set P4.6 to output direction
     GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN6);
     GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
 
@@ -181,7 +185,7 @@ void Configure_Timer(void)
     Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
             TIMER32_PERIODIC_MODE);
     Interrupt_enableInterrupt(INT_T32_INT1);
-    Timer32_setCount(TIMER32_0_BASE,48000);
+    Timer32_setCount(TIMER32_0_BASE,480000);
     Timer32_startTimer(TIMER32_0_BASE, false);
 
     UARTprintf("%s\n",__FUNCTION__);

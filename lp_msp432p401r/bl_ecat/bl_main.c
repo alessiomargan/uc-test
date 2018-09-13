@@ -7,8 +7,11 @@
 
 #include "pins.h"
 #include "osal.h"
+#include "soes/esc.h"
+
 #include "peripherals.h"
 #include "foe_flash.h"
+
 #include "tiva-morser/morse.h"
 
 #include "BSL432_API.h"
@@ -47,16 +50,20 @@ static void jump2app(void) {
 
 static uint8_t test_jump2app(void) {
 
-	// poll switch
-	uint8_t sw = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
-    bool ret = ( !sw ) | ( calc_crc==CRC_App );
+	// poll switch ... 0 pressed
+	uint8_t sw1 = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
+	// poll input pin ... 0 to gnd
+	uint8_t sw2 = GPIO_getInputPinValue(GPIO_PORT_P6, GPIO_PIN0);
+	bool ret = ( sw1 ) && ( sw2 ) && ( calc_crc==CRC_App );
+	//DPRINT("%s : %d %d\n", __FUNCTION__, sw1, sw2);
+
 	return (ret);
 }
 
 
 void main(uint32_t bslParams)
 {
-	uint32_t value;
+	uint32_t value = 0;
     int 	i = 0;
     volatile uint32_t	loop_cnt;
     volatile uint8_t	test_jump = 0;
@@ -71,23 +78,20 @@ void main(uint32_t bslParams)
     DPRINT("bldr ver %d.%d\n", BLDR_Version[0],BLDR_Version[1]);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", calc_crc, CRC_App);
 
-    ESC_init(0);
-    //soes_init();
+    //ESC_init(0);
+    soes_init();
 
     //Interrupt_setPriority(INT_T32_INT1, (char)(2)<<5);
     //Interrupt_enableMaster();
 
     while(1)
     {
-
         test_jump = test_jump2app();
         if ( test_jump ) {
         	jump2app();
         }
 
-        //soes_loop();
-        //value = lan9252_read_32(0x64);
-        ESC_read(0x64, &value, 4);
+        soes_loop();
 
         if ( ! (loop_cnt++ % 100) ) {
 			do_morse_led();

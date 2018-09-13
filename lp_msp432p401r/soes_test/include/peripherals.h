@@ -7,7 +7,7 @@
 
 void Configure_UART(void);
 void Configure_EcatPDI(void);
-void Configure_Led(void);
+void Configure_Led_IO(void);
 void Configure_Timer(void);
 void Configure_Switch(void);
 //void Configure_LCD(void);

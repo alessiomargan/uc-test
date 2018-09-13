@@ -10,6 +10,7 @@
 #include <soes/soes.h>
 #include <soes_hook.h>
 
+#include "osal.h"
 #include "pins.h"
 #include "peripherals.h"
 
@@ -30,6 +31,9 @@ void PORT5_IRQHandler(void) {
 
     status = GPIO_getEnabledInterruptStatus(ECAT_GPIO_PORT);
     GPIO_clearInterruptFlag(ECAT_GPIO_PORT, status);
+
+    //status = lan9252_read_32(0x58);
+    //DPRINT("\rINT_STS = 0x%04X ecat_irq_cnt = %d", status, ecat_irq_cnt );
 
 	ecat_irq_cnt++;
 
@@ -59,9 +63,7 @@ void PORT1_IRQHandler(void)
     {
         GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN1);
         jumpToBsl = true;
-
     }
-
 }
 
 
@@ -70,7 +72,6 @@ void PORT1_IRQHandler(void)
  */
 void T32_INT1_IRQHandler(void)
 {
-
 	static volatile uint32_t toggle = 0;
     // Clear the timer interrupt.
 	Timer32_clearInterruptFlag(TIMER32_0_BASE);
@@ -87,7 +88,7 @@ void T32_INT1_IRQHandler(void)
     GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
 
     // every 1000 cycles
-    if ( (timer0_cnt % 1000) == 0 ) {
+    if ( (timer0_cnt % 100) == 0 ) {
         // Toggle P1.0 output
         GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
         DPRINT("\r tmr_cnt: %d ecat_irq_cnt: %d", timer0_cnt, ecat_irq_cnt );

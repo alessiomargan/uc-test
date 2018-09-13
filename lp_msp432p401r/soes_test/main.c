@@ -39,7 +39,7 @@ int main(void)
     WDT_A_holdTimer();
 
     Configure_UART();
-    Configure_Led();
+    Configure_Led_IO();
     Configure_Switch();
     Configure_EcatPDI();
     Configure_Timer();

@@ -6,12 +6,19 @@
 #include <soes/esc_foe.h>
 #include <soes/soes.h>
 
-#include "soes_hook.h"
 #include "osal.h"
+#include "soes_hook.h"
 #include "math.h"
 
-//#define DPRINT(...)
-//#define DPRINT UARTprintf
+//#define ESC_DEBUG
+#ifdef ESC_DEBUG
+	#undef DPRINT
+    #define DPRINT(...) OSAL_PRINT ("hook: "__VA_ARGS__)
+    #define DEBUG_ASSERT(expression)    ASSERT(expression)
+#else
+    #define DPRINT(...)
+    #define DEBUG_ASSERT(expression)
+#endif  /* ESC_DEBUG */
 
 extern const _objd SDO8002[];
 extern const _objd SDO8003[];
