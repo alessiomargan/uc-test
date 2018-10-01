@@ -27,12 +27,11 @@
 
 #include <utils/uartstdio.h>
 
-#include "osal.h"
 #include "pins.h"
 #include "soes_hook.h"
 #include "peripherals.h"
 
-#include "soes/utypes.h"
+//#include "soes/utypes.h"
 #include "soes/esc.h"
 
 extern void lcd_init( void );

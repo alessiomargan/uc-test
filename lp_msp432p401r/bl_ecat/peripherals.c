@@ -13,13 +13,11 @@
 
 //#include <utils/uartstdio.h>
 
+#include <soes_hook.h>
+#include <soes/esc.h>
 
-#include "osal.h"
-#include "pins.h"
-#include "soes_hook.h"
-#include "peripherals.h"
-#include "soes/utypes.h"
-#include "soes/esc.h"
+#include <pins.h>
+#include <peripherals.h>
 
 /*
  * SPI master Config

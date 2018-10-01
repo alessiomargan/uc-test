@@ -16,7 +16,7 @@
 #include "utils/uartstdio.h"
 #include <string.h>
 
-#include <peripherals.h>
+#include <m3/include/peripherals.h>
 
 //*****************************************************************************
 //

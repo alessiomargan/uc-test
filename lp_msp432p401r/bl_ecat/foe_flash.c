@@ -7,10 +7,8 @@
 //#include <ti/devices/msp432p4xx/driverlib/flash.h>
 //#include <ti/devices/msp432p4xx/driverlib/crc32.h>
 
-#include "osal.h"
 #include "foe_flash.h"
-#include "soes/utypes.h"
-#include "soes/esc_foe.h"
+#include <soes/esc_foe.h>
 
 /*
  * bool FlashCtl_eraseSector ( uint32_t addr )
@@ -36,7 +34,7 @@ extern foe_cfg_t 	gFOE_config;
 
 #pragma RETAIN(BLDR_Version)
 #pragma DATA_SECTION(BLDR_Version, ".BLDR_VERSION")
-const uint8_t BLDR_Version[2] = {0x1, 0x1};
+const uint8_t BLDR_Version[8] = "msp_1.0";
 
 #pragma RETAIN(CRC_App)
 #pragma DATA_SECTION(CRC_App, ".CRC_APP")
@@ -99,7 +97,7 @@ uint32_t on_foe_open_cb ( uint8_t op ) {
 	// Unprotecting User Bank 1, Sectors 0 to 31 */
 	MAP_FlashCtl_unprotectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, ALL_FLASH_SECTORS);
 	ret = MAP_FlashCtl_performMassErase();
-    DPRINT("%s Erase application memory section\n",	__FUNCTION__);
+    DPRINT("\n%s Erase application memory section %d\n", __FUNCTION__, ret);
 	// 0 on success
 	return (!ret);
 }
@@ -113,7 +111,7 @@ uint32_t on_foe_close_cb( void ) {
 	crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
 	// get flash bank and sector of crc address ....
 	MAP_FlashCtl_getMemoryInfo((uint32_t)&CRC_App, &bankNum, &sectorNum);
-    DPRINT("%s crc 0x%04X addr 0x%04X bank %d sector %d\n",
+    DPRINT("\n%s crc 0x%04X addr 0x%04X bank %d sector %d\n",
     		__FUNCTION__, crc, &CRC_App, bankNum, sectorNum);
 
 	// unprotect bank and sector ...

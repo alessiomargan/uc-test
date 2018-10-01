@@ -2,8 +2,8 @@
 #define __objectlist__
 
 
-#include "soes/esc_coe.h"
-#include "soes_hook.h"
+#include <soes/esc_coe.h>
+#include <soes_hook.h>
 
 const char Number_of_elemets[] = "Number of Elements";
 
@@ -31,10 +31,17 @@ const _objd SDO100A[] =
 const _objd SDO1018[] =
 {
   {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 4, 0},
-  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Vendor ID", 664, 0},				// Vendor ID
+  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Vendor ID", 664, 0},			// Vendor ID
   {0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Product Code", 0, 0},			// Product code
-  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Revision Number", 0, 0},			// Revision number
-  {0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Serial Number", 0x00000000, 0},	// Serial number
+  {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Revision Number", 0, 0},		// Revision number
+  {0x4, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Serial Number", 0x00000000, 0},// Serial number
+};
+
+const _objd SDO10F1[] =
+{
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 2, 0},
+  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RW, "Local Error Reaction", 1, 0},
+  {0x2, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Sync Error Counter Limit", 4, 0},
 };
 
 // RxPdo 1600
@@ -79,15 +86,24 @@ const _objd SDO1C00[] =
   {0x3, DTYPE_UNSIGNED8, 8, ATYPE_RO, "Communications Type SM2", 3, 0},
   {0x4, DTYPE_UNSIGNED8, 8, ATYPE_RO, "Communications Type SM3", 4, 0},
 };
+
 const _objd SDO1C12[] =
 {
   {0x0, DTYPE_UNSIGNED8, 	8, 	ATYPE_RO, Number_of_elemets, 1, 0},
   {0x1, DTYPE_UNSIGNED16, 	16, ATYPE_RO, "PDO Mapping", 0x1600, 0},
 };
+
 const _objd SDO1C13[] =
 {
   {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 1, 0},
   {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RO, "PDO Mapping", 0x1A00, 0},
+};
+
+const _objd SDO1C32[] =
+{
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 2, 0},
+  {0x4, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Synchronization Types supported", 0x1F, 0},
+  {0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Minimum Cycle Time", 0, 0},
 };
 
 const _objd SDO6000[] =
@@ -141,7 +157,7 @@ const _objd SDO8001[] =
 
 const _objd SDO8002[] =
 {
-  {0x0,  DTYPE_UNSIGNED8,    8, ATYPE_RO, "NumElem",  	4, 0},
+  {0x0,  DTYPE_UNSIGNED8,    8, ATYPE_RO, "NumElem",  	5, 0},
   {0x1,  DTYPE_REAL32,      32, ATYPE_RO, "aux_rtt",	0, &aux_pdo_tx.rtt},
   {0x2,  DTYPE_REAL32,      32, ATYPE_RO, "pos_ref_fb", 0, &aux_pdo_tx.pos_ref_fb},
   {0x3,  DTYPE_REAL32,      32, ATYPE_RO, "current", 	0, &aux_pdo_tx.current},
@@ -164,16 +180,18 @@ const _objectlist SDOobjects[] =
   {0x1009, OTYPE_VAR, 		 0,  0, "Manufacturer Hardware Version", SDO1009},
   {0x100A, OTYPE_VAR, 		 0,  0, "Manufacturer Software Version", SDO100A},
   {0x1018, OTYPE_RECORD, 	 4,  0, "Identity Object", SDO1018},
+  {0x10F1, OTYPE_RECORD, 	 2,  0, "Error Setting Object", SDO10F1},
   {0x1600, OTYPE_RECORD, 	 12, 0, "Receive PDO Mapping", SDO1600},
   {0x1A00, OTYPE_RECORD, 	 10, 0, "Transmit PDO Mapping", SDO1A00},
   {0x1C00, OTYPE_ARRAY, 	 4,  0, "Sync Manager Communication Type", SDO1C00},
   {0x1C12, OTYPE_ARRAY, 	 1,  0, "Sync Manager 2 PDO Assignment", SDO1C12},
   {0x1C13, OTYPE_ARRAY, 	 1,  0, "Sync Manager 3 PDO Assignment", SDO1C13},
+  {0x1C32, OTYPE_ARRAY, 	 2,  0, "SM2(Output) Synchronisation  Parameter", SDO1C32},
   {0x6000, OTYPE_RECORD, 	 10, 0, "Inputs", SDO6000},
   {0x7000, OTYPE_RECORD, 	 12, 0, "Outputs", SDO7000},
   {0x8000, OTYPE_RECORD, 	 1,  0, "Flash Parameters", SDO8000},
   {0x8001, OTYPE_RECORD, 	 6,  0, "Ram Parameters", SDO8001},
-  {0x8002, OTYPE_RECORD,     4,  0, "AuxPdo RO",   SDO8002},
+  {0x8002, OTYPE_RECORD,     5,  0, "AuxPdo RO",   SDO8002},
   {0x8003, OTYPE_RECORD,     2,  0, "AuxPdo WR",   SDO8003},
   {0xffff, 0xff, 0xff, 0xff, 0,  0}
 };

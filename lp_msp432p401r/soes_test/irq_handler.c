@@ -5,12 +5,10 @@
 /* DriverLib Includes */
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
-
-#include <ethercat.h>
-#include <soes/soes.h>
+#include <soes/esc.h>
+#include <soes/hal/advr_esc/soes.h>
 #include <soes_hook.h>
 
-#include "osal.h"
 #include "pins.h"
 #include "peripherals.h"
 
@@ -20,7 +18,7 @@ volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
 extern bool jumpToBsl;
-
+extern uint8_t ESC_SYNCactivation(void);
 
 /*
  * Ecat PDI irq
@@ -31,9 +29,6 @@ void PORT5_IRQHandler(void) {
 
     status = GPIO_getEnabledInterruptStatus(ECAT_GPIO_PORT);
     GPIO_clearInterruptFlag(ECAT_GPIO_PORT, status);
-
-    //status = lan9252_read_32(0x58);
-    //DPRINT("\rINT_STS = 0x%04X ecat_irq_cnt = %d", status, ecat_irq_cnt );
 
 	ecat_irq_cnt++;
 
@@ -81,7 +76,7 @@ void T32_INT1_IRQHandler(void)
 
     soes_loop();
 
-    if ( ! DC_activation() ) {
+    if ( ! ESC_SYNCactivation() ) {
         ecat_process_pdo();
     }
 

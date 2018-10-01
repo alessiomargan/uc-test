@@ -14,7 +14,7 @@
 #include <driverlib/gpio.h>
 #include <driverlib/sysctl.h>
 
-#include "pins.h"
+#include <pins.h>
 
 #ifdef PART_TM4C123AH6PM
 void wait_us(uint32_t us) { SysCtlDelay( (SysCtlClockGet() / (4*1000000)) * us);  }

@@ -14,11 +14,9 @@
 //#include <utils/uartstdio.h>
 
 
-#include "osal.h"
 #include "pins.h"
 #include "soes_hook.h"
 #include "peripherals.h"
-#include "soes/utypes.h"
 #include "soes/esc.h"
 
 #define BSL_PARAM			BSL_DEFAULT_PARAM // I2C slave address = 0x48, Interface selection = Auto
@@ -58,6 +56,15 @@ const eUSCI_UART_Config uartConfig =
         EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
 };
 
+/* I2C Master Configuration Parameter */
+const eUSCI_I2C_MasterConfig i2cConfig =
+{
+		EUSCI_B_I2C_CLOCKSOURCE_SMCLK,			// SMCLK Clock Source
+		3000000,								// SMCLK = 3MHz
+		EUSCI_B_I2C_SET_DATA_RATE_400KBPS,		// Desired I2C Clock of 400khz
+		0,										// No byte counter threshold
+		EUSCI_B_I2C_NO_AUTO_STOP				// No Autostop
+};
 
 void jump_to_bootloader(void) {
 
@@ -196,6 +203,31 @@ void Configure_ADC(void)
 {
 
 }
+
+
+void Configure_I2C(uint8_t slave_address)
+{
+	/* Initializing I2C Master to SMCLK at 400kbs with no autostop */
+	I2C_initMaster(EUSCI_B0_BASE, &i2cConfig);
+
+	/* Specify slave address */
+	I2C_setSlaveAddress(EUSCI_B0_BASE, slave_address);
+	/* Set Master in receive mode */
+	I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
+	/* Enable I2C Module to start operations */
+	I2C_enableModule(EUSCI_B0_BASE);
+#if 0
+	/* Enable and clear the interrupt flag */
+	I2C_clearInterruptFlag(EUSCI_B0_BASE,
+			EUSCI_B_I2C_TRANSMIT_INTERRUPT0 + EUSCI_B_I2C_NAK_INTERRUPT);
+	//Enable master Receive interrupt
+	I2C_enableInterrupt(EUSCI_B0_BASE,
+			EUSCI_B_I2C_TRANSMIT_INTERRUPT0 + EUSCI_B_I2C_NAK_INTERRUPT);
+
+	Interrupt_enableInterrupt(INT_EUSCIB0);
+#endif
+}
+
 
 
 

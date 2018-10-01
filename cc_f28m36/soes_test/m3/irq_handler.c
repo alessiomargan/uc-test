@@ -13,13 +13,15 @@
 #include <driverlib/ssi.h>
 #include <driverlib/timer.h>
 
-#include <ethercat.h>
-#include <soes/soes.h>
+#include <soes/esc.h>
+#include <soes/hal/advr_esc/soes.h>
+#include <soes_test/include/soes_hook.h>
 
-#include "pins.h"
-#include "soes_hook.h"
-#include "peripherals.h"
-#include "shared_ram.h"
+#include <pins.h>
+#include <shared_ram.h>
+#include <m3/include/peripherals.h>
+
+extern uint8_t ESC_SYNCactivation(void);
 
 volatile uint16_t write_lcd = 0;
 volatile long ecat_irq_cnt = 0;
@@ -58,7 +60,7 @@ void Timer0A_IntHandler(void) {
 
     //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_PIN_4);
 
-	if ( ! DC_activation() ) {
+    if ( ! ESC_SYNCactivation() ) {
         ecat_process_pdo();
     }
 

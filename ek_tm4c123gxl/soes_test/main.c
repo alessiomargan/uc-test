@@ -28,9 +28,7 @@
 
 #include <utils/uartstdio.h>
 
-#include <ethercat.h>
-#include <soes/soes.h>
-
+#include <soes/hal/advr_esc/soes.h>
 #include <peripherals.h>
 
 

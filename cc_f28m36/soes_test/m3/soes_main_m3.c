@@ -7,6 +7,9 @@
 // $Copyright: Copyright (C) 2012-2015 Texas Instruments Incorporated -
 //             http://www.ti.com/ ALL RIGHTS RESERVED $
 //###########################################################################
+/* Standard Includes */
+#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "inc/hw_ints.h"
@@ -26,12 +29,13 @@
 #include "driverlib/ram.h"
 #include "utils/uartstdio.h"
 
-#include <ethercat.h>
-#include <soes/soes.h>
+#include <flash_utils.h>
+
+#include <soes_hook.h>
+
 #include <pins.h>
 #include <shared_ram.h>
-#include <peripherals.h>
-#include <flash_utils.h>
+#include <m3/include/peripherals.h>
 #ifdef _LCD
 	#if 0
 		#include <dog_LCD/DogLcd_test.h>

@@ -74,7 +74,11 @@ extern aux_pdo_rx_t aux_pdo_rx;
 extern aux_pdo_tx_t aux_pdo_tx;
 extern sdo_t sdo;
 
-void setup_esc_configs(void);
+// esc_config hook
+void pre_state_change_hook (uint8_t * as, uint8_t * an);
+void post_state_change_hook (uint8_t * as, uint8_t * an);
+int ESC_pre_objecthandler (uint16_t index, uint8_t subindex);
+void ESC_objecthandler (uint16_t index, uint8_t subindex);
 
 void ecat_process_pdo(void);
 

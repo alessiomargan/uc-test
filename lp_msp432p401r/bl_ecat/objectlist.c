@@ -1,15 +1,16 @@
 #ifndef __objectlist__
 #define __objectlist__
 
-#include "soes/esc_coe.h"
-#include "soes_hook.h"
+#include <soes/esc_coe.h>
+#include <soes_hook.h>
 
-extern uint16 	flash_cmd;
-extern uint16 	flash_cmd_ack;
-extern uint32 	flash_crc;
-extern uint16   crc_ok;
-extern uint16   et1100_boot_pin;
-extern char 	bl_ver[];
+extern uint16_t 	flash_cmd;
+extern uint16_t 	flash_cmd_ack;
+extern uint16_t   	crc_ok;
+extern uint16_t   	et1100_boot_pin;
+
+extern uint32_t 	CRC_App;
+extern uint8_t 		BLDR_Version[];
 
 
 const char acName1000[] = "Device Type";
@@ -127,8 +128,8 @@ const _objd SDO8001[] =
   {0x0, DTYPE_UNSIGNED8,     	 8, ATYPE_RO,   acName8001_0,   6, 0},
   {0x1, DTYPE_UNSIGNED16,   	16, ATYPE_RW, 	"flash_cmd",  	0, &flash_cmd},
   {0x2, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"flash_cmd_ack",0, &flash_cmd_ack},
-  {0x3, DTYPE_UNSIGNED32,   	32, ATYPE_RO, 	"flash_crc",  	0, &flash_crc},
-  {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "bl_ver",   	0, &bl_ver},
+  {0x3, DTYPE_UNSIGNED32,   	32, ATYPE_RO, 	"flash_crc",  	0, &CRC_App},
+  {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "bl_ver",   	0, &BLDR_Version},
   {0x5, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"crc_ok",  		0, &crc_ok},
   {0x6, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"et1100_boot_pin",0, &et1100_boot_pin},
 

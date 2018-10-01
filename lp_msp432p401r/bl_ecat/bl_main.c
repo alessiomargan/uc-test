@@ -75,7 +75,7 @@ void main(uint32_t bslParams)
     Configure_Switch();
 
     calc_crc = calc_CRC(0x20000, 0x20000);
-    DPRINT("bldr ver %d.%d\n", BLDR_Version[0],BLDR_Version[1]);
+    DPRINT("bldr ver %s\n", BLDR_Version);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", calc_crc, CRC_App);
 
     //ESC_init(0);

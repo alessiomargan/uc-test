@@ -17,16 +17,17 @@
 #include <driverlib/pwm.h>
 #include <driverlib/adc.h>
 
-#include <ethercat.h>
-#include <soes/soes.h>
+#include <soes/esc.h>
+#include <soes/hal/advr_esc/soes.h>
 #include <soes_hook.h>
 
-#include "pins.h"
-#include "peripherals.h"
+#include <pins.h>
+#include <peripherals.h>
 //#include "pwm_ctrl.h"
 #include "dog_LCD/doggy.h"
 
 extern void lcd_test_sprint( void );
+extern uint8_t ESC_SYNCactivation(void);
 
 volatile uint32_t timer0_cnt = 0;
 volatile uint32_t timer1_cnt = 0;
@@ -62,7 +63,7 @@ void Timer0A_IntHandler(void) {
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     timer0_cnt++;
 
-    if ( ! DC_activation() ) {
+    if ( ! ESC_SYNCactivation() ) {
         ecat_process_pdo();
     }
 	soes_loop();
@@ -71,7 +72,7 @@ void Timer0A_IntHandler(void) {
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle 
         HWREGBITB(&toggle, 0) ^= 1;
-        UARTprintf("\r tmr0: %d %d\t ecat_irq_cnt :", timer0_cnt, toggle, ecat_irq_cnt );
+        DPRINT("\r tmr0: %d %d\t ecat_irq_cnt :", timer0_cnt, toggle, ecat_irq_cnt );
     }
 
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, toggle ? GPIO_PIN_3 : 0 );
