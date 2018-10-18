@@ -5,6 +5,8 @@
 
 #define FLASH_APP_START	0x20000
 #define FLASH_APP_SIZE	0x20000
+#define FLASH_PAR_START	0x12000
+#define FLASH_PAR_SIZE	0x1000
 
 extern const uint8_t BLDR_Version[8];
 extern const uint32_t CRC_App;

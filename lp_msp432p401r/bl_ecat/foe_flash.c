@@ -4,9 +4,6 @@
    #include "MSP432P4111/BSL432_device_file.h"
 #endif
 
-//#include <ti/devices/msp432p4xx/driverlib/flash.h>
-//#include <ti/devices/msp432p4xx/driverlib/crc32.h>
-
 #include "foe_flash.h"
 #include <soes/esc_foe.h>
 
@@ -40,7 +37,8 @@ const uint8_t BLDR_Version[8] = "msp_1.0";
 #pragma DATA_SECTION(CRC_App, ".CRC_APP")
 const uint32_t CRC_App;
 
-
+uint32_t 	gCalc_crc;
+uint16_t  	crc_ok;
 
 uint32_t calc_CRC(uint32_t addr, uint32_t length)
 {
@@ -105,23 +103,25 @@ uint32_t on_foe_open_cb ( uint8_t op ) {
 uint32_t on_foe_close_cb( void ) {
 
 	// write crc
-	uint32_t crc, sectorNum, bankNum;
+	uint32_t sectorNum, bankNum;
 	bool ret;
 
-	crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
+	gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
 	// get flash bank and sector of crc address ....
 	MAP_FlashCtl_getMemoryInfo((uint32_t)&CRC_App, &bankNum, &sectorNum);
     DPRINT("\n%s crc 0x%04X addr 0x%04X bank %d sector %d\n",
-    		__FUNCTION__, crc, &CRC_App, bankNum, sectorNum);
+    		__FUNCTION__, gCalc_crc, &CRC_App, bankNum, sectorNum);
 
 	// unprotect bank and sector ...
     MAP_FlashCtl_unprotectSector(0x1<<bankNum, 0x1<<sectorNum);
 	// erase & program
 	MAP_FlashCtl_eraseSector((uint32_t)&CRC_App);
-	MAP_FlashCtl_programMemory((void*)&crc, (void*)&CRC_App, sizeof(crc));
+	MAP_FlashCtl_programMemory((void*)&gCalc_crc, (void*)&CRC_App, sizeof(gCalc_crc));
 	// protect
 	MAP_FlashCtl_protectSector(0x1<<bankNum, 0x1<<sectorNum);
 	MAP_FlashCtl_protectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, ALL_FLASH_SECTORS);
+
+	crc_ok = (gCalc_crc==CRC_App);
 
 	return 0;
 }

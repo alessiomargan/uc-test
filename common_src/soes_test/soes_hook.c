@@ -18,8 +18,9 @@
     #define DEBUG_ASSERT(expression)
 #endif  /* ESC_DEBUG */
 
-extern const _objd SDO8002[];
-extern const _objd SDO8003[];
+extern const 	_objd SDO8002[];
+extern const 	_objd SDO8003[];
+extern float	tempC;
 
 rx_pdo_t    	rx_pdo;
 tx_pdo_t    	tx_pdo;
@@ -218,8 +219,15 @@ void ecat_process_pdo(void) {
     tx_pdo.link_vel = 0;
     tx_pdo.motor_vel = 0;
     tx_pdo.torque = 0;
+    tx_pdo.temperature = (int16_t)(tempC*10);
     tx_pdo.rtt = rx_pdo.ts;
 
     TXPDO_update();
+}
+
+
+void bootstrap_foe_init(void) {
+
+
 }
 

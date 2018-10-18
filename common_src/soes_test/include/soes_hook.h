@@ -81,5 +81,6 @@ int ESC_pre_objecthandler (uint16_t index, uint8_t subindex);
 void ESC_objecthandler (uint16_t index, uint8_t subindex);
 
 void ecat_process_pdo(void);
+void bootstrap_foe_init(void);
 
 #endif 

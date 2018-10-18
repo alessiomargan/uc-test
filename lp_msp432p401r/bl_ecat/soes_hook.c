@@ -19,12 +19,13 @@ esc_cfg_t 	gESC_config = { 0, 0 };
 foe_cfg_t 	gFOE_config = { 0, 0, 0 ,0 };
 uint8_t		foe_buffer[0x400];
 
-extern foe_writefile_cfg_t      gFOE_firmware_files[];
-
 uint16_t 	flash_cmd;
 uint16_t 	flash_cmd_ack;
-uint16_t  	crc_ok;
 uint16_t  	et1100_boot_pin;
+
+extern uint16_t 			crc_ok;
+extern foe_writefile_cfg_t  gFOE_firmware_files[];
+
 
 /** Function to pre-qualify the incoming SDO download.
  *
@@ -57,15 +58,15 @@ void ESC_objecthandler (uint16_t index, uint8_t subindex)
 {
     switch ( index ) {
         case 0x8001:
-            {
-                /* Handle post-write of parameter values */
-                switch ( subindex ) {
-                    default:
-                        DPRINT("post-write param 0x%04X %d\n", index, subindex);
-                        break;
-                }
-                break;
-            }
+		{
+			/* Handle post-write of parameter values */
+			switch ( subindex ) {
+				default:
+					DPRINT("post-write param 0x%04X %d\n", index, subindex);
+					break;
+			}
+			break;
+		}
         default:
             DPRINT("SDO 0x%04X %d NOT Handled\n", index, subindex);
             break;
@@ -85,7 +86,7 @@ void APP_safeoutput (void)
  */
 void pre_state_change_hook (uint8_t * as, uint8_t * an)
 {
-    DPRINT ("pre_state_change_hook 0x%02X %d\n", *as, *an);
+    DPRINT ("pre_state_change_hook 0x%02X 0x%02X\n", *as, *an);
 }
 
 /** Optional: Hook called AFTER state change for application
@@ -97,20 +98,12 @@ void post_state_change_hook (uint8_t * as, uint8_t * an)
 
     if ( (*as == BOOT_TO_INIT) && (*an & ESCerror ) == 0 ) {
 
-    	//ESC_ALstatus (ESCinit);
-    	ESC_ALerror (ALERR_NONE);
-
-    	DPRINT ("RESET 0x%02X %d\n\n\n\n\n", *as, *an);
-
-    	ResetCtl_initiateHardReset();
-
-
-    } else {
-    //	*an |= ESCerror;
-	//	ESC_ALerror (ALERR_INVALIDSTATECHANGE);
+    	if ( crc_ok ) {
+    		jump2app();
+    	} else {
+    	    DPRINT ("Fail jump2app\n");
+    	}
     }
-
-
 }
 
 void bootstrap_foe_init(void) {

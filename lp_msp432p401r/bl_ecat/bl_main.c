@@ -22,7 +22,8 @@
 #else
 #endif
 
-uint32_t 	calc_crc;
+extern uint32_t	gCalc_crc;
+extern uint16_t crc_ok;
 
 
 extern void soes_init(void);
@@ -32,7 +33,7 @@ extern void do_morse_led(void);
 
 void do_morse_led(void);
 
-static void jump2app(void) {
+void jump2app(void) {
 
 	Interrupt_disableMaster(); // disable interrupts
 	// redirect the vector table
@@ -52,9 +53,7 @@ static uint8_t test_jump2app(void) {
 
 	// poll switch ... 0 pressed
 	uint8_t sw1 = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
-	// poll input pin ... 0 to gnd
-	uint8_t sw2 = GPIO_getInputPinValue(GPIO_PORT_P6, GPIO_PIN0);
-	bool ret = ( sw1 ) && ( sw2 ) && ( calc_crc==CRC_App );
+	bool ret = sw1 && crc_ok;
 	//DPRINT("%s : %d %d\n", __FUNCTION__, sw1, sw2);
 
 	return (ret);
@@ -74,11 +73,11 @@ void main(uint32_t bslParams)
     //Configure_Timer();
     Configure_Switch();
 
-    calc_crc = calc_CRC(0x20000, 0x20000);
+    gCalc_crc = calc_CRC(0x20000, 0x20000);
+    crc_ok = (gCalc_crc==CRC_App);
     DPRINT("bldr ver %s\n", BLDR_Version);
-    DPRINT("CRC : calc 0x%04X flash 0x%04X\n", calc_crc, CRC_App);
+    DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, CRC_App);
 
-    //ESC_init(0);
     soes_init();
 
     //Interrupt_setPriority(INT_T32_INT1, (char)(2)<<5);
