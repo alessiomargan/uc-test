@@ -31,6 +31,7 @@ extern uint8_t ESC_SYNCactivation(void);
 /*
  * let's put irq handlers in RAM
  * */
+/*
 __attribute__((ramfunc))
 void PORT5_IRQHandler(void);
 __attribute__((ramfunc))
@@ -41,7 +42,7 @@ __attribute__((ramfunc))
 void ADC14_IRQHandler(void);
 __attribute__((ramfunc))
 void TA0_N_IRQHandler(void);
-
+*/
 
 
 /*
@@ -51,14 +52,14 @@ void PORT5_IRQHandler(void) {
 
     uint32_t status;
 
-    status = GPIO_getEnabledInterruptStatus(ECAT_GPIO_PORT);
-    GPIO_clearInterruptFlag(ECAT_GPIO_PORT, status);
+    status = MAP_GPIO_getEnabledInterruptStatus(ECAT_GPIO_PORT);
+    MAP_GPIO_clearInterruptFlag(ECAT_GPIO_PORT, status);
 
     if(status & ECAT_IRQ_PIN) {
 		ecat_irq_cnt++;
-		GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN6);
+		MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN6);
 		ecat_process_pdo();
-		GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
+		MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
     }
 }
 
@@ -69,13 +70,13 @@ void PORT1_IRQHandler(void)
 {
     uint32_t status;
 
-    status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P1);
-    GPIO_clearInterruptFlag(GPIO_PORT_P1, status);
+    status = MAP_GPIO_getEnabledInterruptStatus(GPIO_PORT_P1);
+    MAP_GPIO_clearInterruptFlag(GPIO_PORT_P1, status);
 
     if(status & GPIO_PIN1) {
-        GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN0);
+        MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN0);
     } else if(status & GPIO_PIN4) {
-        GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN1);
+    	MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN1);
         jumpToBsl = true;
     }
 }
@@ -89,10 +90,10 @@ void T32_INT1_IRQHandler(void)
 	int16_t conRes;
 
     // Clear the timer interrupt.
-	Timer32_clearInterruptFlag(TIMER32_0_BASE);
+	MAP_Timer32_clearInterruptFlag(TIMER32_0_BASE);
     timer0_cnt++;
 
-    GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN0);
+    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN0);
 
     conRes = ((conv_adc[adc_idx][0] - cal30) * 55);
     tempC = (conRes / calDifference) + 30.0f;
@@ -103,12 +104,12 @@ void T32_INT1_IRQHandler(void)
         ecat_process_pdo();
     }
 
-    GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN0);
+    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN0);
 
     // every 1000 cycles
     if ( (timer0_cnt % 100) == 0 ) {
         // Toggle P1.0 output
-        GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    	MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
         //DPRINT("\r tmr_cnt: %d ecat_irq_cnt: %d", timer0_cnt, ecat_irq_cnt );
     }
 

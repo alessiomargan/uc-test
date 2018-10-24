@@ -35,11 +35,9 @@ uint16_t 	conv_adc[256][16];
 const eUSCI_SPI_MasterConfig spiMasterConfig =
 {
         EUSCI_B_SPI_CLOCKSOURCE_SMCLK,	// SMCLK Clock Source
-        48000000,                       // SMCLK = DCO = 48MHZ
-		//2400000,                     	// SPICLK = 2.4Mhz
-		//7500000,                      // SPICLK = 7.5Mhz
-		12000000,                       // SPICLK = 12Mhz max with EL9800
-		//24000000,                     // SPICLK = 24Mhz
+		CS_48MHZ,                       // SMCLK = DCO = 24MHZ
+		//CS_24MHZ,                       // SMCLK = DCO/2 = 24MHZ
+		CS_12MHZ,                       // SPICLK = 12Mhz max with EL9800
 		EUSCI_B_SPI_MSB_FIRST,          // MSB First
         EUSCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
         EUSCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
@@ -51,12 +49,13 @@ const eUSCI_SPI_MasterConfig spiMasterConfig =
  * http://processors.wiki.ti.com/index.php/USCI_UART_Baud_Rate_Gen_Mode_Selection
  * UART Config
  * SMCLK = 24Mhz
- * Baud = 9600
+ * Baud = 115200
+ * 13,0,0
  */
-const eUSCI_UART_Config uartConfig =
+const eUSCI_UART_Config uartConfigOverSampl =
 {
         EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
-        26,                                      // BRDIV = 26
+        26,                                      // BRDIV = 208
         1,                                       // UCxBRF = 1
         0,                                       // UCxBRS = 0
         EUSCI_A_UART_NO_PARITY,                  // No Parity
@@ -70,7 +69,7 @@ const eUSCI_UART_Config uartConfig =
 const eUSCI_I2C_MasterConfig i2cConfig =
 {
 		EUSCI_B_I2C_CLOCKSOURCE_SMCLK,			// SMCLK Clock Source
-		3000000,								// SMCLK = 3MHz
+		CS_3MHZ,								// SMCLK = 24MHz
 		EUSCI_B_I2C_SET_DATA_RATE_400KBPS,		// Desired I2C Clock of 400khz
 		0,										// No byte counter threshold
 		EUSCI_B_I2C_NO_AUTO_STOP				// No Autostop
@@ -80,7 +79,8 @@ const eUSCI_I2C_MasterConfig i2cConfig =
 const Timer_A_UpModeConfig upModeConfig =
 {
 		TIMER_A_CLOCKSOURCE_SMCLK,           // SMCLK Clock Source
-		TIMER_A_CLOCKSOURCE_DIVIDER_2,       // SMCLK/2 = 24MHz
+		TIMER_A_CLOCKSOURCE_DIVIDER_2,       // SMCLK = 48MHz
+		//TIMER_A_CLOCKSOURCE_DIVIDER_1,       // SMCLK = 24MHz
 		//120,                               // 20kHz
         240,                               	 // 10KHz
 		//480,								 //  5kHz
@@ -118,16 +118,14 @@ void jump_to_bootloader(void) {
  */
 void Configure_UART(void)
 {
-    /* Configuring UART Module */
-    MAP_UART_initModule(EUSCI_A0_BASE, &uartConfig);
-
-    /* Enable UART module */
-    MAP_UART_enableModule(EUSCI_A0_BASE);
-
     /* Selecting P1.2 and P1.3 in UART mode */
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1,
     		                                   GPIO_PIN2 | GPIO_PIN3,
 											   GPIO_PRIMARY_MODULE_FUNCTION);
+    /* Configuring UART Module */
+    MAP_UART_initModule(EUSCI_A0_BASE, &uartConfigOverSampl);
+    /* Enable UART module */
+    MAP_UART_enableModule(EUSCI_A0_BASE);
 }
 
 int fputc(int _c, register FILE *_fp)
@@ -189,7 +187,6 @@ void Configure_GPIO(void)
 	MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, PIN_ALL8);
 	MAP_GPIO_setAsOutputPin(GPIO_PORT_P2, PIN_ALL8);
 	MAP_GPIO_setAsOutputPin(GPIO_PORT_P3, PIN_ALL8);
-
 	// Led
 	// Set P1.0 to output direction
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
@@ -197,7 +194,6 @@ void Configure_GPIO(void)
     // Set P2.[0,1,2] to output direction
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
     MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
-
     // IO probe
     // Set P3.6 to output direction
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
@@ -205,7 +201,6 @@ void Configure_GPIO(void)
     // Set P6.[0,1] to output direction
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P6, GPIO_PIN0|GPIO_PIN1);
     MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN0|GPIO_PIN1);
-
     // Buttons switch
     /* Configuring P1.[1,4] as an input and enabling interrupts */
     MAP_GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);

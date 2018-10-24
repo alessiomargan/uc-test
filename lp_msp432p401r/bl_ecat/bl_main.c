@@ -35,7 +35,7 @@ void do_morse_led(void);
 
 void jump2app(void) {
 
-	Interrupt_disableMaster(); // disable interrupts
+	MAP_Interrupt_disableMaster(); // disable interrupts
 	// redirect the vector table
     // initialize the vector table offset
     SCB->VTOR = FLASH_APP_START;
@@ -52,22 +52,41 @@ void jump2app(void) {
 static uint8_t test_jump2app(void) {
 
 	// poll switch ... 0 pressed
-	uint8_t sw1 = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
+	uint8_t sw1 = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
 	bool ret = sw1 && crc_ok;
 	//DPRINT("%s : %d %d\n", __FUNCTION__, sw1, sw2);
 
 	return (ret);
 }
 
+static void clock_src(void) {
+
+	uint32_t i, clks[6];
+
+	//MAP_CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+
+	clks[0] = MAP_CS_getACLK();		// Auxiliary clk
+	clks[1] = MAP_CS_getMCLK();		// Master clk
+	clks[2] = MAP_CS_getSMCLK();	// Low-speed subsystem master clk
+	clks[3] = MAP_CS_getHSMCLK();   // Subsystem master clk
+	clks[4] = MAP_CS_getBCLK();		// Low-speed backup domain clk
+	clks[5] = MAP_CS_getDCOFrequency();
+	for (i=0; i<6;i++) {
+		DPRINT("%d\n", clks[i] );
+	}
+
+}
 
 void main(uint32_t bslParams)
 {
-	uint32_t value = 0;
-    int 	i = 0;
+	int 	i = 0;
     volatile uint32_t	loop_cnt;
     volatile uint8_t	test_jump = 0;
 
     Configure_UART();
+
+    clock_src();
+
     Configure_Led();
     Configure_EcatPDI();
     //Configure_Timer();
@@ -132,11 +151,11 @@ void do_morse_led(void) {
     /////////////////////////////////////////////////////////////////
 
     if ( led_status ) {
-    	GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-    	GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    	MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    	MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
     } else {
-    	GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-    	GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
     }
 }
 
