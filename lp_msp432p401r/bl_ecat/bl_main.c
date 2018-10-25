@@ -6,7 +6,6 @@
 #include <stdbool.h>
 
 #include "pins.h"
-#include "osal.h"
 #include "soes/esc.h"
 
 #include "peripherals.h"
@@ -14,7 +13,6 @@
 
 #include "tiva-morser/morse.h"
 
-#include "BSL432_API.h"
 #if defined (__MSP432P401R__) || defined (__MSP432P401M__)
    #include "MSP432P401x/BSL432_device_file.h"
 #elif defined (__MSP432P4111__) || defined (__MSP432P411V__) || defined (__MSP432P411Y__)
