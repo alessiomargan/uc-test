@@ -22,6 +22,7 @@
 /* Standard Includes */
 #include <stdint.h>
 #include <stdbool.h>
+#include <cc.h>
 
 #include "pins.h"
 #include "peripherals.h"
@@ -35,17 +36,17 @@ uint32_t 		clks[6];
 
 static inline void print_adc() {
     int i;
-    UARTprintf("***************\n");
+    DPRINT("***************\n");
 	for (i=0; i<16;i++) {
-		UARTprintf("%d %d\n", i, conv_adc[adc_idx][i] );
+		DPRINT("%d %d\n", i, conv_adc[adc_idx][i] );
 	}
 }
 
 static inline void print_clks() {
     int i;
-    UARTprintf("***************\n");
+    DPRINT("***************\n");
 	for (i=0; i<6;i++) {
-		UARTprintf("%d\n", clks[i] );
+		DPRINT("%d\n", clks[i] );
 	}
 }
 

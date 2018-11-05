@@ -127,14 +127,12 @@ void ADC14_IRQHandler(void)
     status = MAP_ADC14_getEnabledInterruptStatus();
     MAP_ADC14_clearInterruptFlag(status);
 
-
     if(status & ADC_INT16)
     {
         MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN1);
         MAP_ADC14_getMultiSequenceResult(conv_adc[adc_idx]);
         MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN1);
     }
-
 
 }
 

@@ -56,8 +56,8 @@ const eUSCI_UART_Config uartConfigOverSampl =
 {
         EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
         26,                                      // BRDIV = 208
-        1,                                       // UCxBRF = 1
-        0,                                       // UCxBRS = 0
+        0,                                       // UCxBRF = 1
+        111,                                     // UCxBRS = 0
         EUSCI_A_UART_NO_PARITY,                  // No Parity
         EUSCI_A_UART_LSB_FIRST,                  // LSB First
         EUSCI_A_UART_ONE_STOP_BIT,               // One stop bit
@@ -80,9 +80,9 @@ const Timer_A_UpModeConfig upModeConfig =
 {
 		TIMER_A_CLOCKSOURCE_SMCLK,           // SMCLK Clock Source
 		TIMER_A_CLOCKSOURCE_DIVIDER_2,       // SMCLK = 48MHz
-		//TIMER_A_CLOCKSOURCE_DIVIDER_1,       // SMCLK = 24MHz
-		//120,                               // 20kHz
-        240,                               	 // 10KHz
+		//TIMER_A_CLOCKSOURCE_DIVIDER_1,     // SMCLK = 24MHz
+		//120,                                 // 20kHz
+        240,                            	 // 10KHz
 		//480,								 //  5kHz
 		//1200,							     //  2KHz
 		//2400,							     //  1KHz
@@ -175,7 +175,7 @@ void Configure_EcatPDI (void)
     MAP_GPIO_enableInterrupt(ECAT_GPIO_PORT, ECAT_IRQ_PIN);
     MAP_Interrupt_enableInterrupt(INT_PORT5);
 
-	UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 
 }
 
@@ -209,7 +209,7 @@ void Configure_GPIO(void)
     MAP_GPIO_enableInterrupt(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
     MAP_Interrupt_enableInterrupt(INT_PORT1);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 
@@ -227,7 +227,7 @@ void Configure_Timer(void)
     MAP_Timer32_setCount(TIMER32_0_BASE,480000);
     MAP_Timer32_startTimer(TIMER32_0_BASE, false);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /*
