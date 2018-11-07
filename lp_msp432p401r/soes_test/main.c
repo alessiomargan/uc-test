@@ -28,7 +28,7 @@
 #include "peripherals.h"
 
 extern uint16_t adc_idx;
-extern uint16_t conv_adc[1024][32];
+extern uint16_t conv_adc[1024][16];
 extern void soes_init(void);
 
 volatile bool 	jumpToBsl = false;
@@ -52,8 +52,6 @@ static inline void print_clks() {
 
 
 static void clock_src(void) {
-
-	uint32_t i;
 
 	// set SMCLK = DCO / 2 ==> 24MHz
 	//MAP_CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_2);

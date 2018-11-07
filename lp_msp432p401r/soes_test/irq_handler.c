@@ -17,14 +17,14 @@ volatile uint32_t timer1_cnt = 0;
 volatile long ecat_irq_cnt = 0;
 volatile long pwm_irq_cnt = 0;
 
-extern bool 	jumpToBsl;
+extern volatile bool	jumpToBsl;
 extern uint32_t cal30;
 extern uint32_t cal85;
 extern float 	calDifference;
 extern float 	tempC;
 
 extern uint16_t adc_idx;
-extern uint16_t conv_adc[1024][32];
+extern uint16_t conv_adc[1024][16];
 
 extern uint8_t ESC_SYNCactivation(void);
 

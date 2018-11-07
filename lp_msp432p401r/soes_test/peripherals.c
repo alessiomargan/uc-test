@@ -26,8 +26,8 @@ uint32_t	cal85;
 float 		calDifference;
 float		tempC;
 float		tempF;
-uint8_t		adc_idx;
-uint16_t 	conv_adc[256][16];
+uint16_t	adc_idx;
+uint16_t 	conv_adc[1024][16];
 
 /*
  * SPI master Config
