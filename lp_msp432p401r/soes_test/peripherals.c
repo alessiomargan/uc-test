@@ -144,6 +144,7 @@ int fputc(int _c, register FILE *_fp)
 {
 	while(!(UCA0IFG&UCTXIFG));
 	UCA0TXBUF = (unsigned char) _c;
+	//MAP_UART_transmitData(EUSCI_A0_BASE, (unsigned char)_c);
 	return((unsigned char)_c);
 }
 
@@ -156,6 +157,7 @@ int fputs(const char *_ptr, register FILE *_fp)
 	for(i=0 ; i<len ; i++) {
 		while(!(UCA0IFG&UCTXIFG));
 		UCA0TXBUF = (unsigned char) _ptr[i];
+		//MAP_UART_transmitData(EUSCI_A0_BASE, (unsigned char)_c);
 	}
 
 	return len;

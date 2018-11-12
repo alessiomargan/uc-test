@@ -95,6 +95,11 @@ void main(uint32_t bslParams)
     DPRINT("bldr ver %s\n", BLDR_Version);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, CRC_App);
 
+    test_jump = test_jump2app();
+    if ( test_jump ) {
+    	jump2app();
+    }
+
     soes_init();
 
     //Interrupt_setPriority(INT_T32_INT1, (char)(2)<<5);
@@ -102,11 +107,6 @@ void main(uint32_t bslParams)
 
     while(1)
     {
-        test_jump = test_jump2app();
-        if ( test_jump ) {
-        	jump2app();
-        }
-
         soes_loop();
 
         if ( ! (loop_cnt++ % 100) ) {
