@@ -34,14 +34,14 @@ uint16_t 	conv_adc[1024][16];
  */
 const eUSCI_SPI_MasterConfig spiMasterConfig =
 {
-        EUSCI_B_SPI_CLOCKSOURCE_SMCLK,	// SMCLK Clock Source
-		CS_48MHZ,                       // SMCLK = DCO = 24MHZ
-		//CS_24MHZ,                       // SMCLK = DCO/2 = 24MHZ
-		CS_12MHZ,                       // SPICLK = 12Mhz max with EL9800
-		EUSCI_B_SPI_MSB_FIRST,          // MSB First
-        EUSCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
-        EUSCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
-        EUSCI_B_SPI_3PIN              	// 3Wire SPI Mode
+	EUSCI_B_SPI_CLOCKSOURCE_SMCLK,	// SMCLK Clock Source
+	CS_48MHZ,                       // SMCLK = DCO = 24MHZ
+	//CS_24MHZ,                       // SMCLK = DCO/2 = 24MHZ
+	CS_12MHZ,                       // SPICLK = 12Mhz max with EL9800
+	EUSCI_B_SPI_MSB_FIRST,          // MSB First
+    EUSCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
+    EUSCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
+    EUSCI_B_SPI_3PIN              	// 3Wire SPI Mode
 };
 
 /*
@@ -54,56 +54,68 @@ const eUSCI_SPI_MasterConfig spiMasterConfig =
  */
 const eUSCI_UART_Config uartConfigOverSampl =
 {
-        EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
-        26,                                      // BRDIV = 208
-        0,                                       // UCxBRF = 1
-        111,                                     // UCxBRS = 0
-        EUSCI_A_UART_NO_PARITY,                  // No Parity
-        EUSCI_A_UART_LSB_FIRST,                  // LSB First
-        EUSCI_A_UART_ONE_STOP_BIT,               // One stop bit
-        EUSCI_A_UART_MODE,                       // UART mode
-        EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
+	EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
+    26,                                      // BRDIV = 208
+	1,                                       // UCxBRF = 1
+	0,                                     // UCxBRS = 0
+	EUSCI_A_UART_NO_PARITY,                  // No Parity
+	EUSCI_A_UART_LSB_FIRST,                  // LSB First
+	EUSCI_A_UART_ONE_STOP_BIT,               // One stop bit
+	EUSCI_A_UART_MODE,                       // UART mode
+	EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
 };
 
 /* I2C Master Configuration Parameter */
 const eUSCI_I2C_MasterConfig i2cConfig =
 {
-		EUSCI_B_I2C_CLOCKSOURCE_SMCLK,			// SMCLK Clock Source
-		CS_3MHZ,								// SMCLK = 24MHz
-		EUSCI_B_I2C_SET_DATA_RATE_400KBPS,		// Desired I2C Clock of 400khz
-		0,										// No byte counter threshold
-		EUSCI_B_I2C_NO_AUTO_STOP				// No Autostop
+	EUSCI_B_I2C_CLOCKSOURCE_SMCLK,			// SMCLK Clock Source
+	CS_3MHZ,								// SMCLK = 24MHz
+	EUSCI_B_I2C_SET_DATA_RATE_400KBPS,		// Desired I2C Clock of 400khz
+	0,										// No byte counter threshold
+	EUSCI_B_I2C_NO_AUTO_STOP				// No Autostop
 };
 
 /* Timer_A Continuous Mode Configuration Parameter */
 const Timer_A_UpModeConfig upModeConfig =
 {
-		TIMER_A_CLOCKSOURCE_SMCLK,           // SMCLK Clock Source
-		TIMER_A_CLOCKSOURCE_DIVIDER_2,       // SMCLK = 48MHz
-		//TIMER_A_CLOCKSOURCE_DIVIDER_1,     // SMCLK = 24MHz
-		//120,                                 // 20kHz
-        240,                            	 // 10KHz
-		//480,								 //  5kHz
-		//1200,							     //  2KHz
-		//2400,							     //  1KHz
-		TIMER_A_TAIE_INTERRUPT_DISABLE,      // Disable Timer ISR
-        TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE, // Disable CCR0
-        TIMER_A_DO_CLEAR                     // Clear Counter
+	TIMER_A_CLOCKSOURCE_SMCLK,       	// SMCLK Clock Source
+	TIMER_A_CLOCKSOURCE_DIVIDER_2,    	// SMCLK/2
+	//TIMER_A_CLOCKSOURCE_DIVIDER_1,  	// SMCLK/1
+	//120,                            	// 20kHz
+	240,                            	// 10KHz
+	//480,							 	//  5kHz
+	//1200,						     	//  2KHz
+	//2400,						     	//  1KHz
+	TIMER_A_TAIE_INTERRUPT_DISABLE,   	// Disable Timer ISR
+	TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE,// Disable CCR0
+	TIMER_A_DO_CLEAR                    // Clear Counter
 };
 
 /* Timer_A Compare Configuration Parameter */
 const Timer_A_CompareModeConfig compareConfig =
 {
-        TIMER_A_CAPTURECOMPARE_REGISTER_1,          // Use CCR1
-        TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE,   // Disable CCR interrupt
-		//TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE,	// Enable CCR interrupt
-		TIMER_A_OUTPUTMODE_SET_RESET,               // Toggle output but
-        //120,
-		240,                                      	// Period
-        //480                                       // Period
-        //120                                       // Period
-		//2400
+	TIMER_A_CAPTURECOMPARE_REGISTER_1,          // Use CCR1
+	TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE,   // Disable CCR interrupt
+	//TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE,	// Enable CCR interrupt
+	TIMER_A_OUTPUTMODE_SET_RESET,               // Toggle output but
+	//120,
+	240,                                      	// Period
+	//480                                       // Period
+	//120                                       // Period
+	//2400
 };
+
+/* Timer_A PWM Configuration Parameter */
+Timer_A_PWMConfig pwmConfig =
+{
+    TIMER_A_CLOCKSOURCE_SMCLK,
+    TIMER_A_CLOCKSOURCE_DIVIDER_1,
+    240,										// 20 kHz
+    TIMER_A_CAPTURECOMPARE_REGISTER_1,
+    TIMER_A_OUTPUTMODE_SET_RESET,
+    240 / 2
+};
+
 
 void jump_to_bootloader(void) {
 
@@ -130,22 +142,20 @@ void Configure_UART(void)
 
 int fputc(int _c, register FILE *_fp)
 {
-	//while(!(UCA0IFG&UCTXIFG));
-	//UCA0TXBUF = (unsigned char) _c;
-	MAP_UART_transmitData(EUSCI_A0_BASE, (uint8_t)_c);
-	return((uint8_t)_c);
+	while(!(UCA0IFG&UCTXIFG));
+	UCA0TXBUF = (unsigned char) _c;
+	return((unsigned char)_c);
 }
 
 int fputs(const char *_ptr, register FILE *_fp)
 {
-	uint32_t i, len;
+	unsigned int i, len;
 
 	len = strlen(_ptr);
 
 	for(i=0 ; i<len ; i++) {
-		//while(!(UCA0IFG&UCTXIFG));
-		//UCA0TXBUF = (unsigned char) _ptr[i];
-		MAP_UART_transmitData(EUSCI_A0_BASE, (uint8_t)_ptr[i]);
+		while(!(UCA0IFG&UCTXIFG));
+		UCA0TXBUF = (unsigned char) _ptr[i];
 	}
 
 	return len;
@@ -310,7 +320,9 @@ void Configure_ADC_temp(void)
     		GPIO_PIN7|GPIO_PIN6|GPIO_PIN5|GPIO_PIN4|GPIO_PIN3|GPIO_PIN2|GPIO_PIN1,
     		GPIO_TERTIARY_MODULE_FUNCTION);
 
-    /* Configuring ADC Memory */
+    /* Configuring ADC Memory
+     * true  ==> cycle after the first round of sample/conversions
+     * false ==> single sequence of channels */
     MAP_ADC14_configureMultiSequenceMode(ADC_MEM7, ADC_MEM16, true);
     // internal temperature
     MAP_ADC14_configureConversionMemory(ADC_MEM7, ADC_VREFPOS_INTBUF_VREFNEG_VSS, ADC_INPUT_A22, false);
@@ -341,9 +353,12 @@ void Configure_ADC_temp(void)
     MAP_ADC14_enableSampleTimer(ADC_MANUAL_ITERATION);
 
     /* Configuring Timer_A in continuous mode and sourced from SMCLK */
-    MAP_Timer_A_configureUpMode(TIMER_A0_BASE, &upModeConfig);
+    //MAP_Timer_A_configureUpMode(TIMER_A0_BASE, &upModeConfig);
     /* Configuring Timer_A0 in CCR1 to trigger at 16000 (0.5s) */
-    MAP_Timer_A_initCompare(TIMER_A0_BASE, &compareConfig);
+    //MAP_Timer_A_initCompare(TIMER_A0_BASE, &compareConfig);
+
+    MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+
     /* Configuring the sample trigger to be sourced from Timer_A0  and setting it
      * to automatic iteration after it is triggered */
     MAP_ADC14_setSampleHoldTrigger(ADC_TRIGGER_SOURCE1, false);
@@ -353,10 +368,9 @@ void Configure_ADC_temp(void)
     /* Enable conversion */
     MAP_ADC14_enableConversion();
 
-    //MAP_ADC14_toggleConversionTrigger();
     /* Starting the Timer */
-    MAP_Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
-
+    //MAP_Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
+    //MAP_ADC14_toggleConversionTrigger();
 
 }
 
