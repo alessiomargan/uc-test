@@ -40,18 +40,34 @@
 
 MEMORY
 {
-    MAIN       (RX) : origin = 0x00000000, length = 0x00040000
-    BSL_START  (RX) : origin = 0x00202000, length = 0x00000010
-    BSL_FLASH1 (RX) : origin = 0x00202020, length = 0x00000060
-    BSL_INTVEC (RX) : origin = 0x00202080, length = 0x00000020
-    BSL_FLASH2 (RX) : origin = 0x002020A0, length = 0x00001F60
+//    MAIN       (RX) : origin = 0x00000000, length = 0x0003C000
+//    BSL_TEXT   (RX) : origin = 0x0003C000, length = 0x00004000
+//    MBX_BOOT   (R)  : origin = 0x00200000, length = 0x00001000
+//    BSL_START  (RX) : origin = 0x00202000, length = 0x00000010
+    // BLS432_VERSION_...
+//    NOT_USED   (RX) : origin = 0x00202020, length = 0x00000060
+//    BSL_INTVEC (RX) : origin = 0x00202080, length = 0x00000020
+//    BSL_FLASH  (RX) : origin = 0x002020A0, length = 0x00001F60
+
+//    SRAM_CODE  (RWX): origin = 0x01000000, length = 0x00010000
+//    SRAM_DATA  (RW) : origin = 0x20000000, length = 0x00002000
+
+//    BSL432_VERSION_VENDOR (R): origin = 0x00202010, length = 0x00000002
+//    BSL432_VERSION_CI     (R): origin = 0x00202012, length = 0x00000002
+//    BSL432_VERSION_API    (R): origin = 0x00202014, length = 0x00000002
+//    BSL432_VERSION_PI     (R): origin = 0x00202016, length = 0x00000002
+//    BSL432_VERSION_ID     (R): origin = 0x00202018, length = 0x00000002
+
+    BLDR_VERSION (R): origin = 0x0010000, length = 0x00000008 // SECTOR_16
+    CRC_APP      (R): origin = 0x0011000, length = 0x00000004 // SECTOR_17
+    PAR_APP      (R): origin = 0x0012000, length = 0x00001000 // SECTOR_18
+
+    MAIN_BL    (RX) : origin = 0x00000000, length = 0x00010000
+    MAIN_APP   (RX) : origin = 0x00020000, length = 0x00010000
+    INFO       (RX) : origin = 0x00200000, length = 0x00004000
+
     SRAM_CODE  (RWX): origin = 0x01000000, length = 0x00010000
-    SRAM_DATA  (RW) : origin = 0x20000000, length = 0x00002000
-    BSL432_VERSION_VENDOR (R): origin = 0x00202010, length = 0x00000002
-    BSL432_VERSION_CI     (R): origin = 0x00202012, length = 0x00000002
-    BSL432_VERSION_API    (R): origin = 0x00202014, length = 0x00000002
-    BSL432_VERSION_PI     (R): origin = 0x00202016, length = 0x00000002
-    BSL432_VERSION_ID     (R): origin = 0x00202018, length = 0x00000002
+    SRAM_DATA  (RW) : origin = 0x20000000, length = 0x00010000
 }
 
 /* The following command line options are set as part of the CCS project.    */
@@ -71,26 +87,25 @@ MEMORY
 
 SECTIONS
 {
-    .BSL432_VERSION_VENDOR : > BSL432_VERSION_VENDOR
-    .BSL432_VERSION_CI     : > BSL432_VERSION_CI
-    .BSL432_VERSION_API    : > BSL432_VERSION_API
-    .BSL432_VERSION_PI     : > BSL432_VERSION_PI
-    .BSL432_VERSION_ID     : > BSL432_VERSION_ID
-    .bsl_start: > BSL_START
-    .intvecs:   > BSL_INTVEC
-    .text   :   >> BSL_FLASH1 | BSL_FLASH2
-    .const  :   >> BSL_FLASH1 | BSL_FLASH2
-    .cinit  :   > BSL_FLASH2
-    .pinit  :   >> BSL_FLASH1 | BSL_FLASH2
-    .init_array : > MAIN
+    .intvecs:   > 0x00000000
+    .text   :   > MAIN_BL
+    .const  :   > MAIN_BL
+    .cinit  :   > MAIN_BL
+    .pinit  :   > MAIN_BL
+    .init_array : > MAIN_BL
+    .binit  : {}  > MAIN_BL
 
-    .flashMailbox : > 0x00200000
+    .CRC_APP : > CRC_APP
+    .BLDR_VERSION : > BLDR_VERSION
 
-    .vtable :   > 0x20000000
+    .vtable :   > SRAM_DATA
     .data   :   > SRAM_DATA
     .bss    :   > SRAM_DATA
     .sysmem :   > SRAM_DATA
     .stack  :   > SRAM_DATA (HIGH)
+
+    .TI.ramfunc : {} load=MAIN_BL, run=SRAM_CODE, table(BINIT)
+
 }
 
 /* Symbolic definition of the WDTCTL register for RTS */

@@ -1,3 +1,29 @@
+/******************************************************************************
+ * MSP432 Project
+ *
+ * -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -Ooff --opt_for_speed=0
+ * --define=_DEBUG --define=FOE_READ_SUPPORTED --define=ESC_DEBUG --define=__MSP432P401R__ --define=DeviceFamily_MSP432P401x --define=ccs
+ * -g --diag_warning=225 --diag_warning=255
+ * --include_path="/opt/ti/ccsv7/tools/compiler/ti-cgt-arm_18.1.3.LTS/include"
+ * --include_path="/opt/ti/simplelink_msp432p4_sdk_2_30_00_14/source"
+ * --include_path="/opt/ti/simplelink_msp432p4_sdk_2_30_00_14/source/third_party/CMSIS/Include"
+ * --include_path="/home/amargan/work/code/firmware/SOES"
+ * --include_path="/home/amargan/work/code/firmware/SOES/soes/include/sys/ccs"
+ * --include_path="/home/amargan/work/code/firmware/uc_test/common_src"
+ * --include_path="/home/amargan/work/code/firmware/uc_test/lp_msp432p401r/bl_ecat/include"
+ *
+ * -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -Ooff --opt_for_speed=0
+ * --define=_DEBUG --define=FOE_READ_SUPPORTED --define=ESC_DEBUG --define=__MSP432P401R__ --define=DeviceFamily_MSP432P401x --define=ccs
+ * -g --diag_warning=225 --diag_warning=255
+ * -z -m"bl_msp432.map" --heap_size=1024 --stack_size=1024
+ * -i"/opt/ti/ccsv7/tools/compiler/ti-cgt-arm_18.1.3.LTS/include"
+ * -i"/opt/ti/ccsv7/tools/compiler/ti-cgt-arm_18.1.3.LTS/lib"
+ * -i"/opt/ti/simplelink_msp432p4_sdk_2_30_00_14/source"
+ * --warn_sections --xml_link_info="bl_msp432_linkInfo.xml" --trampolines=off --rom_model
+ *
+ */
+
+
 /* DriverLib Includes */
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
@@ -90,13 +116,14 @@ void main(uint32_t bslParams)
     //Configure_Timer();
     Configure_Switch();
 
-    gCalc_crc = calc_CRC(0x20000, 0x20000);
+    gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
     crc_ok = (gCalc_crc==CRC_App);
     DPRINT("bldr ver %s\n", BLDR_Version);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, CRC_App);
 
     test_jump = test_jump2app();
     if ( test_jump ) {
+    	DPRINT(">>>\n");
     	jump2app();
     }
 
