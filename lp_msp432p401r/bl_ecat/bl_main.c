@@ -39,16 +39,8 @@
 
 #include "tiva-morser/morse.h"
 
-#if defined (__MSP432P401R__) || defined (__MSP432P401M__)
-   #include "MSP432P401x/BSL432_device_file.h"
-#elif defined (__MSP432P4111__) || defined (__MSP432P411V__) || defined (__MSP432P411Y__)
-   #include "MSP432P4111/BSL432_device_file.h"
-#else
-#endif
-
 extern uint32_t	gCalc_crc;
 extern uint16_t crc_ok;
-
 
 extern void soes_init(void);
 extern void soes_loop(void);
@@ -103,17 +95,44 @@ static void clock_src(void) {
 
 void main(uint32_t bslParams)
 {
-	int 	i = 0;
+	int i = 0;
     volatile uint32_t	loop_cnt;
     volatile uint8_t	test_jump = 0;
 
-    Configure_UART();
+    // Halting the Watchdog and disable IRQs
+    MAP_WDT_A_holdTimer();
+    MAP_Interrupt_disableMaster();
 
-    clock_src();
+    // Set the core voltage level to VCORE1
+    MAP_PCM_setCoreVoltageLevel(PCM_VCORE1);
+    // Before we set the DCO, transition the device to use DCDC converter
+    MAP_PCM_setPowerState(PCM_AM_DCDC_VCORE1);
 
-    Configure_Led();
+    // At 48MHz in VCORE0, MSP432P401R needs 1 wait states
+    MAP_FlashCtl_setWaitState(FLASH_BANK0, 1);
+    MAP_FlashCtl_setWaitState(FLASH_BANK1, 1);
+
+    // Enabling the FPU with stacking enabled (for use within ISR)
+    MAP_FPU_enableModule();
+    MAP_FPU_enableLazyStacking();
+
+    // Set DCO to 48MHz
+    MAP_CS_setDCOFrequency(CS_48MHZ);
+
+    /* Initializes Clock System */
+	//MAP_CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_48);
+	MAP_CS_initClockSignal(CS_MCLK,   CS_DCOCLK_SELECT,  CS_CLOCK_DIVIDER_1);
+	MAP_CS_initClockSignal(CS_HSMCLK, CS_DCOCLK_SELECT,  CS_CLOCK_DIVIDER_1);
+	MAP_CS_initClockSignal(CS_SMCLK,  CS_DCOCLK_SELECT,  CS_CLOCK_DIVIDER_2);
+	MAP_CS_initClockSignal(CS_ACLK,   CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+
+	/*
+	 * Config periphs
+	 */
+	Configure_UART();
+	clock_src();
+    Configure_GPIO();
     Configure_EcatPDI();
-    //Configure_Timer();
     Configure_Switch();
 
     gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
@@ -127,10 +146,10 @@ void main(uint32_t bslParams)
     	jump2app();
     }
 
+    /*
+     * Init soes
+     */
     soes_init();
-
-    //Interrupt_setPriority(INT_T32_INT1, (char)(2)<<5);
-    //Interrupt_enableMaster();
 
     while(1)
     {
