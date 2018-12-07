@@ -64,15 +64,24 @@ void jump2app(void) {
 	__asm(" ldr r0, [r0, #4]\n"
 	      " blx r0\n");
 }
-
+/*
+ * return > 0 will jump to app
+ */
 static uint8_t test_jump2app(void) {
 
+	uint8_t ret = 0;
+	uint8_t sw1 = 1;
+	uint8_t ecat_boot = 0;
+#ifdef LAUNCHPAD
 	// poll switch ... 0 pressed
-	uint8_t sw1 = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
-	bool ret = sw1 && crc_ok;
-	//DPRINT("%s : %d %d\n", __FUNCTION__, sw1, sw2);
+	sw1 = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
+#endif
+	ecat_boot = MAP_GPIO_getInputPinValue(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
 
-	return (ret);
+	ret = sw1 && (!ecat_boot) && crc_ok;
+	DPRINT("%s : %d = %d !%d %d\n", __FUNCTION__, ret, sw1, ecat_boot, crc_ok);
+
+	return ret;
 }
 
 static void clock_src(void) {
@@ -133,10 +142,9 @@ void main(uint32_t bslParams)
 	clock_src();
     Configure_GPIO();
     Configure_EcatPDI();
-    Configure_Switch();
 
     gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
-    crc_ok = (gCalc_crc==CRC_App);
+    crc_ok = (gCalc_crc==CRC_App) ? 1 : 0;
     DPRINT("bldr ver %s\n", BLDR_Version);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, CRC_App);
 
@@ -195,11 +203,9 @@ void do_morse_led(void) {
     /////////////////////////////////////////////////////////////////
 
     if ( led_status ) {
-    	MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-    	MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    	MAP_GPIO_setOutputHighOnPin(PORT_LED_RED, PIN_LED_R);
     } else {
-    	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-    	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    	MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, PIN_LED_R);
     }
 }
 

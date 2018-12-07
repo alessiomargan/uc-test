@@ -96,8 +96,11 @@ void post_state_change_hook (uint8_t * as, uint8_t * an)
 {
     DPRINT ("post_state_change_hook 0x%02X 0x%02X\n", *as, *an);
 
-    if ( (*as == BOOT_TO_INIT) && (*an & ESCerror ) == 0 ) {
+    if ( *an & ESCerror ) {
+        DPRINT ("Error in state transition\n");
+    }
 
+    if ( (*as == BOOT_TO_INIT) && (*an == ESCinit ) ) {
     	if ( crc_ok ) {
     		jump2app();
     	} else {

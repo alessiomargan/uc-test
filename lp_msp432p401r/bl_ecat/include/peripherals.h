@@ -4,6 +4,5 @@
 void Configure_UART(void);
 void Configure_EcatPDI(void);
 void Configure_GPIO(void);
-void Configure_Switch(void);
 
 #endif

@@ -219,7 +219,7 @@ void ecat_process_pdo(void) {
     tx_pdo.link_vel = 0;
     tx_pdo.motor_vel = 0;
     tx_pdo.torque = 0;
-    tx_pdo.temperature = (int16_t)(tempC*10);
+    //tx_pdo.temperature = (int16_t)(tempC*10);
     tx_pdo.rtt = rx_pdo.ts;
 
     TXPDO_update();

@@ -121,7 +121,7 @@ uint32_t on_foe_close_cb( void ) {
 	MAP_FlashCtl_protectSector(0x1<<bankNum, 0x1<<sectorNum);
 	MAP_FlashCtl_protectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, ALL_FLASH_SECTORS);
 
-	crc_ok = (gCalc_crc==CRC_App);
+	crc_ok = (gCalc_crc==CRC_App) ? 1 : 0;
 
 	return 0;
 }

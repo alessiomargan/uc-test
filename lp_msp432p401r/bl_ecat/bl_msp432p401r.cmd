@@ -58,9 +58,9 @@ MEMORY
 //    BSL432_VERSION_PI     (R): origin = 0x00202016, length = 0x00000002
 //    BSL432_VERSION_ID     (R): origin = 0x00202018, length = 0x00000002
 
-    BLDR_VERSION (R): origin = 0x0010000, length = 0x00000008 // SECTOR_16
-    CRC_APP      (R): origin = 0x0011000, length = 0x00000004 // SECTOR_17
-    PAR_APP      (R): origin = 0x0012000, length = 0x00001000 // SECTOR_18
+    BLDR_VERSION (R): origin = 0x0010000, length = 0x00000008   // BANK_0 SECTOR_16
+    CRC_APP      (R): origin = 0x0011000, length = 0x00000004   // BANK_0 SECTOR_17
+    //PAR_APP      (R): origin = 0x0039000, length = 0x00001000 // BANK_1 SECTOR_31
 
     MAIN_BL    (RX) : origin = 0x00000000, length = 0x00010000
     MAIN_APP   (RX) : origin = 0x00020000, length = 0x00010000

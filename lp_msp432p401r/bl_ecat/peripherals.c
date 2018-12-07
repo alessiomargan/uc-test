@@ -113,11 +113,16 @@ void Configure_EcatPDI (void)
     MAP_SPI_enableModule(EUSCI_ECAT);
     // IRQ
     //MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_EEL);
-	MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_IRQ);
+    // BOOT
+    MAP_GPIO_setAsOutputPin(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
+    MAP_GPIO_setOutputLowOnPin(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
+    // IRQ
+#if 0
+    MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_IRQ);
     MAP_GPIO_interruptEdgeSelect(PORT_ECAT_GPIO, PIN_ECAT_IRQ, GPIO_HIGH_TO_LOW_TRANSITION);
     MAP_GPIO_enableInterrupt(PORT_ECAT_GPIO, PIN_ECAT_IRQ);
     MAP_Interrupt_enableInterrupt(INT_ECAT);
-
+#endif
     DPRINT("%s\n",__FUNCTION__);
 
 }
@@ -127,53 +132,39 @@ void Configure_EcatPDI (void)
  */
 void Configure_GPIO(void)
 {
-    // Set P1.0 to output direction
-	MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
-	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+#ifdef LAUNCHPAD
+	/*
+	 * Led
+	 */
+	// Set P1.0 to output direction
+    MAP_GPIO_setAsOutputPin(PORT_LED_RED, GPIO_PIN0);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, GPIO_PIN0);
     // Set P2.[0,1,2] to output direction
-	MAP_GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
-	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
-    // Set P3.6 to output direction
-	MAP_GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
-	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
-    // Set P4.6 to output direction
-	MAP_GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN6);
-	MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
-
+    MAP_GPIO_setAsOutputPin(PORT_LED_RED, LED_PINS);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, LED_PINS);
+    /*
+     * Buttons switch
+     */
+    // Configuring P1.[1,4] as an input and enabling interrupts
+    MAP_GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
+    //MAP_GPIO_interruptEdgeSelect(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4, GPIO_LOW_TO_HIGH_TRANSITION);
+    //MAP_GPIO_clearInterruptFlag(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
+    //MAP_GPIO_enableInterrupt(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
+    //MAP_Interrupt_enableInterrupt(INT_PORT1);
+#else
+	// LEDs
+	MAP_GPIO_setAsOutputPin(PORT_LED_RG, PIN_LED_R|PIN_LED_G);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_RG, PIN_LED_R|PIN_LED_G);
+	//
+    MAP_GPIO_setAsOutputPin(PORT_LED_B, PIN_LED_B);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_B, PIN_LED_B);
+    // DBG
+    MAP_GPIO_setAsOutputPin(PORT_DBG, PIN_DBG_1|PIN_DBG_2);
+    MAP_GPIO_setOutputLowOnPin(PORT_DBG, PIN_DBG_1|PIN_DBG_2);
+#endif
     DPRINT("%s\n",__FUNCTION__);
 }
 
-/*
- *
- */
-void Configure_Switch(void)
-{
-	/* Configuring P1.[1,4] as an input and enabling interrupts */
-	MAP_GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P6, GPIO_PIN0);
-	/* Configuring P1.[1,4] as an input and enabling interrupts */
-	MAP_GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
-    //GPIO_interruptEdgeSelect(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4, GPIO_LOW_TO_HIGH_TRANSITION);
-    //GPIO_clearInterruptFlag(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
-    //GPIO_enableInterrupt(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
-    //Interrupt_enableInterrupt(INT_PORT1);
-
-    DPRINT("%s\n",__FUNCTION__);
-}
-
-/*
- *
- */
-void Configure_Timer(void)
-{
-    /* Configuring Timer32 to 48000 (1ms) of MCLK in periodic mode */
-	MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
-            TIMER32_PERIODIC_MODE);
-	MAP_Interrupt_enableInterrupt(INT_T32_INT1);
-	MAP_Timer32_setCount(TIMER32_0_BASE,48000);
-	MAP_Timer32_startTimer(TIMER32_0_BASE, false);
-
-    DPRINT("%s\n",__FUNCTION__);
-}
 
 
 
