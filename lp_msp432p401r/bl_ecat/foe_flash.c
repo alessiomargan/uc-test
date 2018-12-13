@@ -55,7 +55,7 @@ uint32_t calc_CRC(uint32_t addr, uint32_t length)
 }
 
 
-uint32_t foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data) {
+uint32_t foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data, size_t length) {
 
 	uint32_t bytestowrite = gFOE_config.buffer_size;
 	uint32_t ui32FlashAddr = writefile_cfg->address_offset + writefile_cfg->dest_start_address;
@@ -68,7 +68,7 @@ uint32_t foe_write_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data) {
 	return (!ret);
 }
 
-uint32_t foe_read_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data) {
+uint32_t foe_read_flash(foe_writefile_cfg_t * writefile_cfg, uint8_t * data, size_t length) {
 
 	int i;
     uint32_t ui32FlashAddr;

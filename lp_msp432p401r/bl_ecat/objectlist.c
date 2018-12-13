@@ -12,7 +12,7 @@ extern uint16_t   	et1100_boot_pin;
 extern uint32_t 	CRC_App;
 extern uint8_t 		BLDR_Version[];
 
-static const char Number_of_elemets[] = "Number of Elements";
+static const char Number_of_elements[] = "Number of Elements";
 //static const char mapped_obj[] = "Mapped Object";
 
 const _objd SDO1000[] =
@@ -38,7 +38,7 @@ const _objd SDO100A[] =
 
 const _objd SDO1018[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 4, 0},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 4, 0},
   {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Vendor ID", 664, 0},			// Vendor ID
   {0x2, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Product Code", 0, 0},			// Product code
   {0x3, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Revision Number", 0, 0},		// Revision number
@@ -47,14 +47,14 @@ const _objd SDO1018[] =
 
 const _objd SDO10F1[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 2, 0},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 2, 0},
   {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RW, "Local Error Reaction", 1, 0},
   {0x2, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Sync Error Counter Limit", 4, 0},
 };
 
 const _objd SDO1C00[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 4, 0},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 4, 0},
   {0x1, DTYPE_UNSIGNED8, 8, ATYPE_RO, "Communications Type SM0", 1, 0},
   {0x2, DTYPE_UNSIGNED8, 8, ATYPE_RO, "Communications Type SM1", 2, 0},
   {0x3, DTYPE_UNSIGNED8, 8, ATYPE_RO, "Communications Type SM2", 3, 0},
@@ -63,19 +63,19 @@ const _objd SDO1C00[] =
 
 const _objd SDO1C12[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 	8, 	ATYPE_RO, Number_of_elemets, 1, 0},
+  {0x0, DTYPE_UNSIGNED8, 	8, 	ATYPE_RO, Number_of_elements, 1, 0},
   {0x1, DTYPE_UNSIGNED16, 	16, ATYPE_RO, "PDO Mapping", 0x1600, 0},
 };
 
 const _objd SDO1C13[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 1, 0},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 1, 0},
   {0x1, DTYPE_UNSIGNED16, 16, ATYPE_RO, "PDO Mapping", 0x1A00, 0},
 };
 
 const _objd SDO1C32[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elemets, 2, 0},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 2, 0},
   {0x4, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Synchronization Types supported", 0x1F, 0},
   {0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Minimum Cycle Time", 0, 0},
 };
@@ -89,28 +89,28 @@ const _objd SDO1C32[] =
 // RxPdo 1600 
 const _objd SDO1600[] =
 {
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elemets, 0, 0},
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elements, 0, 0},
 };
 
 // TxPdo
 const _objd SDO1A00[] =
 {
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elemets, 0, 0},
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elements, 0, 0},
 };
 
 const _objd SDO6000[] =
 {
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elemets, 0, 0},
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elements, 0, 0},
 };
 
 const _objd SDO7000[] =
 {
-  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elemets, 0, 0},
+  {0x0, DTYPE_UNSIGNED8,   8, ATYPE_RO, Number_of_elements, 0, 0},
 };
 
 const _objd SDO8000[] =
 {
-  {0x0, DTYPE_UNSIGNED8,     	 8, ATYPE_RO,   Number_of_elemets,   6, 0},
+  {0x0, DTYPE_UNSIGNED8,     	 8, ATYPE_RO,   Number_of_elements,   6, 0},
   {0x1, DTYPE_UNSIGNED16,   	16, ATYPE_RW, 	"flash_cmd",  	0, &flash_cmd},
   {0x2, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"flash_cmd_ack",0, &flash_cmd_ack},
   {0x3, DTYPE_UNSIGNED32,   	32, ATYPE_RO, 	"flash_crc",  	0, &CRC_App},
