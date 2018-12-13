@@ -169,22 +169,20 @@ int fputs(const char *_ptr, register FILE *_fp)
 void Configure_EcatPDI (void)
 {
     // Set P3.0 to output direction CS
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
-    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
+    MAP_GPIO_setAsOutputPin(PORT_ECAT_CS, GPIO_PIN0);
+    MAP_GPIO_setOutputHighOnPin(PORT_ECAT_CS, GPIO_PIN0);
     /* Selecting P1.5 P1.6 and P1.7 in SPI mode */
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(SPI_ECAT_PORT,
-                                               ECAT_SPI_PINS,
-                                               GPIO_PRIMARY_MODULE_FUNCTION);
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_SPI_ECAT, ECAT_SPI_PINS,
+            									   GPIO_PRIMARY_MODULE_FUNCTION);
     /* Configuring SPI in 3wire master mode */
     MAP_SPI_initMaster(EUSCI_ECAT, &spiMasterConfig);
     /* Enable SPI module */
     MAP_SPI_enableModule(EUSCI_ECAT);
     // Configure the SPI INT pin as an input.
     // Configure the SPI EPROM_LOADED pin as an input.
-    // Set P5.0 P5.2 to input direction
-    MAP_GPIO_setAsInputPin(ECAT_GPIO_PORT, ECAT_IRQ_PIN | ECAT_EEL_PIN);
-    MAP_GPIO_interruptEdgeSelect(ECAT_GPIO_PORT, ECAT_IRQ_PIN, GPIO_HIGH_TO_LOW_TRANSITION);
-    MAP_GPIO_enableInterrupt(ECAT_GPIO_PORT, ECAT_IRQ_PIN);
+    MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_IRQ /*| ECAT_EEL_PIN*/);
+    MAP_GPIO_interruptEdgeSelect(PORT_ECAT_GPIO, PIN_ECAT_IRQ, GPIO_HIGH_TO_LOW_TRANSITION);
+    MAP_GPIO_enableInterrupt(PORT_ECAT_GPIO, PIN_ECAT_IRQ);
     MAP_Interrupt_enableInterrupt(INT_PORT5);
 
     DPRINT("%s\n",__FUNCTION__);

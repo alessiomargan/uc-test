@@ -52,10 +52,10 @@ void PORT5_IRQHandler(void) {
 
     uint32_t status;
 
-    status = MAP_GPIO_getEnabledInterruptStatus(ECAT_GPIO_PORT);
-    MAP_GPIO_clearInterruptFlag(ECAT_GPIO_PORT, status);
+    status = MAP_GPIO_getEnabledInterruptStatus(PORT_ECAT_GPIO);
+    MAP_GPIO_clearInterruptFlag(PORT_ECAT_GPIO, status);
 
-    if(status & ECAT_IRQ_PIN) {
+    if(status & PIN_ECAT_IRQ) {
 		ecat_irq_cnt++;
 		MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN6);
 		ecat_process_pdo();
