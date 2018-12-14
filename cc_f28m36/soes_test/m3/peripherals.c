@@ -27,7 +27,7 @@
 #include <soes/esc.h>
 
 #include <pins.h>
-#include <m3/include/peripherals.h>
+#include <peripherals.h>
 #include <dog_LCD/DogLcd_test.h>
 
 extern void EcatIntHandler(void);

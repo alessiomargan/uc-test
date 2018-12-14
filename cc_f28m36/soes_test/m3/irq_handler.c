@@ -19,7 +19,7 @@
 
 #include <pins.h>
 #include <shared_ram.h>
-#include <m3/include/peripherals.h>
+#include <peripherals.h>
 
 extern uint8_t ESC_SYNCactivation(void);
 
