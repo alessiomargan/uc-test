@@ -1,9 +1,15 @@
 #ifndef __objectlist__
 #define __objectlist__
 
-
 #include <soes/esc_coe.h>
 #include <soes_hook.h>
+
+extern tx_pdo_t tx_pdo;
+extern rx_pdo_t rx_pdo;
+extern aux_pdo_rx_t aux_pdo_rx;
+extern aux_pdo_tx_t aux_pdo_tx;
+extern sdo_t sdo;
+
 
 const char Number_of_elemets[] = "Number of Elements";
 
@@ -141,18 +147,18 @@ const _objd SDO7000[] =
 const _objd SDO8000[] =
 {
   {0x0, DTYPE_UNSIGNED8,   		8,	ATYPE_RO, "NumElem"				, 1, 0},
-  {0x1, DTYPE_UNSIGNED32,      32,	ATYPE_RW, "Board_id"			, 0, &sdo.board_id},
+  {0x1, DTYPE_UNSIGNED32,      32,	ATYPE_RW, "Board_id"			, 0, &sdo.flash.board_id},
 };
 
 const _objd SDO8001[] =
 {
   {0x0, DTYPE_UNSIGNED8,   		8,  ATYPE_RO, "NumElem"				, 6, 0},
-  {0x1, DTYPE_VISIBLE_STRING,   64, ATYPE_RO, "firmware_version"	, 0, &sdo.fw_ver},
-  {0x2, DTYPE_UNSIGNED16,       16, ATYPE_RW, "Control status cmd"	, 0, &sdo.ctrl_status_cmd},
-  {0x3, DTYPE_UNSIGNED16,       16, ATYPE_RO, "Control status ack"	, 0, &sdo.ctrl_status_cmd_ack},
-  {0x4, DTYPE_UNSIGNED16,       16, ATYPE_RW, "Flash params cmd"	, 0, &sdo.flash_params_cmd},
-  {0x5, DTYPE_UNSIGNED16,       16, ATYPE_RO, "Flash params ack"	, 0, &sdo.flash_params_cmd_ack},
-  {0x6, DTYPE_UNSIGNED16,       16, ATYPE_RO, "Ack Board_fault"		, 0, &sdo.ack_board_faults},
+  {0x1, DTYPE_VISIBLE_STRING,   64, ATYPE_RO, "firmware_version"	, 0, &sdo.ram.fw_ver},
+  {0x2, DTYPE_UNSIGNED16,       16, ATYPE_RW, "Control status cmd"	, 0, &sdo.ram.ctrl_status_cmd},
+  {0x3, DTYPE_UNSIGNED16,       16, ATYPE_RO, "Control status ack"	, 0, &sdo.ram.ctrl_status_cmd_ack},
+  {0x4, DTYPE_UNSIGNED16,       16, ATYPE_RW, "Flash params cmd"	, 0, &sdo.ram.flash_params_cmd},
+  {0x5, DTYPE_UNSIGNED16,       16, ATYPE_RO, "Flash params ack"	, 0, &sdo.ram.flash_params_cmd_ack},
+  {0x6, DTYPE_UNSIGNED16,       16, ATYPE_RO, "Ack Board_fault"		, 0, &sdo.ram.ack_board_faults},
 };
 
 const _objd SDO8002[] =

@@ -9,6 +9,16 @@
 	#define CCS_PACKED
 #endif
 
+typedef struct {
+	uint8_t		warn_read_flash:1;
+	uint8_t		warn:7;
+	uint8_t		err:8;
+} bit_fault_t;
+
+typedef union{
+    uint16_t 	all;
+    bit_fault_t bit;
+} fault_t;
 
 typedef IAR_PACKED struct {
     float       pos_ref;  				// motor position reference
@@ -36,11 +46,17 @@ typedef IAR_PACKED struct {
 
 } CCS_PACKED tx_pdo_t;
 
-
 typedef IAR_PACKED struct {
 
     // 0x8000 flash param
+	uint32_t	_signature_;
 	uint32_t 	board_id;
+	uint32_t	analog_sample_freq;
+
+} CCS_PACKED flash_sdo_t;
+
+typedef IAR_PACKED struct {
+
     // 0x8001 ram param
     char 		fw_ver[8];
 	uint16_t 	ctrl_status_cmd;
@@ -48,6 +64,13 @@ typedef IAR_PACKED struct {
 	uint16_t 	flash_params_cmd;
 	uint16_t 	flash_params_cmd_ack;
 	uint16_t 	ack_board_faults;
+
+} CCS_PACKED ram_sdo_t;
+
+typedef IAR_PACKED struct {
+
+    flash_sdo_t	flash;
+    ram_sdo_t	ram;
 
 } CCS_PACKED sdo_t;
 
@@ -68,11 +91,11 @@ typedef IAR_PACKED struct {
 
 } CCS_PACKED aux_pdo_rx_t;
 
-extern tx_pdo_t tx_pdo;
-extern rx_pdo_t rx_pdo;
-extern aux_pdo_rx_t aux_pdo_rx;
-extern aux_pdo_tx_t aux_pdo_tx;
-extern sdo_t sdo;
+//extern tx_pdo_t tx_pdo;
+//extern rx_pdo_t rx_pdo;
+//extern aux_pdo_rx_t aux_pdo_rx;
+//extern aux_pdo_tx_t aux_pdo_tx;
+//extern sdo_t sdo;
 
 // esc_config hook
 void pre_state_change_hook (uint8_t * as, uint8_t * an);

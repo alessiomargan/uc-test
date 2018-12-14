@@ -42,8 +42,11 @@
 
 MEMORY
 {
-    MAIN_APP   (RX) : origin = APP_START, length = 0x00020000
+    MAIN_APP   (RX) : origin = APP_START, length = 0x00010000   // BANK_1 SECTOR_0
     INFO       (RX) : origin = 0x00200000, length = 0x00004000
+
+    PAR_APP    (RW) : origin = 0x0039000, length = 0x00001000   // BANK_1 SECTOR_31
+    CALIB      (RW) : origin = 0x0038000, length = 0x00001000   // BANK_1 SECTOR_30
 
     ALIAS
     {
@@ -86,6 +89,11 @@ SECTIONS
     .tlvTable     : > 0x00201000
     /* BSL area for device bootstrap loader                                  */
     .bslArea      : > 0x00202000
+
+    /* flash parameters */
+    .PAR_APP    : > PAR_APP
+    /* flash parameters */
+    .CALIB      : > CALIB
 
     .vtable :   > 0x20000000
     .data   :   > SRAM_DATA

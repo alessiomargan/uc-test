@@ -11,37 +11,39 @@
 /* DriverLib Includes */
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
-//#include <utils/uartstdio.h>
-
 #include "pins.h"
+#include "globals.h"
 #include "soes_hook.h"
 #include "peripherals.h"
 #include "soes/esc.h"
 
-#define BSL_PARAM			BSL_DEFAULT_PARAM // I2C slave address = 0x48, Interface selection = Auto
-
-// globals used for adc14 temp sensor
-uint32_t	cal30;
-uint32_t	cal85;
-float 		calDifference;
-float		tempC;
-float		tempF;
-uint16_t	adc_idx;
-uint16_t 	conv_adc[1024][16];
 
 /*
- * SPI master Config
+ * SPI ecat config
  */
-const eUSCI_SPI_MasterConfig spiMasterConfig =
+const eUSCI_SPI_MasterConfig spiEcatConfig =
 {
-	EUSCI_B_SPI_CLOCKSOURCE_SMCLK,	// SMCLK Clock Source
-	CS_48MHZ,                       // SMCLK = DCO = 24MHZ
-	//CS_24MHZ,                       // SMCLK = DCO/2 = 24MHZ
-	CS_12MHZ,                       // SPICLK = 12Mhz max with EL9800
-	EUSCI_B_SPI_MSB_FIRST,          // MSB First
-    EUSCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
-    EUSCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
-    EUSCI_B_SPI_3PIN              	// 3Wire SPI Mode
+	.selectClockSource		= EUSCI_B_SPI_CLOCKSOURCE_SMCLK,	// SMCLK Clock Source
+	.clockSourceFrequency 	= CS_24MHZ,                     	// SMCLK = DCO/2 = 24MHZ
+	.desiredSpiClock		= CS_12MHZ,                     	// SPICLK = 12Mhz max with EL9800
+	.msbFirst				= EUSCI_B_SPI_MSB_FIRST,        	// MSB First
+    .clockPhase				= EUSCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
+    .clockPolarity			= EUSCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
+    .spiMode				= EUSCI_B_SPI_3PIN              	// 3Wire SPI Mode
+};
+
+/*
+ * SPI dac config
+ */
+const eUSCI_SPI_MasterConfig spiDacConfig =
+{
+	.selectClockSource		= EUSCI_A_SPI_CLOCKSOURCE_SMCLK,	// SMCLK Clock Source
+	.clockSourceFrequency 	= CS_24MHZ,                     	// SMCLK = DCO/2 = 24MHZ
+	.desiredSpiClock		= CS_24MHZ,                     	// SPICLK
+	.msbFirst				= EUSCI_A_SPI_MSB_FIRST,        	// MSB First
+    .clockPhase				= EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
+    .clockPolarity			= EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
+    .spiMode				= EUSCI_A_SPI_3PIN              	// 3Wire SPI Mode
 };
 
 /*
@@ -54,97 +56,97 @@ const eUSCI_SPI_MasterConfig spiMasterConfig =
  */
 const eUSCI_UART_Config uartConfigOverSampl =
 {
-	EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
-    26,                                      // BRDIV = 208
-	1,                                       // UCxBRF = 1
-	0,                                     // UCxBRS = 0
-	EUSCI_A_UART_NO_PARITY,                  // No Parity
-	EUSCI_A_UART_LSB_FIRST,                  // LSB First
-	EUSCI_A_UART_ONE_STOP_BIT,               // One stop bit
-	EUSCI_A_UART_MODE,                       // UART mode
-	EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
+	.selectClockSource	= EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
+    .clockPrescalar		= 13,                                      // BRDIV = 208
+	.firstModReg		= 0,                                       // UCxBRF = 1
+	.secondModReg		= 0,                                       // UCxBRS = 0
+	.parity				= EUSCI_A_UART_NO_PARITY,                  // No Parity
+	.msborLsbFirst		= EUSCI_A_UART_LSB_FIRST,                  // LSB First
+	.numberofStopBits	= EUSCI_A_UART_ONE_STOP_BIT,               // One stop bit
+	.uartMode			= EUSCI_A_UART_MODE,                       // UART mode
+	.overSampling		= EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
 };
 
 /* I2C Master Configuration Parameter */
 const eUSCI_I2C_MasterConfig i2cConfig =
 {
-	EUSCI_B_I2C_CLOCKSOURCE_SMCLK,			// SMCLK Clock Source
-	CS_3MHZ,								// SMCLK = 24MHz
-	EUSCI_B_I2C_SET_DATA_RATE_400KBPS,		// Desired I2C Clock of 400khz
-	0,										// No byte counter threshold
-	EUSCI_B_I2C_NO_AUTO_STOP				// No Autostop
+	.selectClockSource		= EUSCI_B_I2C_CLOCKSOURCE_SMCLK,		// SMCLK Clock Source
+	.i2cClk					= CS_3MHZ,								// SMCLK = 24MHz
+	.dataRate				= EUSCI_B_I2C_SET_DATA_RATE_400KBPS,	// Desired I2C Clock of 400khz
+	.byteCounterThreshold	= 0,									// No byte counter threshold
+	.autoSTOPGeneration		= EUSCI_B_I2C_NO_AUTO_STOP				// No Autostop
 };
 
 /* Timer_A Continuous Mode Configuration Parameter */
 const Timer_A_UpModeConfig upModeConfig =
 {
-	TIMER_A_CLOCKSOURCE_SMCLK,       	// SMCLK Clock Source
-	TIMER_A_CLOCKSOURCE_DIVIDER_2,    	// SMCLK/2
-	//TIMER_A_CLOCKSOURCE_DIVIDER_1,  	// SMCLK/1
-	//120,                            	// 20kHz
-	240,                            	// 10KHz
-	//480,							 	//  5kHz
-	//1200,						     	//  2KHz
-	//2400,						     	//  1KHz
-	TIMER_A_TAIE_INTERRUPT_DISABLE,   	// Disable Timer ISR
-	TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE,// Disable CCR0
-	TIMER_A_DO_CLEAR                    // Clear Counter
+	.clockSource		= TIMER_A_CLOCKSOURCE_SMCLK,       	// SMCLK Clock Source
+	.clockSourceDivider	= TIMER_A_CLOCKSOURCE_DIVIDER_1,  	// SMCLK/1
+	.timerPeriod		= (SMCLK_FREQUENCY/DFLT_SAMPLE_FREQ),
+	.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE,   	// Disable Timer ISR
+	.captureCompareInterruptEnable_CCR0_CCIE = TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE,// Disable CCR0
+	.timerClear 		= TIMER_A_DO_CLEAR                    // Clear Counter
 };
 
 /* Timer_A Compare Configuration Parameter */
 const Timer_A_CompareModeConfig compareConfig =
 {
-	TIMER_A_CAPTURECOMPARE_REGISTER_1,          // Use CCR1
-	TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE,   // Disable CCR interrupt
-	//TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE,	// Enable CCR interrupt
-	TIMER_A_OUTPUTMODE_SET_RESET,               // Toggle output but
-	//120,
-	240,                                      	// Period
-	//480                                       // Period
-	//120                                       // Period
-	//2400
+	.compareRegister		= TIMER_A_CAPTURECOMPARE_REGISTER_1,          // Use CCR1
+	.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE,	// Enable CCR interrupt
+	.compareOutputMode		= TIMER_A_OUTPUTMODE_SET_RESET,               // Toggle output but
+	.compareValue			= (SMCLK_FREQUENCY/DFLT_SAMPLE_FREQ)
 };
 
-/* Timer_A PWM Configuration Parameter */
+/*
+ * Timer_A Compare Configuration Parameter
+ * CCR1 is used to trigger the ADC14, conversion time is defined by the resolution
+ * 14bit -> 16 cycles + 1 cycle (SLAU356d, 20.2.8.3)
+ *
+ * In this example, 14-bit resolution at 24Mhz ~708ns conversion time
+ * Sample time is defined by at least 4 ADC clocks, pulse sample mode
+ * Sample period is 1200/24Mhz = 50us
+ */
 Timer_A_PWMConfig pwmConfig =
 {
-    TIMER_A_CLOCKSOURCE_SMCLK,
-    TIMER_A_CLOCKSOURCE_DIVIDER_1,
-    240,										// 20 kHz
-    TIMER_A_CAPTURECOMPARE_REGISTER_1,
-    TIMER_A_OUTPUTMODE_SET_RESET,
-    240 / 2
+	.clockSource 		= TIMER_A_CLOCKSOURCE_SMCLK,
+	.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
+	.timerPeriod 		= (SMCLK_FREQUENCY/DFLT_SAMPLE_FREQ),
+	.compareRegister 	= TIMER_A_CAPTURECOMPARE_REGISTER_1,
+	.compareOutputMode 	= TIMER_A_OUTPUTMODE_SET_RESET,
+	.dutyCycle 			= (SMCLK_FREQUENCY/DFLT_SAMPLE_FREQ) * 0.75	// 25% duty cycle
 };
 
 
 void jump_to_bootloader(void) {
 
-	ResetCtl_initiateHardReset();
+	//ResetCtl_initiateHardReset();
+	SysCtl_rebootDevice();
 }
 
 
 /**
- * This function sets up UART0 to be used for a console to display information
+ * This function sets up UART to be used for a console to display information
  *
  * @author amargan (7/4/2014)
  */
 void Configure_UART(void)
 {
     /* Selecting P1.2 and P1.3 in UART mode */
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1,
-    		                                   GPIO_PIN2 | GPIO_PIN3,
-											   GPIO_PRIMARY_MODULE_FUNCTION);
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_UART,
+    		PIN_UART_RX | PIN_UART_TX, GPIO_PRIMARY_MODULE_FUNCTION);
     /* Configuring UART Module */
-    MAP_UART_initModule(EUSCI_A0_BASE, &uartConfigOverSampl);
+    MAP_UART_initModule(EUSCI_UART, &uartConfigOverSampl);
     /* Enable UART module */
-    MAP_UART_enableModule(EUSCI_A0_BASE);
+    MAP_UART_enableModule(EUSCI_UART);
+
+    DPRINT("\n\n%s\n",__FUNCTION__);
 }
 
 int fputc(int _c, register FILE *_fp)
 {
-	while(!(UCA0IFG&UCTXIFG));
-	UCA0TXBUF = (unsigned char) _c;
-	//MAP_UART_transmitData(EUSCI_A0_BASE, (unsigned char)_c);
+	//while(!(UCA0IFG&UCTXIFG));
+	//UCA0TXBUF = (unsigned char) _c;
+	MAP_UART_transmitData(EUSCI_UART, (unsigned char)_c);
 	return((unsigned char)_c);
 }
 
@@ -155,38 +157,68 @@ int fputs(const char *_ptr, register FILE *_fp)
 	len = strlen(_ptr);
 
 	for(i=0 ; i<len ; i++) {
-		while(!(UCA0IFG&UCTXIFG));
-		UCA0TXBUF = (unsigned char) _ptr[i];
-		//MAP_UART_transmitData(EUSCI_A0_BASE, (unsigned char)_c);
+		//while(!(UCA0IFG&UCTXIFG));
+		//UCA0TXBUF = (unsigned char) _ptr[i];
+		MAP_UART_transmitData(EUSCI_UART, (unsigned char)_ptr[i]);
 	}
 
 	return len;
 }
 
 /**
- *
+ *	Ethercat
  */
 void Configure_EcatPDI (void)
 {
-    // Set P3.0 to output direction CS
-    MAP_GPIO_setAsOutputPin(PORT_ECAT_CS, GPIO_PIN0);
-    MAP_GPIO_setOutputHighOnPin(PORT_ECAT_CS, GPIO_PIN0);
-    /* Selecting P1.5 P1.6 and P1.7 in SPI mode */
+    // CS
+    MAP_GPIO_setAsOutputPin(PORT_ECAT_CS, PIN_ECAT_CS);
+    MAP_GPIO_setOutputHighOnPin(PORT_ECAT_CS, PIN_ECAT_CS);
+    // CLK MISO MOSI
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_SPI_ECAT, ECAT_SPI_PINS,
-            									   GPIO_PRIMARY_MODULE_FUNCTION);
+                                               GPIO_PRIMARY_MODULE_FUNCTION);
     /* Configuring SPI in 3wire master mode */
-    MAP_SPI_initMaster(EUSCI_ECAT, &spiMasterConfig);
+    MAP_SPI_initMaster(EUSCI_ECAT, &spiEcatConfig);
     /* Enable SPI module */
     MAP_SPI_enableModule(EUSCI_ECAT);
-    // Configure the SPI INT pin as an input.
-    // Configure the SPI EPROM_LOADED pin as an input.
-    MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_IRQ /*| ECAT_EEL_PIN*/);
+    // EEL
+    //MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_EEL);
+    // BOOT
+	MAP_GPIO_setAsOutputPin(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
+    MAP_GPIO_setOutputLowOnPin(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
+    // IRQ
+	MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_IRQ);
     MAP_GPIO_interruptEdgeSelect(PORT_ECAT_GPIO, PIN_ECAT_IRQ, GPIO_HIGH_TO_LOW_TRANSITION);
     MAP_GPIO_enableInterrupt(PORT_ECAT_GPIO, PIN_ECAT_IRQ);
-    MAP_Interrupt_enableInterrupt(INT_PORT5);
+    MAP_Interrupt_enableInterrupt(INT_ECAT);
 
     DPRINT("%s\n",__FUNCTION__);
 
+}
+
+/**
+ *	DAC
+ */
+void Configure_DAC (void)
+{
+#ifndef LAUNCHPAD
+    // CLR
+    MAP_GPIO_setAsOutputPin(PORT_DAC_P2, PIN_DAC_CLR);
+    MAP_GPIO_setOutputHighOnPin(PORT_DAC_P2, PIN_DAC_CLR);
+    // SYNC LDAC
+    MAP_GPIO_setAsOutputPin(PORT_DAC_P1, PIN_DAC_SYNC|PIN_DAC_LDAC);
+    MAP_GPIO_setOutputHighOnPin(PORT_DAC_P1, PIN_DAC_SYNC|PIN_DAC_LDAC);
+
+    // CLK MOSI
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_DAC_P2,
+    		PIN_DAC_CLK|PIN_DAC_DIN,
+			GPIO_PRIMARY_MODULE_FUNCTION);
+    /* Configuring SPI in 3wire master mode */
+    MAP_SPI_initMaster(EUSCI_DAC, &spiDacConfig);
+    /* Enable SPI module */
+    MAP_SPI_enableModule(EUSCI_DAC);
+
+    DPRINT("%s\n",__FUNCTION__);
+#endif
 }
 
 /*
@@ -194,31 +226,52 @@ void Configure_EcatPDI (void)
  */
 void Configure_GPIO(void)
 {
-	MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, PIN_ALL8);
-	MAP_GPIO_setAsOutputPin(GPIO_PORT_P2, PIN_ALL8);
-	MAP_GPIO_setAsOutputPin(GPIO_PORT_P3, PIN_ALL8);
-	// Led
+#ifdef LAUNCHPAD
+	/*
+	 * Led
+	 */
 	// Set P1.0 to output direction
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    MAP_GPIO_setAsOutputPin(PORT_LED_RED, GPIO_PIN0);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, GPIO_PIN0);
     // Set P2.[0,1,2] to output direction
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0|GPIO_PIN1|GPIO_PIN2);
-    // IO probe
+    MAP_GPIO_setAsOutputPin(PORT_LED_RED, LED_PINS);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, LED_PINS);
+    /*
+     * IO probe
+     */
     // Set P3.6 to output direction
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
     MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
     // Set P6.[0,1] to output direction
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P6, GPIO_PIN0|GPIO_PIN1);
     MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN0|GPIO_PIN1);
-    // Buttons switch
-    /* Configuring P1.[1,4] as an input and enabling interrupts */
+    /*
+     * Buttons switch
+     */
+    // Configuring P1.[1,4] as an input and enabling interrupts
     MAP_GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
     MAP_GPIO_interruptEdgeSelect(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4, GPIO_LOW_TO_HIGH_TRANSITION);
     MAP_GPIO_clearInterruptFlag(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
     MAP_GPIO_enableInterrupt(GPIO_PORT_P1, GPIO_PIN1|GPIO_PIN4);
     MAP_Interrupt_enableInterrupt(INT_PORT1);
+    /*
+     * PWM timerA out
+     */
+    // Configuring P2.4 as peripheral output for PWM timerA
+    MAP_GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN4,
+            GPIO_PRIMARY_MODULE_FUNCTION);
+#else
+	// LEDs
+	MAP_GPIO_setAsOutputPin(PORT_LED_RG, PIN_LED_R|PIN_LED_G);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_RG, PIN_LED_R|PIN_LED_G);
+	//
+    MAP_GPIO_setAsOutputPin(PORT_LED_B, PIN_LED_B);
+    MAP_GPIO_setOutputLowOnPin(PORT_LED_B, PIN_LED_B);
+    // DBG
+    MAP_GPIO_setAsOutputPin(PORT_DBG, PIN_DBG_1|PIN_DBG_2);
+    MAP_GPIO_setOutputLowOnPin(PORT_DBG, PIN_DBG_1|PIN_DBG_2);
 
+#endif
     DPRINT("%s\n",__FUNCTION__);
 }
 
@@ -228,13 +281,11 @@ void Configure_GPIO(void)
  */
 void Configure_Timer(void)
 {
-    /*
-     * Configuring Timer32 to 480000 (10ms) of MCLK in periodic mode
-     * */
+    // Configuring Timer32 to 48000 (1ms) of MCLK in periodic mode
     MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
             TIMER32_PERIODIC_MODE);
     MAP_Interrupt_enableInterrupt(INT_T32_INT1);
-    MAP_Timer32_setCount(TIMER32_0_BASE,480000);
+    MAP_Timer32_setCount(TIMER32_0_BASE,48000);
     MAP_Timer32_startTimer(TIMER32_0_BASE, false);
 
     DPRINT("%s\n",__FUNCTION__);
@@ -245,26 +296,33 @@ void Configure_Timer(void)
  */
 void Configure_ADC(void)
 {
-    /*
-     * Initializing ADC (SMCLK/1/2) ==> 24MHz < 25MHz max ADC clock freq
-     * */
-    MAP_ADC14_enableModule();
-    MAP_ADC14_initModule(ADC_CLOCKSOURCE_SMCLK, ADC_PREDIVIDER_1, ADC_DIVIDER_2, ADC_TEMPSENSEMAP);
-
-    MAP_ADC14_setPowerMode(ADC_UNRESTRICTED_POWER_MODE);
-    /* Setting reference voltage to 2.5 */
+    // Setting reference voltage to 2.5
     MAP_REF_A_setReferenceVoltage(REF_A_VREF2_5V);
     MAP_REF_A_enableReferenceVoltage();
 
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5,
-    		GPIO_PIN5|GPIO_PIN4,
-    		GPIO_TERTIARY_MODULE_FUNCTION);
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4,
-    		GPIO_PIN7|GPIO_PIN6|GPIO_PIN5|GPIO_PIN4|GPIO_PIN3|GPIO_PIN2|GPIO_PIN1,
-    		GPIO_TERTIARY_MODULE_FUNCTION);
+	// Initializing ADC (SMCLK/1/1) ==> 24MHz < 25MHz max ADC clock freq
+    MAP_ADC14_enableModule();
+    MAP_ADC14_initModule(ADC_CLOCKSOURCE_SMCLK, ADC_PREDIVIDER_1, ADC_DIVIDER_1, 0);
 
-    MAP_ADC14_configureMultiSequenceMode(ADC_MEM0, ADC_MEM8, true);
+    MAP_ADC14_setPowerMode(ADC_UNRESTRICTED_POWER_MODE);
+#ifdef LAUNCHPAD
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_ADC_P4, AIN_P4_PINS,
+    		GPIO_TERTIARY_MODULE_FUNCTION);
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_ADC_P5, PIN_A0|PIN_A1,
+    		GPIO_TERTIARY_MODULE_FUNCTION);
+#else
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_ADC_P4, PIN_A6|PIN_A7|PIN_A8,
+    		GPIO_TERTIARY_MODULE_FUNCTION);
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(PORT_ADC_P5, AIN_P5_PINS,
+    		GPIO_TERTIARY_MODULE_FUNCTION);
+#endif
+
+    /* Configuring ADC Memory
+     * true  ==> cycle after the first round of sample/conversions
+     * false ==> single sequence of channels */
+	MAP_ADC14_configureMultiSequenceMode(ADC_MEM0, ADC_MEM8, false);
     //ch 9
+#ifdef LAUNCHPAD
     MAP_ADC14_configureConversionMemory(ADC_MEM0, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A0,  false); //P5.5
     MAP_ADC14_configureConversionMemory(ADC_MEM1, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A1,  false); //P5.4
     MAP_ADC14_configureConversionMemory(ADC_MEM2, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A6,  false); //P4.7
@@ -274,23 +332,40 @@ void Configure_ADC(void)
     MAP_ADC14_configureConversionMemory(ADC_MEM6, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A10, false); //P4.3
     MAP_ADC14_configureConversionMemory(ADC_MEM7, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A11, false); //P4.2
     MAP_ADC14_configureConversionMemory(ADC_MEM8, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A12, false); //P4.1
-
+#else
+    MAP_ADC14_configureConversionMemory(ADC_MEM0, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A0, false); //P5.5
+    MAP_ADC14_configureConversionMemory(ADC_MEM1, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A1, false); //P5.4
+    MAP_ADC14_configureConversionMemory(ADC_MEM2, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A2, false); //P5.3
+    MAP_ADC14_configureConversionMemory(ADC_MEM3, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A3, false); //P5.2
+    MAP_ADC14_configureConversionMemory(ADC_MEM4, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A4, false); //P5.1
+    MAP_ADC14_configureConversionMemory(ADC_MEM5, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A5, false); //P5.0
+    MAP_ADC14_configureConversionMemory(ADC_MEM6, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A6, false); //P4.7
+    MAP_ADC14_configureConversionMemory(ADC_MEM7, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A7, false); //P4.6
+    MAP_ADC14_configureConversionMemory(ADC_MEM8, ADC_VREFPOS_AVCC_VREFNEG_VSS, ADC_INPUT_A8, false); //P4.5
+#endif
     MAP_ADC14_enableInterrupt(ADC_INT8);
+
+    MAP_ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
+#ifndef ADC_TRG_SRC_PWM
     /* Configuring Timer_A in continuous mode and sourced from ACLK */
     MAP_Timer_A_configureUpMode(TIMER_A0_BASE, &upModeConfig);
     /* Configuring Timer_A0 in CCR1 to trigger at 16000 (0.5s) */
     MAP_Timer_A_initCompare(TIMER_A0_BASE, &compareConfig);
+#endif
     /* Configuring the sample trigger to be sourced from Timer_A0  and setting it
      * to automatic iteration after it is triggered
      * */
     MAP_ADC14_setSampleHoldTrigger(ADC_TRIGGER_SOURCE1, false);
-    /* Enabling Interrupts */
+    // Enabling Interrupts
     MAP_Interrupt_enableInterrupt(INT_ADC14);
-    /* Enable conversion */
+    // Enable conversion
     MAP_ADC14_enableConversion();
-    /* Starting the Timer */
+    // Start timer
+#ifndef ADC_TRG_SRC_PWM
     MAP_Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
-
+#else
+    MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+#endif
 }
 
 /*
@@ -298,20 +373,19 @@ void Configure_ADC(void)
  */
 void Configure_ADC_temp(void)
 {
-    /*
-     * Initializing ADC (MCLK/1/2) with temperature sensor routed
-     * */
+	// Setting reference voltage to 2.5 and enabling temperature sensor
+	MAP_REF_A_enableTempSensor();
+	MAP_REF_A_setReferenceVoltage(REF_A_VREF2_5V);
+	MAP_REF_A_enableReferenceVoltage();
+	cal30 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_2_5V_REF, SYSCTL_30_DEGREES_C);
+	cal85 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_2_5V_REF, SYSCTL_85_DEGREES_C);
+	calDifference = cal85 - cal30;
+
+	// Initializing ADC (SMCLK/1/1) ==> 24MHz < 25MHz max ADC clock freq
     MAP_ADC14_enableModule();
-    MAP_ADC14_initModule(ADC_CLOCKSOURCE_SMCLK, ADC_PREDIVIDER_1, ADC_DIVIDER_2, ADC_TEMPSENSEMAP);
+    MAP_ADC14_initModule(ADC_CLOCKSOURCE_SMCLK, ADC_PREDIVIDER_1, ADC_DIVIDER_1, 0);
 
     MAP_ADC14_setPowerMode(ADC_UNRESTRICTED_POWER_MODE);
-    /* Setting reference voltage to 2.5 and enabling temperature sensor */
-    MAP_REF_A_enableTempSensor();
-    MAP_REF_A_setReferenceVoltage(REF_A_VREF2_5V);
-    MAP_REF_A_enableReferenceVoltage();
-    cal30 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_2_5V_REF, SYSCTL_30_DEGREES_C);
-    cal85 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_2_5V_REF, SYSCTL_85_DEGREES_C);
-    calDifference = cal85 - cal30;
 
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5,
     		GPIO_PIN5|GPIO_PIN4,
@@ -323,7 +397,7 @@ void Configure_ADC_temp(void)
     /* Configuring ADC Memory
      * true  ==> cycle after the first round of sample/conversions
      * false ==> single sequence of channels */
-    MAP_ADC14_configureMultiSequenceMode(ADC_MEM7, ADC_MEM16, true);
+    MAP_ADC14_configureMultiSequenceMode(ADC_MEM7, ADC_MEM16, false);
     // internal temperature
     MAP_ADC14_configureConversionMemory(ADC_MEM7, ADC_VREFPOS_INTBUF_VREFNEG_VSS, ADC_INPUT_A22, false);
     // 9 channels
@@ -347,59 +421,29 @@ void Configure_ADC_temp(void)
      * ADC_MEMORY_24 through ADC_MEMORY_31, while the second value
      * controls memory locations ADC_MEMORY_8 through ADC_MEMORY_23.
      * */
-    //ADC14_setSampleHoldTime(ADC_PULSE_WIDTH_192,ADC_PULSE_WIDTH_192);
-    MAP_ADC14_setSampleHoldTime(ADC_PULSE_WIDTH_96,ADC_PULSE_WIDTH_16);
+    MAP_ADC14_setSampleHoldTime(ADC_PULSE_WIDTH_96,ADC_PULSE_WIDTH_4);
+	MAP_ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
 
-    MAP_ADC14_enableSampleTimer(ADC_MANUAL_ITERATION);
-
-    /* Configuring Timer_A in continuous mode and sourced from SMCLK */
-    //MAP_Timer_A_configureUpMode(TIMER_A0_BASE, &upModeConfig);
+#ifndef ADC_TRG_SRC_PWM
+    /* Configuring Timer_A in continuous mode and sourced from ACLK */
+    MAP_Timer_A_configureUpMode(TIMER_A0_BASE, &upModeConfig);
     /* Configuring Timer_A0 in CCR1 to trigger at 16000 (0.5s) */
-    //MAP_Timer_A_initCompare(TIMER_A0_BASE, &compareConfig);
-
-    MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+    MAP_Timer_A_initCompare(TIMER_A0_BASE, &compareConfig);
+#endif
 
     /* Configuring the sample trigger to be sourced from Timer_A0  and setting it
      * to automatic iteration after it is triggered */
     MAP_ADC14_setSampleHoldTrigger(ADC_TRIGGER_SOURCE1, false);
-
-    /* Enabling Interrupts */
+    // Enabling Interrupts
     MAP_Interrupt_enableInterrupt(INT_ADC14);
-    /* Enable conversion */
+    // Enable conversion
     MAP_ADC14_enableConversion();
-
-    /* Starting the Timer */
-    //MAP_Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
-    //MAP_ADC14_toggleConversionTrigger();
-
-}
-
-
-void Configure_I2C(uint8_t slave_address)
-{
-    /* Select Port 6 for I2C - Set Pin 5, 4 to input Primary Module Function,
-     *   (UCB0SIMO/UCB0SDA, UCB0SOMI/UCB0SCL).
-     */
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6,
-            GPIO_PIN4 + GPIO_PIN5, GPIO_PRIMARY_MODULE_FUNCTION);
-    /* Initializing I2C Master to SMCLK at 400kbs with no autostop */
-	MAP_I2C_initMaster(EUSCI_B1_BASE, &i2cConfig);
-	/* Specify slave address */
-	MAP_I2C_setSlaveAddress(EUSCI_B1_BASE, slave_address);
-	/* Set Master in transmit mode */
-	MAP_I2C_setMode(EUSCI_B1_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
-	/* Set Master in receive mode */
-	//I2C_setMode(EUSCI_B1_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
-	/* Enable I2C Module to start operations */
-	MAP_I2C_enableModule(EUSCI_B1_BASE);
-	/* Enable and clear the interrupt flag */
-	MAP_I2C_clearInterruptFlag(EUSCI_B1_BASE,
-			EUSCI_B_I2C_TRANSMIT_INTERRUPT0 + EUSCI_B_I2C_NAK_INTERRUPT);
-	//Enable master Receive interrupt
-	MAP_I2C_enableInterrupt(EUSCI_B1_BASE,
-			EUSCI_B_I2C_TRANSMIT_INTERRUPT0 + EUSCI_B_I2C_NAK_INTERRUPT);
-
-	MAP_Interrupt_enableInterrupt(INT_EUSCIB1);
+    // Start timer
+#ifndef ADC_TRG_SRC_PWM
+    MAP_Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
+#else
+    MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+#endif
 }
 
 

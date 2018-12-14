@@ -6,31 +6,13 @@
 #include <soes/hal/advr_esc/soes.h>
 #include <config.h>
 #include <soes_hook.h>
+#include <globals.h>
 #include "math.h"
-
-//#define ESC_DEBUG
-#ifdef ESC_DEBUG
-	#undef DPRINT
-    #define DPRINT(...) printf ("hook: "__VA_ARGS__)
-    #define DEBUG_ASSERT(expression)    ASSERT(expression)
-#else
-    #define DPRINT(...)
-    #define DEBUG_ASSERT(expression)
-#endif  /* ESC_DEBUG */
 
 extern const 	_objd SDO8002[];
 extern const 	_objd SDO8003[];
 extern float	tempC;
 
-rx_pdo_t    	rx_pdo;
-tx_pdo_t    	tx_pdo;
-aux_pdo_rx_t	aux_pdo_rx;
-aux_pdo_tx_t	aux_pdo_tx;
-
-sdo_t	sdo = {
-	.board_id = 696,
-	.fw_ver = "_(@)(@)_",
-};
 
 extern void jump_to_bootloader(void);
 
