@@ -23,7 +23,7 @@
 
 #include <pins.h>
 #include <peripherals.h>
-//#include "pwm_ctrl.h"
+#include <globals.h>
 #include "dog_LCD/doggy.h"
 
 extern void lcd_test_sprint( void );

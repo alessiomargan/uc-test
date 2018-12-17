@@ -20,7 +20,7 @@ sdo_t	sdo = {
 const flash_sdo_t	dflt_flash_sdo = {
 	//
 	._signature_ = FLASH_SIGN_DEFAULT,
-	.board_id = 747,
+	.board_id = 696,
 	.analog_sample_freq = DFLT_SAMPLE_FREQ,
 };
 
@@ -31,20 +31,21 @@ void print_sdo(const flash_sdo_t *s) {
     DPRINT("sdo.flash.analog_sample_freq=%d\n", s->analog_sample_freq);
 }
 
-
 /************************************************************************************
- * DMA Control Table
+ * Calib matrix
  */
-#if defined(__TI_COMPILER_VERSION__)
-	#pragma DATA_ALIGN(MSP_EXP432P401RLP_DMAControlTable, 1024)
-#elif defined(__IAR_SYSTEMS_ICC__)
-	#pragma data_alignment=1024
-#elif defined(__GNUC__)
-	__attribute__ ((aligned (1024)))
-#elif defined(__CC_ARM)
-	__align(1024)
-#endif
-static DMA_ControlTable MSP_EXP432P401RLP_DMAControlTable[32];
+#pragma RETAIN(calib_matrix)
+#pragma DATA_SECTION(calib_matrix, ".CALIB")
+const float	calib_matrix[6][6];
+
+const float	dflt_calib_matrix[6][6] = {
+		{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+		{ 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 },
+		{ 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 },
+		{ 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 },
+		{ 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
+		{ 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 },
+};
 
 
 /************************************************************************************
@@ -59,3 +60,42 @@ float		tempF;
 uint16_t 	raw_adc[SMPL_NUM][16];
 float		conv_adc[16];
 
+/************************************************************************************
+ * FOE files
+ */
+uint32_t foe_write_cal_mat( foe_writefile_cfg_t * writefile_cfg, uint8_t * data, size_t length ) {
+	return 1;
+}
+uint32_t foe_read_cal_mat ( foe_writefile_cfg_t * writefile_cfg, uint8_t * data, size_t length ) {
+	return 1;
+}
+
+foe_cfg_t 	gFOE_config = { 0, 0, 0 ,0 };
+uint8_t		foe_buffer[0x400];
+
+
+foe_writefile_cfg_t      gFOE_firmware_files[] = {
+	{
+			.name =					"ft6_param.bin",
+			.max_data = 			FLASH_PARAM_MAX_SIZE, 	// sector size ?!?
+			.dest_start_address =	FLASH_PARAM_SECTOR, 	//
+			.address_offset =		0,
+			.filepass =				0xA4A4,
+//			.write_function =		foe_write_flash,
+//			.read_function =		foe_read_flash,
+//			.on_foe_open = 			on_foe_open_cb,
+//			.on_foe_close = 		on_foe_close_cb,
+	},
+    {
+    		.name =					"cal_mat.bin",
+			.max_data = 			FLASH_CALIB_MAX_SIZE, 	// sector size ?!?
+			.dest_start_address =	FLASH_CALIB_SECTOR, 	//
+			.address_offset =		0,
+			.filepass =				0xCA71,
+			.write_function =		foe_write_cal_mat,
+			.read_function =		foe_read_cal_mat,
+			.on_foe_open = 			0,
+			.on_foe_close = 		0,
+    },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+};

@@ -9,10 +9,13 @@
 #include <globals.h>
 #include "math.h"
 
-extern const 	_objd SDO8002[];
-extern const 	_objd SDO8003[];
-extern float	tempC;
+extern const	_objd SDO8002[];
+extern const	_objd SDO8003[];
 
+extern uint16_t	txpdomap, rxpdomap;
+extern uint8_t  txpdoitems, rxpdoitems;
+
+extern float	tempC;
 
 extern void jump_to_bootloader(void);
 

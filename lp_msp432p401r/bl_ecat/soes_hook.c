@@ -26,6 +26,9 @@ uint16_t  	et1100_boot_pin;
 extern uint16_t 			crc_ok;
 extern foe_writefile_cfg_t  gFOE_firmware_files[];
 
+extern uint16_t	txpdomap, rxpdomap;
+extern uint8_t  txpdoitems, rxpdoitems;
+
 
 /** Function to pre-qualify the incoming SDO download.
  *
