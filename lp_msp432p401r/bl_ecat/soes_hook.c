@@ -29,6 +29,7 @@ extern foe_writefile_cfg_t  gFOE_firmware_files[];
 extern uint16_t	txpdomap, rxpdomap;
 extern uint8_t  txpdoitems, rxpdoitems;
 
+extern void jump2app(void);
 
 /** Function to pre-qualify the incoming SDO download.
  *

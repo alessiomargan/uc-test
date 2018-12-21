@@ -48,7 +48,7 @@ const _objd SDO1018[] =
 const _objd SDO10F1[] =
 {
   {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 2, 0},
-  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RW, "Local Error Reaction", 1, 0},
+  {0x1, DTYPE_UNSIGNED32, 32, ATYPE_RW, "Local Error Reaction", 0, 0},
   {0x2, DTYPE_UNSIGNED16, 16, ATYPE_RW, "Sync Error Counter Limit", 4, 0},
 };
 
@@ -75,9 +75,12 @@ const _objd SDO1C13[] =
 
 const _objd SDO1C32[] =
 {
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 2, 0},
-  {0x4, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Synchronization Types supported", 0x1F, 0},
-  {0x5, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Minimum Cycle Time", 0, 0},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, Number_of_elements, 5, 0},
+  {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, "SyncType",  1, 0},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, "CycleTime", 0, 0},
+  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, "ShiftTime", 0, 0},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, "Synchronization Types supported", 0x1F, 0},
+  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, "Minimum Cycle Time", 125000, 0},
 };
 
 /*
@@ -135,7 +138,7 @@ const _objectlist SDOobjects[] =
   {0x1C00, OTYPE_ARRAY, 	 4,  0, "Sync Manager Communication Type", SDO1C00},
   {0x1C12, OTYPE_ARRAY, 	 1,  0, "Sync Manager 2 PDO Assignment", SDO1C12},
   {0x1C13, OTYPE_ARRAY, 	 1,  0, "Sync Manager 3 PDO Assignment", SDO1C13},
-  {0x1C32, OTYPE_ARRAY, 	 2,  0, "SM2(Output) Synchronisation  Parameter", SDO1C32},
+  {0x1C32, OTYPE_RECORD, 	 5,  0, "SM2(Output) Synchronisation  Parameter", SDO1C32},
   {0x6000, OTYPE_RECORD,	 0,  0, "Inputs", SDO6000},
   {0x7000, OTYPE_RECORD,     0,  0, "Outputs", SDO7000},
   {0x8000, OTYPE_RECORD,     6,  0, "Flash Parameters", SDO8000},

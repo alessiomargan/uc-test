@@ -116,12 +116,13 @@ uint32_t on_foe_close_cb( void ) {
     MAP_FlashCtl_unprotectSector(0x1<<bankNum, 0x1<<sectorNum);
 	// erase & program
 	MAP_FlashCtl_eraseSector((uint32_t)&CRC_App);
-	MAP_FlashCtl_programMemory((void*)&gCalc_crc, (void*)&CRC_App, sizeof(gCalc_crc));
+	ret = MAP_FlashCtl_programMemory((void*)&gCalc_crc, (void*)&CRC_App, sizeof(gCalc_crc));
 	// protect
 	MAP_FlashCtl_protectSector(0x1<<bankNum, 0x1<<sectorNum);
 	MAP_FlashCtl_protectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, ALL_FLASH_SECTORS);
 
 	crc_ok = (gCalc_crc==CRC_App) ? 1 : 0;
 
-	return 0;
+	// 0 on success
+	return (!ret);
 }

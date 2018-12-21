@@ -201,11 +201,18 @@ void do_morse_led(void) {
 		init_morser(&m, morser_string);
     }
     /////////////////////////////////////////////////////////////////
-
+#ifdef LAUNCHPAD
     if ( led_status ) {
     	MAP_GPIO_setOutputHighOnPin(PORT_LED_RED, PIN_LED_R);
     } else {
     	MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, PIN_LED_R);
     }
+#else
+    if ( led_status ) {
+    	MAP_GPIO_setOutputHighOnPin(PORT_LED_RG, PIN_LED_R);
+    } else {
+    	MAP_GPIO_setOutputLowOnPin(PORT_LED_RG, PIN_LED_R);
+    }
+#endif
 }
 
