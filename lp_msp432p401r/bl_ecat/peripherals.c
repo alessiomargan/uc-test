@@ -114,8 +114,7 @@ void Configure_EcatPDI (void)
     // IRQ
     //MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_EEL);
     // BOOT
-    MAP_GPIO_setAsOutputPin(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
-    MAP_GPIO_setOutputLowOnPin(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
+    MAP_GPIO_setAsInputPin(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
     // IRQ
 #if 0
     MAP_GPIO_setAsInputPin(PORT_ECAT_GPIO, PIN_ECAT_IRQ);
