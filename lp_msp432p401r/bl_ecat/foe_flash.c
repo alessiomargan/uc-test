@@ -27,6 +27,12 @@
     FLASH_SECTOR24 | FLASH_SECTOR25 | FLASH_SECTOR26 | FLASH_SECTOR27 |	\
     FLASH_SECTOR28 | FLASH_SECTOR29 | FLASH_SECTOR30 | FLASH_SECTOR31 )
 
+#define APP_FLASH_SECTORS (                                             \
+	FLASH_SECTOR0  | FLASH_SECTOR1  | FLASH_SECTOR2  | FLASH_SECTOR3  | \
+    FLASH_SECTOR4  | FLASH_SECTOR5  | FLASH_SECTOR6  | FLASH_SECTOR7  | \
+    FLASH_SECTOR8  | FLASH_SECTOR9  | FLASH_SECTOR10 | FLASH_SECTOR11 |	\
+    FLASH_SECTOR12 | FLASH_SECTOR13 | FLASH_SECTOR14 | FLASH_SECTOR15 )
+
 extern foe_cfg_t 	gFOE_config;
 
 #pragma RETAIN(BLDR_Version)
@@ -93,7 +99,7 @@ uint32_t on_foe_open_cb ( uint8_t op ) {
 	// Performs a mass erase on all unprotected flash sectors.
 	// Protected sectors are ignored.
 	// Unprotecting User Bank 1, Sectors 0 to 31 */
-	MAP_FlashCtl_unprotectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, ALL_FLASH_SECTORS);
+	MAP_FlashCtl_unprotectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, APP_FLASH_SECTORS);
 	ret = MAP_FlashCtl_performMassErase();
     DPRINT("\n%s Erase application memory section %d\n", __FUNCTION__, ret);
 	// 0 on success
@@ -119,7 +125,7 @@ uint32_t on_foe_close_cb( void ) {
 	ret = MAP_FlashCtl_programMemory((void*)&gCalc_crc, (void*)&CRC_App, sizeof(gCalc_crc));
 	// protect
 	MAP_FlashCtl_protectSector(0x1<<bankNum, 0x1<<sectorNum);
-	MAP_FlashCtl_protectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, ALL_FLASH_SECTORS);
+	MAP_FlashCtl_protectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, APP_FLASH_SECTORS);
 
 	crc_ok = (gCalc_crc==CRC_App) ? 1 : 0;
 
