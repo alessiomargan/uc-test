@@ -117,12 +117,6 @@ int main(void)
     print_sdo(&sdo.flash);
 
     /*
-     * use flash params for configuring periphs
-     */
-    pwmConfig.timerPeriod = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq);
-    pwmConfig.dutyCycle   = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq) * 0.75;	// 25% duty cycle
-
-    /*
      * Config periphs
      */
     Configure_GPIO();
