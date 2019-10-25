@@ -35,7 +35,7 @@
 
 #include <pins.h>
 #include <shared_ram.h>
-#include <peripherals.h>
+#include "peripherals.h"
 #ifdef _LCD
 	#if 0
 		#include <dog_LCD/DogLcd_test.h>

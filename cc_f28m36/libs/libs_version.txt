@@ -1,2 +1,3 @@
-controlSUITE_3.4.9/device_support/f28m36x/v220
+controlSUITE_3.4.9/device_support/f28m36x/v220 :
+driverlib compiled due to ramfuncs section, only .TI.ramfunc when compiler version > 15  
 

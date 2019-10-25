@@ -1,6 +1,11 @@
 #ifndef __GLOBALS_H__
 #define __GLOBALS_H__
 
+#ifdef __MSP432P401R__
+/* msp432 DriverLib Includes */
+#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+#endif
+
 /* Standard Includes */
 #include <stdint.h>
 #include <stdbool.h>
@@ -41,6 +46,9 @@ extern float 	tempC;
 extern uint16_t raw_adc[SMPL_NUM][16];
 extern float conv_adc[16];
 
+#ifdef __MSP432P401R__
+extern Timer_A_PWMConfig pwmConfig;
+#endif
 extern foe_cfg_t 	gFOE_config;
 extern uint8_t		foe_buffer[0x400];
 extern foe_writefile_cfg_t	gFOE_firmware_files[];

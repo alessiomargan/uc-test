@@ -364,6 +364,12 @@ void Configure_ADC(void)
 #ifndef ADC_TRG_SRC_PWM
     MAP_Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
 #else
+    /*
+     * use flash params for configuring periphs
+     */
+    pwmConfig.timerPeriod = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq);
+    pwmConfig.dutyCycle   = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq) * 0.75;  // 25% duty cycle
+
     MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
 #endif
 }
