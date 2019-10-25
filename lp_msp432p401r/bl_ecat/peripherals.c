@@ -158,8 +158,10 @@ void Configure_GPIO(void)
     MAP_GPIO_setAsOutputPin(PORT_LED_B, PIN_LED_B);
     MAP_GPIO_setOutputLowOnPin(PORT_LED_B, PIN_LED_B);
     // DBG
-    MAP_GPIO_setAsOutputPin(PORT_DBG, PIN_DBG_1|PIN_DBG_2);
-    MAP_GPIO_setOutputLowOnPin(PORT_DBG, PIN_DBG_1|PIN_DBG_2);
+    MAP_GPIO_setAsOutputPin(PORT_DBG_1, PIN_DBG_1);
+    MAP_GPIO_setOutputLowOnPin(PORT_DBG_1, PIN_DBG_1);
+    MAP_GPIO_setAsOutputPin(PORT_DBG_2, PIN_DBG_2);
+    MAP_GPIO_setOutputLowOnPin(PORT_DBG_2, PIN_DBG_2);
 #endif
     DPRINT("%s\n",__FUNCTION__);
 }

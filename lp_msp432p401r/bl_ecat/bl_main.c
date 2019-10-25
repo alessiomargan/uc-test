@@ -76,8 +76,9 @@ static uint8_t test_jump2app(void) {
 	// poll switch ... 0 pressed
 	sw1 = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN1);
 #endif
+#ifdef HAVE_BOOT_PIN
 	ecat_boot = MAP_GPIO_getInputPinValue(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
-
+#endif
 	ret = sw1 && (!ecat_boot) && crc_ok;
 	DPRINT("%s : %d = %d !%d %d\n", __FUNCTION__, ret, sw1, ecat_boot, crc_ok);
 
@@ -145,7 +146,7 @@ void main(uint32_t bslParams)
 
     gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
     crc_ok = (gCalc_crc==CRC_App) ? 1 : 0;
-    DPRINT("bldr ver %s\n", BLDR_Version);
+    DPRINT("bldr ver %s HW ver 0x02X%\n", BLDR_Version, HW_VER);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, CRC_App);
 
     test_jump = test_jump2app();

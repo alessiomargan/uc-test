@@ -37,7 +37,7 @@ extern foe_cfg_t 	gFOE_config;
 
 #pragma RETAIN(BLDR_Version)
 #pragma DATA_SECTION(BLDR_Version, ".BLDR_VERSION")
-const uint8_t BLDR_Version[8] = "msp_1.0";
+const uint8_t BLDR_Version[8] = "msp_1.1";
 
 #pragma RETAIN(CRC_App)
 #pragma DATA_SECTION(CRC_App, ".CRC_APP")
