@@ -20,13 +20,13 @@ uint32_t calc_CRC(uint32_t addr, uint32_t length)
     return crc;
 }
 
-bool Write_Flash(void * dest, uint32_t flash_addr, size_t size ) {
+bool Write_Flash(void * src, uint32_t flash_addr, size_t size ) {
 
 	bool ret;
 	uint32_t sectorNum, bankNum;
 
-	// get flash bank and sector of flash_sdo
-	MAP_FlashCtl_getMemoryInfo((uint32_t)&flash_sdo, &bankNum, &sectorNum);
+	// get flash bank and sector of flash_addr
+	MAP_FlashCtl_getMemoryInfo(flash_addr, &bankNum, &sectorNum);
     DPRINT("\n%s addr 0x%04X size %d bank %d sector %d\n",
 	    	__FUNCTION__, flash_addr, size, bankNum, sectorNum);
 
@@ -40,7 +40,7 @@ bool Write_Flash(void * dest, uint32_t flash_addr, size_t size ) {
 
     /* Trying to program the memory. Within this function, the API will
      * automatically try to program the maximum number of tries. */
-    if( ! (ret=MAP_FlashCtl_programMemory(dest, (void*)&flash_addr, size)) ) {
+    if( ! (ret=MAP_FlashCtl_programMemory(src, (void*)flash_addr, size)) ) {
     	DPRINT("%s FAIL FlashCtl_programMemory\n", __FUNCTION__);
     	goto failure;
     }

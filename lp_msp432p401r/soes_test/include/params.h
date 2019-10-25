@@ -37,6 +37,4 @@ uint16_t Write_Flash_Params(void);
 
 void Handle_PDO_mailbox(uint8_t);
 void Check_updated_parameter(uint8_t);
-void Handle_system_commands(void);
-void Handle_flash_command(void);
 #endif

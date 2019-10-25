@@ -13,7 +13,11 @@
 
 MEMORY
 {
-    FLASH (RX) : origin = FLASH_APP, length = 0x00039000
+    FLASH   (RX) : origin = FLASH_APP, length = 0x00032000
+    PAR_APP (RW) : origin = 0x0039000, length = 0x00001000
+    CALIB   (RW) : origin = 0x0038000, length = 0x00001000
+    EMPTY   (RW) : origin = 0x0037000, length = 0x00001000
+
     SRAM (RWX) : origin = 0x20000000, length = 0x00008000
 }
 
@@ -50,6 +54,11 @@ SECTIONS
     // cpp LCD
     .pics   :   > SRAM
     .fonts   :   > SRAM
+
+    /* flash parameters */
+    .PAR_APP    : > PAR_APP
+    /* calibration  */
+    .CALIB      : > CALIB
 
     // see http://processors.wiki.ti.com/index.php/Placing_functions_in_RAM
     .TI.ramfunc : {} load=FLASH, run=SRAM, table(BINIT)

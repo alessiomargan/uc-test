@@ -19,6 +19,10 @@ extern float	tempC;
 
 extern void jump_to_bootloader(void);
 
+extern void Handle_0x7000(uint8_t);
+extern void Handle_0x8000(uint8_t);
+extern void Handle_0x8001(uint8_t);
+
 
 /**
  */
@@ -130,16 +134,18 @@ void ESC_objecthandler (uint16_t index, uint8_t subindex)
 			}
 			ESCvar.TXPDOsize = ESCvar.ESC_SM3_sml = sizeOfPDO(TX_PDO_OBJIDX);
 			break;
-        case 0x8001:
-			/* Handle post-write of parameter values */
-			switch ( subindex ) {
-				default:
-					DPRINT("post-write param %d %d\n", index, subindex);
-					break;
-			}
+        case 0x7000:
+        	Handle_0x7000(subindex);
 			break;
-        default:
-            break;
+         case 0x8000:
+ 			Handle_0x8000(subindex);
+			break;
+ 		case 0x8001:
+ 			Handle_0x8001(subindex);
+ 			break;
+         default:
+             DPRINT("SDO 0x%04X %d NOT Handled\n", index, subindex);
+             break;
     }
 }
 

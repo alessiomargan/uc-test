@@ -52,6 +52,7 @@ typedef IAR_PACKED struct {
 	uint32_t	_signature_;
 	uint32_t 	board_id;
 	uint32_t	analog_sample_freq;
+	uint32_t 	module_params;
 
 } CCS_PACKED flash_sdo_t;
 
@@ -88,14 +89,20 @@ typedef IAR_PACKED struct {
     // 0x8003 aux param
 	float ts;
     float pwm_duty;
+    //
+    int8_t		var_int8;
+    int16_t		var_int16;
+    int32_t		var_int32;
+    int64_t		var_int64;
+    uint8_t		var_uint8;
+    uint16_t	var_uint16;
+    uint32_t	var_uint32;
+    uint64_t	var_uint64;
+    float		var_float;
+    double		var_double;
 
 } CCS_PACKED aux_pdo_rx_t;
 
-//extern tx_pdo_t tx_pdo;
-//extern rx_pdo_t rx_pdo;
-//extern aux_pdo_rx_t aux_pdo_rx;
-//extern aux_pdo_tx_t aux_pdo_tx;
-//extern sdo_t sdo;
 
 // esc_config hook
 void pre_state_change_hook (uint8_t * as, uint8_t * an);

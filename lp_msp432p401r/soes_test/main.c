@@ -29,6 +29,9 @@
 #include "peripherals.h"
 #include "params.h"
 
+// should go in globals.h
+// TODO put in globals_priv.h
+extern Timer_A_PWMConfig pwmConfig;
 
 volatile bool 	jumpToBsl = false;
 uint32_t 		clks[6];

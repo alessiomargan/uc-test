@@ -49,6 +49,14 @@
 #endif
 
 
+
+/*
+ * TODO move them ....
+ */
+void Handle_0x7000(uint8_t sudidx) {}
+void Handle_0x8000(uint8_t sudidx) {}
+void Handle_0x8001(uint8_t sudidx) {}
+
 /**
  * 
  * 

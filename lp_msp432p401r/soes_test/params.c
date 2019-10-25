@@ -6,6 +6,10 @@
 #include "flash_utils.h"
 #include "params.h"
 
+// should go in globals.h
+// TODO put in globals_priv.h
+extern Timer_A_PWMConfig pwmConfig;
+
 uint16_t Load_Default_Params(void) {
 
 	memcpy((void*)&sdo.flash, (void*)&dflt_flash_sdo, sizeof(dflt_flash_sdo));
@@ -34,8 +38,28 @@ uint16_t Write_Flash_Params(void) {
 	return (ret ? PARAMS_CMD_DONE : PARAMS_CMD_ERROR);
 }
 
+/*
+ * Handle_PDO_mailbox
+ */
+void Handle_0x7000(uint8_t subidx) {
 
-void Check_updated_parameter(uint8_t subidx) {
+	DPRINT("%s %d\n", __FUNCTION__, subidx);
+
+//	if(ESCvar.ALstatus == ESCop) {
+//		return;
+//	}
+
+	switch(subidx) {
+
+	default:
+		break;
+	}
+}
+
+/*
+ * Check_updated_parameter
+ */
+void Handle_0x8000(uint8_t subidx) {
 
 	DPRINT("%s %d\n", __FUNCTION__, subidx);
 
@@ -56,27 +80,11 @@ void Check_updated_parameter(uint8_t subidx) {
 }
 
 
-void Handle_PDO_mailbox(uint8_t subidx) {
-
-	DPRINT("%s %d\n", __FUNCTION__, subidx);
-
-//	if(ESCvar.ALstatus == ESCop) {
-//		return;
-//	}
-
-	switch(subidx) {
-
-	default:
-		break;
-	}
-}
-
-
 static uint16_t Test_done(void) { return CTRL_CMD_DONE; }
 static uint16_t Test_nedo(void) { return CTRL_CMD_ERROR; }
 static uint16_t Remove_offset(void) { return CTRL_CMD_DONE; }
 
-void Handle_system_commands(void) {
+static void Handle_system_commands(void) {
 
 	DPRINT("%s 0x%04X\n", __FUNCTION__, sdo.ram.ctrl_status_cmd);
 
@@ -98,9 +106,7 @@ void Handle_system_commands(void) {
 	}
 }
 
-
-
-void Handle_flash_command(void)	{
+static void Handle_flash_command(void)	{
 
 	DPRINT("%s 0x%04X\n", __FUNCTION__, sdo.ram.flash_params_cmd);
 
@@ -130,5 +136,23 @@ void Handle_flash_command(void)	{
 	}
 
 	print_sdo(&sdo.flash);
+}
+
+
+void Handle_0x8001(uint8_t subidx) {
+
+	switch(subidx) {
+		// Receive system cmd : 0x8001:2 --> sdo.ram_par.ctrl_status_cmd
+		case 2:
+			Handle_system_commands();
+			break;
+		// Receive flash param cmd : 0x8001:4 --> sdo.ram_par.ctrl_param_flash_cmd
+		case 4:
+			Handle_flash_command();
+			break;
+		default:
+			break;
+	}
+
 }
 

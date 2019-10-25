@@ -45,8 +45,8 @@ MEMORY
     MAIN_APP   (RX) : origin = APP_START, length = 0x00010000   // BANK_1 SECTOR_0
     INFO       (RX) : origin = 0x00200000, length = 0x00004000
 
-    PAR_APP    (RW) : origin = 0x0039000, length = 0x00001000   // BANK_1 SECTOR_31
-    CALIB      (RW) : origin = 0x0038000, length = 0x00001000   // BANK_1 SECTOR_30
+    PAR_APP    (RW) : origin = 0x003F000, length = 0x00001000   // BANK_1 SECTOR_31
+    CALIB      (RW) : origin = 0x003E000, length = 0x00001000   // BANK_1 SECTOR_30
 
     ALIAS
     {
