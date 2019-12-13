@@ -60,6 +60,7 @@ float		tempC;
 float		tempF;
 
 uint16_t 	raw_adc[SMPL_NUM][16];
+uint16_t	raw_adc_count[16];
 float		conv_adc[16];
 
 /************************************************************************************

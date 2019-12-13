@@ -41,16 +41,23 @@ inline void avg_samples(int chs) {
 	int ch, sm;
 	uint32_t temp;
 
+	MAP_Interrupt_disableMaster();
+
 	for ( ch=0; ch<chs; ch++ ) {
 		temp = 0;
-#pragma UNROLL(SMPL_NUM)
+
+		#pragma UNROLL(SMPL_NUM)
 		for ( sm=0; sm<SMPL_NUM; sm++ ) {
 			temp += raw_adc[sm][ch];
 		}
-		// divide by 8 using shift ==>  >>3
-		conv_adc[ch] = (temp>>3)*VTICK;
+		// divide by  8 SMPL_NUM using shift ==>  >> 3
+		// divide by 16 SMPL_NUM using shift ==>  >> 4
+		raw_adc_count[ch] = temp >> 3;
+		//raw_adc_count[ch] = ch;
+		conv_adc[ch] = raw_adc_count[ch]*VTICK;
 	}
 
+	MAP_Interrupt_enableMaster();
 }
 
 

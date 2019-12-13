@@ -23,6 +23,34 @@ extern void Handle_0x7000(uint8_t);
 extern void Handle_0x8000(uint8_t);
 extern void Handle_0x8001(uint8_t);
 
+/* Setup config hooks */
+const esc_cfg_t config =
+{
+    .user_arg = "/spi0/et1100",
+    .use_interrupt = 1,
+    .watchdog_cnt = 0,
+    //.mbxsize = MBXSIZE,
+    //.mbxsizeboot = MBXSIZEBOOT,
+    //.mbxbuffers = MBXBUFFERS,
+    //.mb[0] = {MBX0_sma, MBX0_sml, MBX0_sme, MBX0_smc, 0},
+    //.mb[1] = {MBX1_sma, MBX1_sml, MBX1_sme, MBX1_smc, 0},
+    //.mb_boot[0] = {MBX0_sma_b, MBX0_sml_b, MBX0_sme_b, MBX0_smc_b, 0},
+    //.mb_boot[1] = {MBX1_sma_b, MBX1_sml_b, MBX1_sme_b, MBX1_smc_b, 0},
+    //.pdosm[0] = {SM2_sma, 0, 0, SM2_smc, SM2_act},
+    //.pdosm[1] = {SM3_sma, 0, 0, SM3_smc, SM3_act},
+    .pre_state_change_hook = pre_state_change_hook,
+    .post_state_change_hook = post_state_change_hook,
+    .application_hook = NULL,
+    .safeoutput_override = NULL,
+    .pre_object_download_hook = ESC_pre_objecthandler,
+    .post_object_download_hook = ESC_objecthandler,
+    .rxpdo_override = NULL,
+    .txpdo_override = NULL,
+    .esc_hw_interrupt_enable = NULL,
+    .esc_hw_interrupt_disable = NULL,
+    .esc_hw_eep_handler = NULL
+};
+
 
 /**
  */
@@ -35,14 +63,14 @@ static void on_PREOP(void) {
  */
 static void TXPDO_update (void)
 {
-    ESC_write (SM3_sma, &tx_pdo, ESCvar.TXPDOsize);
+    ESC_write (SM3_sma, &tx_pdo, ESCvar.ESC_SM3_sml);
 }
 
 /** Mandatory: Read Sync Manager 2 to local process data, Master Outputs.
  */
 static void RXPDO_update (void)
 {
-    ESC_read (SM2_sma, &rx_pdo, ESCvar.RXPDOsize);
+    ESC_read (SM2_sma, &rx_pdo, ESCvar.ESC_SM2_sml);
 }
 
 //#pragma CODE_SECTION(handle_aux_pdo_rx,ramFuncSection);
@@ -87,21 +115,12 @@ static void handle_aux_pdo_tx(void) {
  *
  * @param[in] index      = index of SDO download request to check
  * @param[in] sub-index  = sub-index of SDO download request to check
- * @return 1 if the SDO Download is correct. 0 If not correct.
+ * @return SDO abort code, or 0 on success
  */
-int ESC_pre_objecthandler (uint16_t index, uint8_t subindex)
+uint32_t ESC_pre_objecthandler (uint16_t index, uint8_t subindex, void * data, size_t size, uint16_t flags)
 {
-	if ((index == 0x1c12) && (subindex > 0) && (rxpdoitems != 0))
-	{
-		SDO_abort (index, subindex, ABORT_READONLY);
-		return 0;
-	}
-	if ((index == 0x1c13) && (subindex > 0) && (txpdoitems != 0))
-	{
-		SDO_abort (index, subindex, ABORT_READONLY);
-		return 0;
-	}
-	return 1;
+	DPRINT("%s : 0x%04X %d\n", __FUNCTION__, index, subindex);
+	return 0;
 }
 
 
@@ -111,29 +130,9 @@ int ESC_pre_objecthandler (uint16_t index, uint8_t subindex)
  * @param[in] index      = index of SDO download request to handle
  * @param[in] sub-index  = sub-index of SDO download request to handle
  */
-void ESC_objecthandler (uint16_t index, uint8_t subindex)
+void ESC_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
 {
 	switch ( index ) {
-    	case 0x1c12:
-			if ( rxpdoitems > 1 ) {
-				rxpdoitems = 1;
-			}
-			if ( (rxpdomap != 0x1600) && (rxpdomap != 0x1601)
-				 && (rxpdomap != 0x0000) ) {
-				rxpdomap = 0x1600;
-			}
-			ESCvar.RXPDOsize = ESCvar.ESC_SM2_sml = sizeOfPDO(RX_PDO_OBJIDX);
-			break;
-        case 0x1c13:
-			if ( txpdoitems > 1 ) {
-				txpdoitems = 1;
-			}
-			if ( (txpdomap != 0x1A00) && (txpdomap != 0x1A01)
-				 && (rxpdomap != 0x0000) ) {
-				txpdomap = 0x1A00;
-			}
-			ESCvar.TXPDOsize = ESCvar.ESC_SM3_sml = sizeOfPDO(TX_PDO_OBJIDX);
-			break;
         case 0x7000:
         	Handle_0x7000(subindex);
 			break;

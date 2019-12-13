@@ -183,9 +183,9 @@ const _objd SDO8003[] =
   {0x5,  DTYPE_INTEGER32,   32, ATYPE_RW, "var_int32",  0, &aux_pdo_rx.var_int32},
   {0x6,  DTYPE_INTEGER64,   64, ATYPE_RW, "var_int64",  0, &aux_pdo_rx.var_int64},
   {0x7,  DTYPE_UNSIGNED8,    8, ATYPE_RW, "var_uint8",  0, &aux_pdo_rx.var_uint8},
-  {0x8,  DTYPE_UNSIGNED16,   16, ATYPE_RW, "var_uint16", 0, &aux_pdo_rx.var_uint16},
-  {0x9,  DTYPE_UNSIGNED32,   32, ATYPE_RW, "var_uint32", 0, &aux_pdo_rx.var_uint32},
-  {0xa,  DTYPE_UNSIGNED64,   64, ATYPE_RW, "var_uint64", 0, &aux_pdo_rx.var_uint64},
+  {0x8,  DTYPE_UNSIGNED16,  16, ATYPE_RW, "var_uint16", 0, &aux_pdo_rx.var_uint16},
+  {0x9,  DTYPE_UNSIGNED32,  32, ATYPE_RW, "var_uint32", 0, &aux_pdo_rx.var_uint32},
+  {0xa,  DTYPE_UNSIGNED64,  64, ATYPE_RW, "var_uint64", 0, &aux_pdo_rx.var_uint64},
   {0xb,  DTYPE_REAL32,   	32, ATYPE_RW, "var_float",  0, &aux_pdo_rx.var_float},
   {0xc,  DTYPE_REAL64,   	64, ATYPE_RW, "var_double", 0, &aux_pdo_rx.var_double},
 

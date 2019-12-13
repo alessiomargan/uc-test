@@ -383,8 +383,14 @@ void Configure_ADC_temp(void)
 	MAP_REF_A_enableTempSensor();
 	MAP_REF_A_setReferenceVoltage(REF_A_VREF2_5V);
 	MAP_REF_A_enableReferenceVoltage();
+#if defined(__MCU_HAS_SYSCTL__)
 	cal30 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_2_5V_REF, SYSCTL_30_DEGREES_C);
 	cal85 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_2_5V_REF, SYSCTL_85_DEGREES_C);
+#endif
+#if defined(__MCU_HAS_SYSCTL_A__)
+	cal30 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_A_2_5V_REF, SYSCTL_A_30_DEGREES_C);
+	cal85 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_A_2_5V_REF, SYSCTL_A_85_DEGREES_C);
+#endif
 	calDifference = cal85 - cal30;
 
 	// Initializing ADC (SMCLK/1/1) ==> 24MHz < 25MHz max ADC clock freq

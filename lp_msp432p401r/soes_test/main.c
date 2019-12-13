@@ -24,6 +24,8 @@
 #include <stdbool.h>
 #include <cc.h>
 
+#include <soes/esc.h>
+
 #include "pins.h"
 #include "globals.h"
 #include "peripherals.h"
@@ -32,6 +34,8 @@
 // should go in globals.h
 // TODO put in globals_priv.h
 extern Timer_A_PWMConfig pwmConfig;
+
+extern esc_cfg_t config;
 
 volatile bool 	jumpToBsl = false;
 uint32_t 		clks[6];
@@ -79,8 +83,14 @@ int main(void)
     MAP_PCM_setPowerState(PCM_AM_DCDC_VCORE1);
 
     // At 48MHz in VCORE0, MSP432P401R needs 1 wait states
+#if defined(__MCU_HAS_FLCTL_A__)
+    MAP_FlashCtl_A_setWaitState(FLASH_A_BANK0, 1);
+    MAP_FlashCtl_A_setWaitState(FLASH_A_BANK1, 1);
+#endif
+#if defined(__MCU_HAS_FLCTL__)
     MAP_FlashCtl_setWaitState(FLASH_BANK0, 1);
     MAP_FlashCtl_setWaitState(FLASH_BANK1, 1);
+#endif
 
     // Enabling the FPU with stacking enabled (for use within ISR)
     MAP_FPU_enableModule();
@@ -132,7 +142,7 @@ int main(void)
     /*
      * Init soes
      */
-    soes_init();
+    soes_init(&config);
 
     MAP_Interrupt_setPriority(INT_PORT5,    (char)(2)<<5);
     MAP_Interrupt_setPriority(INT_T32_INT1, (char)(2)<<5);

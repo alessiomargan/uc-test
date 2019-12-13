@@ -44,6 +44,7 @@ extern float 	calDifference;
 extern float 	tempC;
 
 extern uint16_t raw_adc[SMPL_NUM][16];
+extern uint16_t raw_adc_count[16];
 extern float conv_adc[16];
 
 #ifdef __MSP432P401R__

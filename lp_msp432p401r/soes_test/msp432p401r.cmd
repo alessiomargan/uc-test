@@ -38,7 +38,8 @@
 
 --retain=flashMailbox
 
-#define APP_START 0x20000
+//#define APP_START 0x20000
+#define APP_START 0x00000
 
 MEMORY
 {

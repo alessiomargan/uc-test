@@ -119,8 +119,15 @@ void main(uint32_t bslParams)
     MAP_PCM_setPowerState(PCM_AM_DCDC_VCORE1);
 
     // At 48MHz in VCORE0, MSP432P401R needs 1 wait states
+#if defined(__MCU_HAS_FLCTL_A__)
+    MAP_FlashCtl_A_setWaitState(FLASH_A_BANK0, 1);
+    MAP_FlashCtl_A_setWaitState(FLASH_A_BANK1, 1);
+#endif
+#if defined(__MCU_HAS_FLCTL__)
     MAP_FlashCtl_setWaitState(FLASH_BANK0, 1);
     MAP_FlashCtl_setWaitState(FLASH_BANK1, 1);
+#endif
+
 
     // Enabling the FPU with stacking enabled (for use within ISR)
     MAP_FPU_enableModule();
