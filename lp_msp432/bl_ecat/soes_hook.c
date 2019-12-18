@@ -2,7 +2,7 @@
 #include <soes/esc_coe.h>
 #include <soes/esc_foe.h>
 #include <soes/hal/advr_esc/soes.h>
-#include <config.h>
+#include <ecat_options.h>
 #include <soes_hook.h>
 
 //#define ESC_DEBUG
@@ -23,34 +23,40 @@ uint16_t 	flash_cmd;
 uint16_t 	flash_cmd_ack;
 uint16_t  	et1100_boot_pin;
 
+// dummy pdo
+rx_pdo_t	rx_pdo;
+tx_pdo_t	tx_pdo;
+
 extern uint16_t 			crc_ok;
 extern foe_writefile_cfg_t  gFOE_firmware_files[];
 
-extern uint16_t	txpdomap, rxpdomap;
-extern uint8_t  txpdoitems, rxpdoitems;
-
 extern void jump2app(void);
 
-/** Function to pre-qualify the incoming SDO download.
- *
- * @param[in] index      = index of SDO download request to check
- * @param[in] sub-index  = sub-index of SDO download request to check
- * @return 1 if the SDO Download is correct. 0 If not correct.
- */
-int ESC_pre_objecthandler (uint16_t index, uint8_t subindex)
+void pre_state_change_hook (uint8_t * as, uint8_t * an);
+void post_state_change_hook (uint8_t * as, uint8_t * an);
+void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags);
+
+/* Setup config hooks */
+const esc_cfg_t config =
 {
-	if ((index == 0x1c12) && (subindex > 0) && (rxpdoitems != 0))
-	{
-		SDO_abort (index, subindex, ABORT_READONLY);
-		return 0;
-	}
-	if ((index == 0x1c13) && (subindex > 0) && (txpdoitems != 0))
-	{
-		SDO_abort (index, subindex, ABORT_READONLY);
-		return 0;
-	}
-	return 1;
-}
+    .user_arg					= "hello_world",
+    .use_interrupt				= 1,
+    .watchdog_cnt				= 0,
+	.set_defaults_hook 			= NULL,
+    .pre_state_change_hook 		= pre_state_change_hook,
+    .post_state_change_hook 	= post_state_change_hook,
+    .application_hook 			= NULL,
+    .safeoutput_override 		= NULL,
+    .pre_object_download_hook 	= NULL,
+    .post_object_download_hook 	= ESC_App_objecthandler,
+    .rxpdo_override				= NULL,
+    .txpdo_override				= NULL,
+    .esc_hw_interrupt_enable	= NULL,
+    .esc_hw_interrupt_disable	= NULL,
+    .esc_hw_eep_handler			= NULL,
+	.esc_check_dc_handler		= NULL,
+};
+
 
 /** Mandatory: Hook called from the slave stack SDO Download handler to act on
  * user specified Index and Sub-index.
@@ -58,11 +64,10 @@ int ESC_pre_objecthandler (uint16_t index, uint8_t subindex)
  * @param[in] index      = index of SDO download request to handle
  * @param[in] sub-index  = sub-index of SDO download request to handle
  */
-void ESC_objecthandler (uint16_t index, uint8_t subindex)
+void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
 {
     switch ( index ) {
         case 0x8001:
-		{
 			/* Handle post-write of parameter values */
 			switch ( subindex ) {
 				default:
@@ -70,8 +75,7 @@ void ESC_objecthandler (uint16_t index, uint8_t subindex)
 					break;
 			}
 			break;
-		}
-        default:
+		default:
             DPRINT("SDO 0x%04X %d NOT Handled\n", index, subindex);
             break;
     }

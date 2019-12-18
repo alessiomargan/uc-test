@@ -22,9 +22,10 @@
 /* Standard Includes */
 #include <stdint.h>
 #include <stdbool.h>
-#include <cc.h>
 
+#include <cc.h>
 #include <soes/esc.h>
+#include <soes/hal/advr_esc/soes.h>
 
 #include "pins.h"
 #include "globals.h"
@@ -35,7 +36,7 @@
 // TODO put in globals_priv.h
 extern Timer_A_PWMConfig pwmConfig;
 
-extern esc_cfg_t config;
+extern const esc_cfg_t config;
 
 volatile bool 	jumpToBsl = false;
 uint32_t 		clks[6];

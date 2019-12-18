@@ -4,7 +4,7 @@
 #include <soes/esc_coe.h>
 #include <soes/esc_foe.h>
 #include <soes/hal/advr_esc/soes.h>
-#include <config.h>
+#include <ecat_options.h>
 #include <soes_hook.h>
 #include <globals.h>
 #include "math.h"
@@ -12,65 +12,53 @@
 extern const	_objd SDO8002[];
 extern const	_objd SDO8003[];
 
-extern uint16_t	txpdomap, rxpdomap;
-extern uint8_t  txpdoitems, rxpdoitems;
-
 extern float	tempC;
 
 extern void jump_to_bootloader(void);
 
-extern void Handle_0x7000(uint8_t);
-extern void Handle_0x8000(uint8_t);
-extern void Handle_0x8001(uint8_t);
+/* Forward declaration of the default fault handlers. */
+void Default_Object_Handler(uint8_t) __attribute__((weak));
+
+extern void Handle_0x7000(uint8_t) __attribute__((weak, alias("Default_Object_Handler")));
+extern void Handle_0x8000(uint8_t) __attribute__((weak, alias("Default_Object_Handler")));
+extern void Handle_0x8001(uint8_t) __attribute__((weak, alias("Default_Object_Handler")));
+
+void pre_state_change_hook (uint8_t * as, uint8_t * an);
+void post_state_change_hook (uint8_t * as, uint8_t * an);
+void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags);
 
 /* Setup config hooks */
 const esc_cfg_t config =
 {
-    .user_arg = "/spi0/et1100",
-    .use_interrupt = 1,
-    .watchdog_cnt = 0,
-    //.mbxsize = MBXSIZE,
-    //.mbxsizeboot = MBXSIZEBOOT,
-    //.mbxbuffers = MBXBUFFERS,
-    //.mb[0] = {MBX0_sma, MBX0_sml, MBX0_sme, MBX0_smc, 0},
-    //.mb[1] = {MBX1_sma, MBX1_sml, MBX1_sme, MBX1_smc, 0},
-    //.mb_boot[0] = {MBX0_sma_b, MBX0_sml_b, MBX0_sme_b, MBX0_smc_b, 0},
-    //.mb_boot[1] = {MBX1_sma_b, MBX1_sml_b, MBX1_sme_b, MBX1_smc_b, 0},
-    //.pdosm[0] = {SM2_sma, 0, 0, SM2_smc, SM2_act},
-    //.pdosm[1] = {SM3_sma, 0, 0, SM3_smc, SM3_act},
-    .pre_state_change_hook = pre_state_change_hook,
-    .post_state_change_hook = post_state_change_hook,
-    .application_hook = NULL,
-    .safeoutput_override = NULL,
-    .pre_object_download_hook = ESC_pre_objecthandler,
-    .post_object_download_hook = ESC_objecthandler,
-    .rxpdo_override = NULL,
-    .txpdo_override = NULL,
-    .esc_hw_interrupt_enable = NULL,
-    .esc_hw_interrupt_disable = NULL,
-    .esc_hw_eep_handler = NULL
+    .user_arg					= "hello_world",
+    .use_interrupt				= 1,
+    .watchdog_cnt				= 0,
+	.set_defaults_hook 			= NULL,
+    .pre_state_change_hook 		= pre_state_change_hook,
+    .post_state_change_hook 	= post_state_change_hook,
+    .application_hook 			= NULL,
+    .safeoutput_override 		= NULL,
+    .pre_object_download_hook 	= NULL,
+    .post_object_download_hook 	= ESC_App_objecthandler,
+    .rxpdo_override				= NULL,
+    .txpdo_override				= NULL,
+    .esc_hw_interrupt_enable	= NULL,
+    .esc_hw_interrupt_disable	= NULL,
+    .esc_hw_eep_handler			= NULL,
+	.esc_check_dc_handler		= NULL,
 };
 
+
+void Default_Object_Handler(uint8_t subindex) {
+
+	DPRINT("%s %d ... not handled\n", __FUNCTION__, subindex);
+}
 
 /**
  */
 static void on_PREOP(void) {
 
 	memset((void*)&tx_pdo,0,sizeof(tx_pdo));
-}
-
-/** Mandatory: Write local process data to Sync Manager 3, Master Inputs.
- */
-static void TXPDO_update (void)
-{
-    ESC_write (SM3_sma, &tx_pdo, ESCvar.ESC_SM3_sml);
-}
-
-/** Mandatory: Read Sync Manager 2 to local process data, Master Outputs.
- */
-static void RXPDO_update (void)
-{
-    ESC_read (SM2_sma, &rx_pdo, ESCvar.ESC_SM2_sml);
 }
 
 //#pragma CODE_SECTION(handle_aux_pdo_rx,ramFuncSection);
@@ -110,27 +98,13 @@ static void handle_aux_pdo_tx(void) {
 	}
 }
 
-
-/** Function to pre-qualify the incoming SDO download.
- *
- * @param[in] index      = index of SDO download request to check
- * @param[in] sub-index  = sub-index of SDO download request to check
- * @return SDO abort code, or 0 on success
- */
-uint32_t ESC_pre_objecthandler (uint16_t index, uint8_t subindex, void * data, size_t size, uint16_t flags)
-{
-	DPRINT("%s : 0x%04X %d\n", __FUNCTION__, index, subindex);
-	return 0;
-}
-
-
 /** Mandatory: Hook called from the slave stack SDO Download handler to act on
  * user specified Index and Sub-index.
  *
  * @param[in] index      = index of SDO download request to handle
  * @param[in] sub-index  = sub-index of SDO download request to handle
  */
-void ESC_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
+void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
 {
 	switch ( index ) {
         case 0x7000:

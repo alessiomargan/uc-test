@@ -28,7 +28,10 @@
 
 #include <utils/uartstdio.h>
 
+#include <cc.h>
+#include <soes/esc.h>
 #include <soes/hal/advr_esc/soes.h>
+
 #include <peripherals.h>
 
 
@@ -49,6 +52,7 @@
 #endif
 
 
+extern esc_cfg_t config;
 
 /*
  * TODO move them ....
@@ -94,7 +98,7 @@ void main(void)
     IntPrioritySet(INT_GPIOB,   0x20);
 
     //
-    soes_init();
+    soes_init(&config);
 #ifdef USE_LCD
 #ifdef C_LCD
     lcd_test_2d ();

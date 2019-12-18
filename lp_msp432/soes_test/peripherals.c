@@ -120,7 +120,12 @@ Timer_A_PWMConfig pwmConfig =
 void jump_to_bootloader(void) {
 
 	//ResetCtl_initiateHardReset();
+#if defined(__MCU_HAS_SYSCTL__)
 	SysCtl_rebootDevice();
+#endif
+#if defined(__MCU_HAS_SYSCTL_A__)
+	SysCtl_A_rebootDevice();
+#endif
 }
 
 
@@ -388,8 +393,8 @@ void Configure_ADC_temp(void)
 	cal85 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_2_5V_REF, SYSCTL_85_DEGREES_C);
 #endif
 #if defined(__MCU_HAS_SYSCTL_A__)
-	cal30 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_A_2_5V_REF, SYSCTL_A_30_DEGREES_C);
-	cal85 = MAP_SysCtl_getTempCalibrationConstant(SYSCTL_A_2_5V_REF, SYSCTL_A_85_DEGREES_C);
+	cal30 = MAP_SysCtl_A_getTempCalibrationConstant(SYSCTL_A_2_5V_REF, SYSCTL_A_30_DEGREES_C);
+	cal85 = MAP_SysCtl_A_getTempCalibrationConstant(SYSCTL_A_2_5V_REF, SYSCTL_A_85_DEGREES_C);
 #endif
 	calDifference = cal85 - cal30;
 

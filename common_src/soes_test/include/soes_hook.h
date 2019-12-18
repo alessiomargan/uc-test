@@ -21,14 +21,14 @@ typedef union{
 } fault_t;
 
 typedef IAR_PACKED struct {
-    float       pos_ref;  				// motor position reference
-    float    	vel_ref;  				// motor velocity reference
-    float     	tor_ref;  				// torque reference
-    float    	gains[5];
-    uint16_t    fault_ack;
-    uint16_t    ts;
-    uint16_t    op_idx_aux;    			// op [get/set] , idx
-    float       aux;        			// set value
+	float       pos_ref;  				// motor position reference
+	float    	vel_ref;  				// motor velocity reference
+	float     	tor_ref;  				// torque reference
+	float    	gains[5];
+	uint16_t    fault_ack;
+	uint16_t    ts;
+	uint16_t    op_idx_aux;    			// op [get/set] , idx
+	float       aux;        			// set value
 
 } CCS_PACKED rx_pdo_t;
 
@@ -102,13 +102,6 @@ typedef IAR_PACKED struct {
     double		var_double;
 
 } CCS_PACKED aux_pdo_rx_t;
-
-
-// esc_config hook
-void pre_state_change_hook (uint8_t * as, uint8_t * an);
-void post_state_change_hook (uint8_t * as, uint8_t * an);
-//int ESC_pre_objecthandler (uint16_t index, uint8_t subindex);
-//void ESC_objecthandler (uint16_t index, uint8_t subindex);
 
 void ecat_process_pdo(void);
 void bootstrap_foe_init(void);

@@ -1,7 +1,10 @@
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#ifndef __ECAT_OPTIONS_H__
+#define __ECAT_OPTIONS_H__
 
 #include <cc.h>
+
+#define USE_FOE     1
+#define USE_EOE     0
 
 #define MBXSIZE     128
 #define MBXSIZEBOOT 128
@@ -33,5 +36,10 @@
 #define SM3_smc     0x20
 #define SM3_act     0x01
 
+#define MAX_RXPDO_SIZE   64
+#define MAX_TXPDO_SIZE   64
 
-#endif /* __CONFIG_H__ */
+#define MAX_MAPPINGS_SM2 0
+#define MAX_MAPPINGS_SM3 0
+
+#endif /* __ECAT_OPTIONS_H__ */

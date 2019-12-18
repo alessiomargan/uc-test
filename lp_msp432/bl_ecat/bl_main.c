@@ -31,23 +31,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "pins.h"
-#include "soes/esc.h"
+#include <cc.h>
+#include <soes/esc.h>
+#include <soes/hal/advr_esc/soes.h>
 
-#include "peripherals.h"
-#include "foe_flash.h"
+#include <pins.h>
+#include <peripherals.h>
+#include <foe_flash.h>
 
-#include "tiva-morser/morse.h"
+#include <tiva-morser/morse.h>
 
 extern uint32_t	gCalc_crc;
 extern uint16_t crc_ok;
-
-extern void soes_init(void);
-extern void soes_loop(void);
-extern void ecat_process_pdo(void);
-extern void do_morse_led(void);
-
-void do_morse_led(void);
+extern esc_cfg_t config;
 
 void jump2app(void) {
 
@@ -102,6 +98,49 @@ static void clock_src(void) {
 	}
 
 }
+
+static void do_morse_led(void) {
+
+    static volatile uint32_t  led_status;
+    static char * morser_string = "boot";
+    static bool sending;
+    static struct morser m;
+    enum OUTPUT res;
+
+    if (sending) {
+        res = tick(&m);
+        switch(res) {
+          case HIGH:
+        	  led_status = 1;
+			  break;
+          case LOW:
+        	  led_status = 0;
+			  break;
+          case END:
+        	  led_status = 0;
+			  sending = false;
+            break;
+        }
+    } else {
+		sending = true;
+		init_morser(&m, morser_string);
+    }
+    /////////////////////////////////////////////////////////////////
+#ifdef LAUNCHPAD
+    if ( led_status ) {
+    	MAP_GPIO_setOutputHighOnPin(PORT_LED_RED, PIN_LED_R);
+    } else {
+    	MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, PIN_LED_R);
+    }
+#else
+    if ( led_status ) {
+    	MAP_GPIO_setOutputHighOnPin(PORT_LED_RG, PIN_LED_R);
+    } else {
+    	MAP_GPIO_setOutputLowOnPin(PORT_LED_RG, PIN_LED_R);
+    }
+#endif
+}
+
 
 void main(uint32_t bslParams)
 {
@@ -165,7 +204,7 @@ void main(uint32_t bslParams)
     /*
      * Init soes
      */
-    soes_init();
+    soes_init(&config);
 
     while(1)
     {
@@ -180,47 +219,5 @@ void main(uint32_t bslParams)
 
     }
 
-}
-
-void do_morse_led(void) {
-
-    static volatile uint32_t  led_status;
-    static char * morser_string = "boot";
-    static bool sending;
-    static struct morser m;
-    enum OUTPUT res;
-
-    if (sending) {
-        res = tick(&m);
-        switch(res) {
-          case HIGH:
-        	  led_status = 1;
-			  break;
-          case LOW:
-        	  led_status = 0;
-			  break;
-          case END:
-        	  led_status = 0;
-			  sending = false;
-            break;
-        }
-    } else {
-		sending = true;
-		init_morser(&m, morser_string);
-    }
-    /////////////////////////////////////////////////////////////////
-#ifdef LAUNCHPAD
-    if ( led_status ) {
-    	MAP_GPIO_setOutputHighOnPin(PORT_LED_RED, PIN_LED_R);
-    } else {
-    	MAP_GPIO_setOutputLowOnPin(PORT_LED_RED, PIN_LED_R);
-    }
-#else
-    if ( led_status ) {
-    	MAP_GPIO_setOutputHighOnPin(PORT_LED_RG, PIN_LED_R);
-    } else {
-    	MAP_GPIO_setOutputLowOnPin(PORT_LED_RG, PIN_LED_R);
-    }
-#endif
 }
 

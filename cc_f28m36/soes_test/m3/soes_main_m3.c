@@ -31,7 +31,9 @@
 
 #include <flash_utils.h>
 
-#include <soes_hook.h>
+#include <cc.h>
+#include <soes/esc.h>
+#include <soes/hal/advr_esc/soes.h>
 
 #include <pins.h>
 #include <shared_ram.h>
@@ -67,6 +69,7 @@ char lcd_print_buff[128];
 m3_to_c28_data_t	m3_rw_data;
 c28_to_m3_data_t	c28_ro_data;
 
+extern esc_cfg_t config;
 extern volatile uint16_t write_lcd;
 extern void usb_handler(void);
 
@@ -199,7 +202,7 @@ int main(void)
 	/////////////////////////////////////////////////////////////////
 
 	// ecat initialization
-	soes_init();
+	soes_init(&config);
 
 #ifdef _LCD
 #if 0
