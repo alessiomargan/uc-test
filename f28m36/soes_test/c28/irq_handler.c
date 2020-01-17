@@ -97,7 +97,6 @@ __interrupt void cpu_timer2_isr(void)
 {
 	EALLOW;
 	CpuTimer2.InterruptCount++;
-
 #ifdef _CONTROL_CARD
 	LED_0_TOGGLE;
 #else

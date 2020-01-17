@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include <flash_utils.h>
+
 #include "c28/include/definitions.h"
 #include "common/include/shared_ram.h"
 
@@ -47,6 +49,8 @@ void main(void)
 	// This function is found in F28M36x_PieVect.c.
 	InitPieVectTable();
 
+	/* User application conf */
+
 	Configure_Pie_Vector();
 	Configure_C28_Gpio();
 	Configure_C28_Timer();
@@ -65,6 +69,10 @@ void main(void)
 	//IpcSync(IPC_FLAG18);
 	//	Set CTOM IPC Flag
 	CtoMIpcRegs.CTOMIPCSET.bit.IPC18 = 1;
+
+	StartCpuTimer0();
+	StartCpuTimer1();
+	StartCpuTimer2();
 
 	for(;;) {
     	// loop
