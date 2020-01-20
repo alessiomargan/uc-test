@@ -26,6 +26,7 @@ extern void Handle_0x8001(uint8_t) __attribute__((weak, alias("Default_Object_Ha
 void pre_state_change_hook (uint8_t * as, uint8_t * an);
 void post_state_change_hook (uint8_t * as, uint8_t * an);
 void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags);
+uint16_t check_dc_handler_hook(void);
 
 /* Setup config hooks */
 const esc_cfg_t config =
@@ -45,7 +46,7 @@ const esc_cfg_t config =
     .esc_hw_interrupt_enable	= NULL,
     .esc_hw_interrupt_disable	= NULL,
     .esc_hw_eep_handler			= NULL,
-	.esc_check_dc_handler		= NULL,
+	.esc_check_dc_handler		= check_dc_handler_hook,
 };
 
 
@@ -153,6 +154,10 @@ void post_state_change_hook (uint8_t * as, uint8_t * an)
     	jump_to_bootloader();
     }
 
+}
+
+uint16_t check_dc_handler_hook(void) {
+	return 0;
 }
 
 /**
