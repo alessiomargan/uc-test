@@ -41,7 +41,7 @@ const eUSCI_SPI_MasterConfig spiEcatConfig =
  * Baud = 115200
  * 13,0,0
  */
-const eUSCI_UART_Config uartConfigOverSampl =
+const eUSCI_UART_ConfigV1 uartConfigOverSampl =
 {
 	.selectClockSource	= EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
     .clockPrescalar		= 13,                                      // BRDIV = 208
