@@ -47,7 +47,7 @@ MEMORY
     RESETISR (RX)   : origin = 0x00200030, length = 0x0008
     INTVECS (RX)    : origin = 0x00201000, length = 0x0258
 
-    FLASH_APP (RX)    : origin = 0x00201258, length = 0x6DA8
+    FLASH_APP (RX)    : origin = 0x00201258, length = 0xEDA8    /* N + M */
     
     //FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8   /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
     //FLASH_M (RX)    : origin = 0x00208000, length = 0x8000   /* Bootloader */
@@ -129,13 +129,6 @@ SECTIONS
     .data   :   >  C9C15 //C2 | C3
     .bss    :   >> C2 | C3
     
-    .lcd    :   >  C4C8
-    //.font_8 :   >> C4
-    //.font_11:   >> C4
-
-    .fonts  :   >> C4C8
-    .pics   :   >> C4C8
-
     //.z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
     //.z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)
     //.z2secvalues  :   >  CSM_ECSL_Z2, ALIGN(8)

@@ -33,7 +33,7 @@
 
 //#include <cc.h>
 //#include <soes/esc.h>
-//#include <soes/hal/advr_esc/soes.h>
+#include <soes/hal/advr_esc/soes.h>
 
 #include <pins.h>
 #include <shared_ram.h>
@@ -62,7 +62,7 @@ char lcd_print_buff[128];
 m3_to_c28_data_t	m3_rw_data;
 c28_to_m3_data_t	c28_ro_data;
 
-//extern esc_cfg_t config;
+extern esc_cfg_t config;
 
 // map to RAM S1
 #pragma DATA_SECTION(m3_rw_data,"RAM_S1");
@@ -113,7 +113,7 @@ int main(void)
     	UARTprintf("Test_EraseWrite_flash(0x002F0000)\n");
     }
 
-    //Configure_EcatPDI();
+    Configure_EcatPDI();
     // ecat timer
 	Configure_Timer_0A();
 	// sensor & lcd timer
@@ -121,6 +121,7 @@ int main(void)
 
     // Enable C28 Peripherals not already enabled before in Configure_xxx functions
     SysCtlPeripheralEnable(LED_PERIPH);
+
     // Give C28 control of Port L pin 5 7
 	GPIOPinConfigureCoreSelect(LED_BASE, LED_PINS_C28, GPIO_PIN_C_CORE_SELECT);
 
@@ -152,7 +153,7 @@ int main(void)
 	/////////////////////////////////////////////////////////////////
 
 	// ecat initialization
-	//soes_init(&config);
+	soes_init(&config);
 
 	// Loop forever while the timers run.
 	ulLoop = 0;

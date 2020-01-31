@@ -37,6 +37,15 @@
 //
 //  M3 PDI EtherCAT interface
 //
+//! -   EPI0S0(D0)    -    PH3        EPI0S1(D1)    -    PH2
+//! - 	EPI0S2(D2)    -    PC4        EPI0S3(D3)    -    PC5
+//! - 	EPI0S4(D4)    -    PC6        EPI0S5(D5)    -    PC7
+//! - 	EPI0S6(D6)    -    PH0        EPI0S7(D7)    -    PH1
+//! - 	EPI0S8(A0)    -    PE0        EPI0S9(A1)    -    PE1
+//! - 	EPI0S10(A2)   -    PH4        EPI0S11(A3)   -    PH5
+//! - 	EPI0S12(A4)   -    PF4
+//! - 	EPI0S28(OEn)  -    PJ4        EPI0S29(WEn)  -    PJ5
+//! - 	EPI0S30(CEn)  -    PJ6
 //*****************************************************************************
 #define ECAT_SSI_BASE                   SSI3_BASE
 #define ECAT_SSI_SYSCTL_PERIPH   		SYSCTL_PERIPH_SSI3
@@ -90,29 +99,6 @@
 
 #define DEFL_ENC_SSI_PINS          		(DEFL_ENC_SSI_RX_MISO | DEFL_ENC_SSI_CLK)
 
-//*****************************************************************************
-//
-//  M3 LCD EA DOGM128-6
-//
-//*****************************************************************************
-#define LCD_SSI_BASE               	SSI1_BASE
-#define LCD_SSI_SYSCTL_PERIPH   	SYSCTL_PERIPH_SSI1
-
-#define LCD_SSI_GPIO_PORTBASE		GPIO_PORTL_BASE
-#define LCD_SSI_GPIO_SYSCTL_PERIPH	SYSCTL_PERIPH_GPIOL
-
-#define LCD_SSI_CLK               	GPIO_PIN_2
-#define LCD_SSI_TX_MOSI           	GPIO_PIN_0
-
-#define LCD_SSI_PINS          		(LCD_SSI_TX_MOSI | LCD_SSI_CLK)
-
-#define LCD_GPIO_PORTBASE           GPIO_PORTL_BASE
-#define LCD_GPIO_SYSCTL_PERIPH  	SYSCTL_PERIPH_GPIOL
-
-#define LCD_A0						GPIO_PIN_1
-#define LCD_CS						GPIO_PIN_3
-//#define LCD_RST						GPIO_PIN_4
-//#define LCD_VDD						GPIO_PIN_5
 
 //*****************************************************************************
 //

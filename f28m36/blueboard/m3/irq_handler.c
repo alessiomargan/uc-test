@@ -58,6 +58,13 @@ void Timer0A_IntHandler(void) {
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     timer0_cnt++;
 
+    //if ( ! ESC_SYNCactivation() ) {
+    //       ecat_process_pdo();
+    //}
+
+    // every cycle
+   	soes_loop();
+
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle
