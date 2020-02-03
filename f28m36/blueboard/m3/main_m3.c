@@ -107,6 +107,8 @@ int main(void)
     //
     Configure_UART();
     Configure_Led();
+    // DAC & DBG pin
+    Configure_Gpio();
 
     Configure_flashAPI();
     if ( Test_EraseWrite_flash(0x002F0000) == Fapi_Status_Success ) {
@@ -140,7 +142,7 @@ int main(void)
     //where N is 3 for the Concerto family
     IntPrioritySet(INT_TIMER0A, (char)(3)<<5); // middle prio soes loop
     IntPrioritySet(INT_TIMER1A, (char)(2)<<5); // higher prio sensor
-    //IntPrioritySet(INT_GPIOK,   (char)(3)<<5); // middle prio pdi ecat irq
+    IntPrioritySet(INT_GPIOK,   (char)(3)<<5); // middle prio pdi ecat irq
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
     SysCtlPeripheralDisable(SYSCTL_PERIPH_WDOG1);

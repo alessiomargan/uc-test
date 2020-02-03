@@ -32,7 +32,7 @@
 #include <pins.h>
 #include <peripherals.h>
 
-extern void EcatIntHandler(void);
+extern void Ecat_IntHandler(void);
 extern void Timer0A_IntHandler(void);
 extern void Timer1A_IntHandler(void);
 extern void SysTick_IntHandler(void);
@@ -180,6 +180,15 @@ void Configure_EcatPDI (void)
 
     EPIAddressMapSet(EPI0_BASE, (EPI_ADDR_PER_SIZE_64KB | EPI_ADDR_PER_BASE_C) );
 
+    SysCtlPeripheralEnable(ECAT_GPIO_SYSCTL_PERIPH);
+    // Configure the PDI irq pin as an input.
+    GPIOPinTypeGPIOInput(ECAT_GPIO_PORTBASE, ECAT_IRQ);
+    // Configure the PDI irq pin as interrupt on falling edge.
+    GPIOIntTypeSet(ECAT_GPIO_PORTBASE, ECAT_IRQ, GPIO_FALLING_EDGE);
+    GPIOPinIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
+    IntRegister(INT_GPIOK, Ecat_IntHandler);
+    IntEnable(INT_GPIOK);
+
 }
 
 /**
@@ -237,6 +246,22 @@ void Configure_Timer_1A(void)
     UARTprintf("%s\n",__FUNCTION__);
 }
 
+void Configure_Gpio(void) {
+
+#ifdef _DBG_DAC_M3
+	uint8_t dacPins = GPIO_DBG_DAC_CS|GPIO_DBG_DAC_CLK|GPIO_DBG_DAC_MOSI|GPIO_DBG_DAC_LDAC;
+	// DBG
+	SysCtlPeripheralEnable(GPIO_DBG_PERIPH);
+	// DBG PIN
+	GPIOPinTypeGPIOOutput(GPIO_DBG_BASE, GPIO_DBG_PIN);
+	GPIOPinWrite(GPIO_DBG_BASE,GPIO_DBG_PIN,0);
+	// DBG DAC
+	GPIOPinTypeGPIOOutput(GPIO_DBG_BASE, dacPins);
+	GPIOPinWrite(GPIO_DBG_BASE, dacPins, 0);
+#endif
+	UARTprintf("%s\n",__FUNCTION__);
+}
+
 void Watchdog0Reset(void)
 {
 	WatchdogUnlock(WATCHDOG0_BASE);
@@ -252,5 +277,7 @@ void Watchdog0Reset(void)
 	while(1) {}
 
 }
+
+
 
 

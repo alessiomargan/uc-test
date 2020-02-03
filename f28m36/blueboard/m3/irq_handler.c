@@ -14,8 +14,8 @@
 #include <driverlib/timer.h>
 
 //#include <soes/esc.h>
-//#include <soes/hal/advr_esc/soes.h>
-//#include <soes_test/include/soes_hook.h>
+#include <soes/hal/advr_esc/soes.h>
+#include <soes_test/include/soes_hook.h>
 
 #include <pins.h>
 #include <shared_ram.h>
@@ -33,15 +33,17 @@ volatile unsigned long g_ulLastTick;
 /**
  * 
  */
-void EcatIntHandler(void) {
+#pragma CODE_SECTION(Ecat_IntHandler,ramFuncSection);
+void Ecat_IntHandler(void) {
 
 	GPIOPinRead(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 	GPIOPinIntClear(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 	ecat_irq_cnt++;
 
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, GPIO_PIN_7);
-    //ecat_process_pdo();
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_7, 0);
+	setDAC_B(255);
+	ecat_process_pdo();
+	setDAC_B(0);
+
 
     //UARTprintf("PDI irq %d\n", ecat_irq_cnt );
 }
@@ -49,6 +51,7 @@ void EcatIntHandler(void) {
 /**
  * 1 KHz  1 ms
  */
+#pragma CODE_SECTION(Timer0A_IntHandler,ramFuncSection);
 void Timer0A_IntHandler(void) {
 
     static uint32_t timer0_cnt;
@@ -58,12 +61,16 @@ void Timer0A_IntHandler(void) {
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     timer0_cnt++;
 
-    //if ( ! ESC_SYNCactivation() ) {
-    //       ecat_process_pdo();
-    //}
+    setDAC_A(255);
+
+    if ( ! ESC_SYNCactivation() ) {
+    	ecat_process_pdo();
+    }
 
     // every cycle
    	soes_loop();
+
+   	setDAC_A(0);
 
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
@@ -79,6 +86,7 @@ void Timer0A_IntHandler(void) {
 /**
  * 500 Hz  2 ms
  */
+#pragma CODE_SECTION(Timer1A_IntHandler,ramFuncSection);
 void Timer1A_IntHandler(void) {
 
     static uint32_t timer1_cnt;

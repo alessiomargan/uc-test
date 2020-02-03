@@ -39,4 +39,23 @@ typedef struct {
 extern m3_to_c28_data_t	m3_rw_data;
 extern c28_to_m3_data_t c28_ro_data;
 
+
+#define DACREG_CH_A		0
+#define DACREG_CH_B		1
+
+struct DAC08 {
+	uint16_t spare:4;
+    uint16_t data:8;
+    uint16_t pd0:1;    	// Power down modes: 00: Normal operation
+    uint16_t pd1:1;
+    uint16_t buf:1;		// 0: Unbuffered - 1: Buffered
+    uint16_t addx:1;
+};
+
+typedef union {
+    uint16_t all;
+    struct DAC08 dac_data;
+} DAC08_UNION;
+
+
 #endif
