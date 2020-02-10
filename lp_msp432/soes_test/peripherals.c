@@ -117,6 +117,16 @@ Timer_A_PWMConfig pwmConfig =
 };
 
 
+void Disable_interrupt(void) {
+	// Disable all interrupts
+	MAP_Interrupt_disableMaster();
+}
+void Enable_interrupt(void) {
+	// Enable all interrupts
+	MAP_Interrupt_enableMaster();
+}
+
+
 void jump_to_bootloader(void) {
 
 	//ResetCtl_initiateHardReset();

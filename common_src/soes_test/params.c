@@ -1,14 +1,20 @@
 /* DriverLib Includes */
+#ifdef __MSP432P4111__
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+// should go in globals.h
+// TODO put in globals_priv.h
+extern Timer_A_PWMConfig pwmConfig;
+#endif
 
-#include <soes_hook.h>
 #include "globals.h"
 #include "flash_utils.h"
 #include "params.h"
 
-// should go in globals.h
-// TODO put in globals_priv.h
-extern Timer_A_PWMConfig pwmConfig;
+#include <soes_hook.h>
+
+extern void Disable_interrupt();
+extern void Enable_interrupt();
+
 
 uint16_t Load_Default_Params(void) {
 
@@ -34,7 +40,7 @@ uint16_t Write_Flash_Params(void) {
 
 	bool ret;
 	sdo.flash._signature_ = FLASH_SIGN_VALID;
-	ret = Write_Flash((void*)&sdo.flash, (uint32_t)&flash_sdo, sizeof(flash_sdo_t));
+	ret = Write_Flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo_t));
 	return (ret ? PARAMS_CMD_DONE : PARAMS_CMD_ERROR);
 }
 
@@ -66,11 +72,13 @@ void Handle_0x8000(uint8_t subidx) {
 	switch(subidx) {
 
 	case 3 :
+#ifdef __MSP432P4111__
 		MAP_Interrupt_disableMaster();
 		pwmConfig.timerPeriod = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq);
 	    pwmConfig.dutyCycle   = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq) * 0.75;	// 25% duty cycle
 	    MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
 		MAP_Interrupt_enableMaster();
+#endif
 		break;
 
 	default:
@@ -113,9 +121,11 @@ static void Handle_flash_command(void)	{
 	switch(sdo.ram.flash_params_cmd){
 
 		case SAVE_PARAMS_TO_FLASH :
-			MAP_Interrupt_disableMaster();
+			//MAP_Interrupt_disableMaster();
+			Disable_interrupt();
 			sdo.ram.flash_params_cmd_ack = (Write_Flash_Params() | SAVE_PARAMS_TO_FLASH);
-			MAP_Interrupt_enableMaster();
+			//MAP_Interrupt_enableMaster();
+			Enable_interrupt();
 			break;
 
 		case LOAD_PARAMS_FROM_FLASH:

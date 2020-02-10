@@ -20,7 +20,7 @@ uint32_t calc_CRC(uint32_t addr, uint32_t length)
     return crc;
 }
 
-bool Write_Flash(void * src, uint32_t flash_addr, size_t size ) {
+bool Write_Flash(uint32_t flash_addr, void * src, size_t size ) {
 
 	bool ret;
 	uint32_t sectorNum, bankNum;

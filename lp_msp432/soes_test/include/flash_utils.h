@@ -3,6 +3,6 @@
 
 uint32_t calc_CRC(uint32_t addr, uint32_t length);
 
-bool Write_Flash(void * dest, uint32_t flash_addr, size_t size);
+bool Write_Flash(uint32_t flash_addr, void * src, size_t size);
 
 #endif
