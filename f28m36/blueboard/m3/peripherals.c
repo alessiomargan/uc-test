@@ -41,10 +41,13 @@ extern volatile unsigned long g_ulSysTickCount;
 extern volatile unsigned long g_ulLastTick;
 
 
-void disable_peripheral_irq(void)
-{
-	IntDisable(INT_TIMER0A);
-    //IntDisable(INT_GPIOB);
+void Disable_interrupt(void) {
+	// Disable all interrupts
+	IntMasterDisable();
+}
+void Enable_interrupt(void) {
+	// Enable all interrupts
+	IntMasterEnable();
 }
 
 void jump_to_bootloader(void) {
@@ -106,7 +109,6 @@ unsigned long GetTickms(void)
 }
 
 /**
- *
  *
  * @author amargan (7/4/2014)
  */

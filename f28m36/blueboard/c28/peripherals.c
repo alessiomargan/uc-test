@@ -87,7 +87,7 @@ void Configure_C28_Gpio(void)
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO86 = 1;
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO87 = 1;
 	EDIS;
-	GpioG1CtrlRegs.GPCMUX2.bit.GPIO86 = 0;  // GPIO85 = GPIO			--> DEBUG GREEN LED
+	GpioG1CtrlRegs.GPCMUX2.bit.GPIO86 = 0;  // GPIO86 = GPIO			--> DEBUG GREEN LED
 	GpioG1CtrlRegs.GPCMUX2.bit.GPIO87 = 0;  // GPIO87 = GPIO			--> DEBUG ORANGE LED
 	YLW_LED_OFF;
 	ORG_LED_OFF;

@@ -48,7 +48,7 @@ void Ecat_IntHandler(void) {
     //UARTprintf("PDI irq %d\n", ecat_irq_cnt );
 }
 
-/**
+/**fg
  * 1 KHz  1 ms
  */
 #pragma CODE_SECTION(Timer0A_IntHandler,ramFuncSection);

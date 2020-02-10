@@ -44,28 +44,24 @@ MEMORY
     //CSM_RSVD_Z1     : origin = 0x00200024, length = 0x000C
     
     /* Flash Block 0, Sector 0 */
-    RESETISR (RX)   : origin = 0x00200030, length = 0x0008
-    INTVECS (RX)    : origin = 0x00201000, length = 0x0258
+    //RESETISR (RX)   : origin = 0x00200030, length = 0x0008
+    //INTVECS (RX)    : origin = 0x00201000, length = 0x0258
+    //FLASH_APP (RX)    : origin = 0x00201258, length = 0xEDA8  /* N + M */
 
-    FLASH_APP (RX)    : origin = 0x00201258, length = 0xEDA8    /* N + M */
-    
-    //FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8   /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
-    //FLASH_M (RX)    : origin = 0x00208000, length = 0x8000   /* Bootloader */
+    //FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8    /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
+    //FLASH_M (RX)    : origin = 0x00208000, length = 0x8000    /* Bootloader */
     //FLASH_L (RX)    : origin = 0x00210000, length = 0x8000
     //!!FLASH_K (RX)    : origin = 0x00218000, length = 0x8000
-    //FLS_E_CRC (RX)  : origin = 0x00218000, length = 0x0004   /* App crc */
-    //!!FLASH_J (RX)    : origin = 0x00220000, length = 0x20000
-    //**RESETISR (RX)     : origin = 0x00220000, length = 0x0008   /* App Reset ISR is mapped to boot to Flash location */
-    //**INTVECS (RX)      : origin = 0x00221000, length = 0x0258
-    //**FLASH_APP (RX)    : origin = 0x00222000, length = 0x1DFFF  /* Application */
+    FLS_E_CRC (RX)  : origin = 0x00218000, length = 0x0004   /* App crc */
+    //FLASH_J (RX)    : origin = 0x00220000, length = 0x20000
     //FLASH_I (RX)    : origin = 0x00240000, length = 0x20000
     //FLASH_H (RX)    : origin = 0x00260000, length = 0x20000
     //FLASH_G (RX)    : origin = 0x00280000, length = 0x20000
     //FLASH_F (RX)    : origin = 0x002A0000, length = 0x20000
     //!!FLASH_E (RX)    : origin = 0x002C0000, length = 0x20000
-    //RESETISR (RX)     : origin = 0x002C0000, length = 0x0008   /* App Reset ISR is mapped to boot to Flash location */
-    //INTVECS (RX)      : origin = 0x002C1000, length = 0x0258
-    //FLASH_APP (RX)    : origin = 0x002C2000, length = 0x1DFFF  /* Application */
+    RESETISR (RX)     : origin = 0x002C0000, length = 0x0008   /* App Reset ISR is mapped to boot to Flash location */
+    INTVECS (RX)      : origin = 0x002C1000, length = 0x0258
+    FLASH_APP (RX)    : origin = 0x002C2000, length = 0x1DFFF  /* Application */
     //FLASH_D (RX)    : origin = 0x002E0000, length = 0x8000
     //FLASH_C (RX)    : origin = 0x002E8000, length = 0x8000
     //FLASH_B (RX)    : origin = 0x002F0000, length = 0x8000

@@ -12,7 +12,7 @@ ROMS
 /* multiply the linker addressing of Flash sections by 2 (16 bit to 8 bit addressing ) */
 /* when using --binary option all addresses are converted to binary (byte addressing) */
 APPLICATION_BINARY:
-org = 0x00200030, /* reset ISR */
+org = 0x002C0000, /* reset ISR */
 len = 0x0020000,
 fill = 0xFFFFFFFF
 }

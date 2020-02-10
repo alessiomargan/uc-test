@@ -111,11 +111,11 @@ Fapi_StatusType Erase_flash_sector(uint32_t address) {
 }
 
 
-#pragma CODE_SECTION(Write_flash,ramFuncSection);
+#pragma CODE_SECTION(Write_Flash,ramFuncSection);
 #ifdef _C28X
-Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint16_t * dataBuffer, uint32_t dataBufferSize) {
+Fapi_StatusType Write_Flash(uint32_t ui32FlashAddr, uint16_t * dataBuffer, uint32_t dataBufferSize) {
 #else
-Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint8_t * dataBuffer, uint32_t dataBufferSize) {
+Fapi_StatusType Write_Flash(uint32_t ui32FlashAddr, uint8_t * dataBuffer, uint32_t dataBufferSize) {
 #endif
 	Fapi_StatusType       		oReturnCheck = Fapi_Status_Success;
     //Fapi_FlashStatusWordType   	oFlashStatusWord;
@@ -196,7 +196,7 @@ Fapi_StatusType Test_EraseWrite_flash(uint32_t sectorAddr)
     	return oReturnCheck;
     }
 
-	oReturnCheck = Write_flash(sectorAddr,dataBuff,sizeof(dataBuff));
+	oReturnCheck = Write_Flash(sectorAddr,dataBuff,sizeof(dataBuff));
     if(oReturnCheck != Fapi_Status_Success) {
     	//DPRINT("FAIL Test_EraseWrite_flash 0x%04X\n", sectorAddr);
     	return oReturnCheck;

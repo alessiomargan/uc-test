@@ -38,6 +38,8 @@
 #include <pins.h>
 #include <shared_ram.h>
 #include "peripherals.h"
+#include "params.h"
+#include "globals.h"
 
 //*****************************************************************************
 // The error routine that is called if the driver library encounters an error.
@@ -78,17 +80,17 @@ int main(void)
 
     // Disable all interrupts
     IntMasterDisable();
-
+/*
     // Sets up PLL, M3 running at 75MHz and C28 running at 150MHz
     SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xF) |
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
                          SYSCTL_XCLKDIV_4);
-/*
+*/
     // Sets up PLL, M3 running at 125MHz and C28 running at 125MHz
     SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xC) | (SYSCTL_SPLLFMULT_M & 0x2) |
                        	 SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_1 |
                          SYSCTL_XCLKDIV_4);
-*/
+
 
 
 #ifdef _FLASH
@@ -114,6 +116,25 @@ int main(void)
     if ( Test_EraseWrite_flash(0x002F0000) == Fapi_Status_Success ) {
     	UARTprintf("Test_EraseWrite_flash(0x002F0000)\n");
     }
+
+    if ( Read_Flash_Params() == PARAMS_CMD_ERROR) {
+		//
+    	glob_fault.bit.warn_read_flash = 1;
+		DPRINT("Read_Flash_Params FAIL\n");
+	    if ( Load_Default_Params() == PARAMS_CMD_ERROR) {
+	    	// FATAL EROR
+	    	while (1) {}
+ 	    }
+	}
+
+    DPRINT("sdo.ram.fw_ver=%s\n", sdo.ram.fw_ver);
+    DPRINT("FLASH_SDO\n");
+    print_sdo(&flash_sdo);
+    DPRINT("DFLT_FLASH_SDO\n");
+    print_sdo(&dflt_flash_sdo);
+    DPRINT("SDO\n");
+    print_sdo(&sdo.flash);
+
 
     Configure_EcatPDI();
     // ecat timer
