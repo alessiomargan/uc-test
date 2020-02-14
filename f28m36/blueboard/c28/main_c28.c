@@ -57,7 +57,7 @@ void main(void)
 
 #ifdef _FLASH
 	Configure_flashAPI();
-	Test_EraseWrite_flash(0x100000); // FLASH_B
+	Test_EraseWrite_flash(0x138000); // FLASH_D
 #endif
 	Configure_C28_Ipc();
 

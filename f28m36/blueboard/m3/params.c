@@ -1,11 +1,3 @@
-/* DriverLib Includes */
-#ifdef __MSP432P4111__
-#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
-// should go in globals.h
-// TODO put in globals_priv.h
-extern Timer_A_PWMConfig pwmConfig;
-#endif
-
 #include "globals.h"
 #include "flash_utils.h"
 #include "params.h"
@@ -70,16 +62,6 @@ void Handle_0x8000(uint8_t subidx) {
 	DPRINT("%s %d\n", __FUNCTION__, subidx);
 
 	switch(subidx) {
-
-	case 3 :
-#ifdef __MSP432P4111__
-		MAP_Interrupt_disableMaster();
-		pwmConfig.timerPeriod = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq);
-	    pwmConfig.dutyCycle   = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq) * 0.75;	// 25% duty cycle
-	    MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
-		MAP_Interrupt_enableMaster();
-#endif
-		break;
 
 	default:
 		break;

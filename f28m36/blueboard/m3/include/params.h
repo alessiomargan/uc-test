@@ -1,6 +1,13 @@
 #ifndef __PARAMS_H__
 #define __PARAMS_H__
 
+#define FLASH_SIGN_VALID		0xCAFE
+#define FLASH_SIGN_DEFAULT		0xDEFA
+
+#define FLASH_PARAM_SECTOR		0x2A0000
+#define FLASH_PARAM_MAX_SIZE	0x20000
+
+
 /*********************************************************************************************/
 // CONTROL COMMAND CODES
 /*********************************************************************************************/
@@ -37,4 +44,5 @@ uint16_t Write_Flash_Params(void);
 
 void Handle_PDO_mailbox(uint8_t);
 void Check_updated_parameter(uint8_t);
+
 #endif

@@ -46,22 +46,22 @@ MEMORY
     /* Flash Block 0, Sector 0 */
     //RESETISR (RX)   : origin = 0x00200030, length = 0x0008
     //INTVECS (RX)    : origin = 0x00201000, length = 0x0258
-    //FLASH_APP (RX)    : origin = 0x00201258, length = 0xEDA8  /* N + M */
+    //FLASH_APP (RX)  : origin = 0x00201258, length = 0xEDA8  /* N + M */
 
     //FLASH_N (RX)    : origin = 0x00201258, length = 0x6DA8    /* Bootloader -- For storing code in Flash to copy to RAM at runtime */
     //FLASH_M (RX)    : origin = 0x00208000, length = 0x8000    /* Bootloader */
     //FLASH_L (RX)    : origin = 0x00210000, length = 0x8000
-    //!!FLASH_K (RX)    : origin = 0x00218000, length = 0x8000
-    FLS_E_CRC (RX)  : origin = 0x00218000, length = 0x0004   /* App crc */
+    //!!FLASH_K (RX)  : origin = 0x00218000, length = 0x8000
+    FLASH_K_CRC (RX)  : origin = 0x00218000, length = 0x0004    /* App crc */
     //FLASH_J (RX)    : origin = 0x00220000, length = 0x20000
     //FLASH_I (RX)    : origin = 0x00240000, length = 0x20000
     //FLASH_H (RX)    : origin = 0x00260000, length = 0x20000
     //FLASH_G (RX)    : origin = 0x00280000, length = 0x20000
-    //FLASH_F (RX)    : origin = 0x002A0000, length = 0x20000
-    //!!FLASH_E (RX)    : origin = 0x002C0000, length = 0x20000
-    RESETISR (RX)     : origin = 0x002C0000, length = 0x0008   /* App Reset ISR is mapped to boot to Flash location */
+    FLASH_F_PAR (RX)  : origin = 0x002A0000, length = 0x20000   /* Sector used for flash parameters */
+    //!!FLASH_E (RX)  : origin = 0x002C0000, length = 0x20000
+    RESETISR (RX)     : origin = 0x002C0000, length = 0x0008    /* App Reset ISR is mapped to boot to Flash location */
     INTVECS (RX)      : origin = 0x002C1000, length = 0x0258
-    FLASH_APP (RX)    : origin = 0x002C2000, length = 0x1DFFF  /* Application */
+    FLASH_E_APP (RX)  : origin = 0x002C2000, length = 0x1DFFF   /* Application */
     //FLASH_D (RX)    : origin = 0x002E0000, length = 0x8000
     //FLASH_C (RX)    : origin = 0x002E8000, length = 0x8000
     //FLASH_B (RX)    : origin = 0x002F0000, length = 0x8000
@@ -112,11 +112,11 @@ SECTIONS
 {
     .intvecs:       > INTVECS,  ALIGN(8)
     .resetisr:      > RESETISR, ALIGN(8)
-    .text   :       > FLASH_APP,  ALIGN(8)
-    .const  :       > FLASH_APP,  ALIGN(8)
-    .cinit  :       > FLASH_APP,  ALIGN(8)
-    .pinit  :       > FLASH_APP,  ALIGN(8)
-    .init_array :   > FLASH_APP,  ALIGN(8)
+    .text   :       > FLASH_E_APP,  ALIGN(8)
+    .const  :       > FLASH_E_APP,  ALIGN(8)
+    .cinit  :       > FLASH_E_APP,  ALIGN(8)
+    .pinit  :       > FLASH_E_APP,  ALIGN(8)
+    .init_array :   > FLASH_E_APP,  ALIGN(8)
     //FLS_APP_CRC :   > FLS_E_CRC
 
     .vtable :   >  C0
@@ -130,11 +130,14 @@ SECTIONS
     //.z2secvalues  :   >  CSM_ECSL_Z2, ALIGN(8)
     //.z2_csm_rsvd  :   >  CSM_RSVD_Z2, ALIGN(8)
 
+    /* flash parameters */
+    .PAR_APP    : > FLASH_E_APP
+
     GROUP
     {
         .TI.ramfunc { -l F021_API_CortexM3_LE.lib }
-    } LOAD = FLASH_APP, run=C1, table(BINIT)
-    .binit : {} > FLASH_APP
+    } LOAD = FLASH_E_APP, run=C1, table(BINIT)
+    .binit : {} > FLASH_E_APP
 
     RAM_S0  : > S0
     RAM_S1  : > S1
