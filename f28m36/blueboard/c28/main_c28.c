@@ -11,6 +11,8 @@
 void main(void)
 {
 	unsigned long delay;
+	volatile unsigned long ulLoop;
+
 	// Step 1. Initialize System Control:
 	// PLL, WatchDog, enable Peripheral Clocks
 	// This example function is found in the F28M36x_SysCtrl.c file.
@@ -59,7 +61,7 @@ void main(void)
 	Configure_flashAPI();
 	Test_EraseWrite_flash(0x138000); // FLASH_D
 #endif
-	Configure_C28_Ipc();
+	//Configure_C28_Ipc();
 
 	// Enable global Interrupts and higher priority real-time debug events:
 	EINT;  // Enable Global interrupt INTM
@@ -69,8 +71,14 @@ void main(void)
 	//	Set CTOM IPC Flag
 	CtoMIpcRegs.CTOMIPCSET.bit.IPC18 = 1;
 
+	StartCpuTimer0();
+	StartCpuTimer1();
+	StartCpuTimer2();
+
 	for(;;) {
 		// loop
+		for(delay = 0; delay < 2000000; delay++) { }
+		YLW_LED_TGL
 	}
 }
 

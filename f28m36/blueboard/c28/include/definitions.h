@@ -46,8 +46,8 @@ extern void Configure_C28_ePWM(void);
 extern void Configure_C28_Ipc(void);
 extern void Configure_flashAPI(void);
 
-extern void bootloaderService(Uint32 param);
-extern Uint32 bootloaderServiceResult;
+extern void IpcService(uint32_t param);
+extern uint32_t ipcServiceResult;
 
 extern volatile m3_to_c28_data_t	m3_ro_data;
 extern volatile c28_to_m3_data_t	c28_rw_data;

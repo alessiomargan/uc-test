@@ -33,6 +33,7 @@ typedef struct {
 #endif
     uint32_t	ipc_irq_err_cnt;
     uint32_t	ipc_irq_error;
+    uint32_t	timer_cnt;
 
 } c28_to_m3_data_t;
 

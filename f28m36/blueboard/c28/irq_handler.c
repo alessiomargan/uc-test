@@ -97,7 +97,7 @@ __interrupt void cpu_timer2_isr(void)
 {
 	EALLOW;
 	CpuTimer2.InterruptCount++;
-	YLW_LED_TGL;
+	c28_rw_data.timer_cnt = CpuTimer2.InterruptCount;
 	// The CPU acknowledges the interrupt.
 	EDIS;
 }

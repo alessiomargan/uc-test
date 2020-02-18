@@ -14,6 +14,5 @@ volatile c28_to_m3_data_t	c28_rw_data;
 volatile tIpcController g_sIpcController1;
 volatile tIpcController g_sIpcController2;
 
-Uint32 *pulMsgRam;
-
-Uint32 bootloaderServiceResult;
+uint32_t * pulMsgRam;
+uint32_t ipcServiceResult;

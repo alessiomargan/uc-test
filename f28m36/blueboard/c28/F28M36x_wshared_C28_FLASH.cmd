@@ -150,7 +150,8 @@ SECTIONS
     GROUP
     {
         .TI.ramfunc { -l F021_API_C28x_FPU32.lib }
-    }   LOAD = FLASH_APP, run=RAML0L1, table(BINIT)
+        //ramfuncs { -l F021_API_C28x_FPU32.lib }
+    } LOAD = FLASH_APP, run=RAML0L1, table(BINIT)
     .binit : {} > FLASH_APP
 
 

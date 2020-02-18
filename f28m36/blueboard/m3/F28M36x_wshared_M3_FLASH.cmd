@@ -136,7 +136,7 @@ SECTIONS
     GROUP
     {
         .TI.ramfunc { -l F021_API_CortexM3_LE.lib }
-    } LOAD = FLASH_E_APP, run=C1, table(BINIT)
+    } LOAD = FLASH_E_APP, run=C4C8, table(BINIT)
     .binit : {} > FLASH_E_APP
 
     RAM_S0  : > S0

@@ -76,7 +76,8 @@ void Timer0A_IntHandler(void) {
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle
         HWREGBITB(&toggle, 0) ^= 1;
-        //UARTprintf("\r tmr0: %d %d", timer0_cnt, toggle);
+        //DPRINT("\r tmr0: %d %d", timer0_cnt, toggle);
+        DPRINT("\r %d", c28_ro_data.timer_cnt);
     }
 
     GPIOPinWrite(LED_BASE, LED_RED_PIN, toggle ? LED_RED_PIN : 0 );

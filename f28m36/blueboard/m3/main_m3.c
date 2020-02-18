@@ -154,9 +154,9 @@ int main(void)
     //IpcSync(IPC_FLAG18);
     //	Wait for CTOM IPC Flag
     while((HWREG(MTOCIPC_BASE + IPC_O_CTOMIPCSTS) & IPC_FLAG18) == 0) {}
-    UARTprintf("C28 is running\n");
+    DPRINT("C28 is running\n");
 #else
-    UARTprintf("C28 is NOT running\n");
+    DPRINT("C28 is NOT running\n");
 #endif
 
     //The hardware priority mechanism will only look at the upper N bits of the priority level

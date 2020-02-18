@@ -5,7 +5,7 @@
 #define FLASHA_START	0x13E000
 #define FLASHD_START 	0x138000
 
-void bootloaderService(Uint32 param)
+void IpcService(uint32_t param)
 {
 
 	switch (param) {

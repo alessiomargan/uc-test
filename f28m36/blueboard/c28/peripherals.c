@@ -41,13 +41,12 @@ void Configure_C28_Ipc(void)
 
 	// Point array to address in CTOM MSGRAM for passing variable locations
 	pulMsgRam = (void *)0x0003FBF4;
-	// Write addresses of variables where words should be written to pulMsgRam
-	// array.
-	// 0 = Bootloader Service function.
-	// 1 = Address of 16-bit Bootloader Service result
+	// Write addresses of variables where words should be written to pulMsgRam array.
+	// 0 = Ipc Service function.
+	// 1 = Address of 16-bit Ipc Service result
 	// executed
-	pulMsgRam[0] = (unsigned long)&bootloaderService;
-	pulMsgRam[1] = (unsigned long)&bootloaderServiceResult;
+	pulMsgRam[0] = (unsigned long)&IpcService;
+	pulMsgRam[1] = (unsigned long)&ipcServiceResult;
 
 }
 
@@ -60,7 +59,7 @@ void Configure_C28_Timer(void)
 	// C28_FREQ in MHz, 1 second Period (in uSeconds)
 	ConfigCpuTimer(&CpuTimer0, CPU_FRQ, 1000);
 	ConfigCpuTimer(&CpuTimer1, CPU_FRQ, 250000);
-	ConfigCpuTimer(&CpuTimer2, CPU_FRQ, 1000000);
+	ConfigCpuTimer(&CpuTimer2, CPU_FRQ, 500000);
 
 	// To ensure precise timing, use write-only instructions to write to the entire register. Therefore, if any
 	// of the configuration bits are changed in ConfigCpuTimer and InitCpuTimers (in F28M36x_CpuTimers.h), the
@@ -87,7 +86,7 @@ void Configure_C28_Gpio(void)
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO86 = 1;
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO87 = 1;
 	EDIS;
-	GpioG1CtrlRegs.GPCMUX2.bit.GPIO86 = 0;  // GPIO86 = GPIO			--> DEBUG GREEN LED
+	GpioG1CtrlRegs.GPCMUX2.bit.GPIO86 = 0;  // GPIO86 = GPIO			--> DEBUG YELLOW LED
 	GpioG1CtrlRegs.GPCMUX2.bit.GPIO87 = 0;  // GPIO87 = GPIO			--> DEBUG ORANGE LED
 	YLW_LED_OFF;
 	ORG_LED_OFF;

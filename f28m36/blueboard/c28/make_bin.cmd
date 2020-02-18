@@ -21,10 +21,10 @@ fill = 0xFFFF
 
 SECTIONS
 {
-.text :
-.TI.ramfunc :
-.econst :
 .cinit :
-.binit :
+.text :
 codestart :
+.econst :
+.binit :
+.TI.ramfunc :
 }
