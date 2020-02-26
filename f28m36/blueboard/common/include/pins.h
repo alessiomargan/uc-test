@@ -1,6 +1,8 @@
 #ifndef __PINS_H__
 #define __PINS_H__
 
+#define GPIO_PIN_ALL		(0x000000FF)
+
 //*****************************************************************************
 // GPIO for the user LEDs
 //*****************************************************************************
@@ -12,6 +14,23 @@
 #define LED_ORG_PIN       	GPIO_PIN_7
 #define LED_PINS_M3			(LED_RED_PIN|LED_GRN_PIN)
 #define LED_PINS_C28		(LED_YLW_PIN|LED_ORG_PIN)
+
+//*****************************************************************************
+// GPIO for the HALL sens
+//*****************************************************************************
+#define HALL_PERIPH			SYSCTL_PERIPH_GPIOM
+#define HALL_BASE        	GPIO_PORTM_BASE
+#define HALL_A_PIN         	GPIO_PIN_0
+#define HALL_B_PIN         	GPIO_PIN_1
+#define HALL_C_PIN         	GPIO_PIN_2
+#define HALL_PINS			(HALL_A_PIN|HALL_B_PIN|HALL_C_PIN)
+
+//*****************************************************************************
+// GPIO for DRV8332
+//*****************************************************************************
+#define DRV_PERIPH			SYSCTL_PERIPH_GPIOA
+#define DRV_BASE        	GPIO_PORTA_BASE
+#define DRV_PINS			GPIO_PIN_ALL
 
 //*****************************************************************************
 //

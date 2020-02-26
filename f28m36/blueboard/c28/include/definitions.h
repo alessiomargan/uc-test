@@ -24,12 +24,16 @@ extern "C" {
 	#error CPU_FREQ
 #endif
 
-#define YLW_LED_ON	GpioG1DataRegs.GPCSET.bit.GPIO86 = 1;
-#define YLW_LED_OFF	GpioG1DataRegs.GPCCLEAR.bit.GPIO86 = 1;
-#define YLW_LED_TGL	GpioG1DataRegs.GPCTOGGLE.bit.GPIO86 = 1;
-#define ORG_LED_ON	GpioG1DataRegs.GPCSET.bit.GPIO87 = 1;
-#define ORG_LED_OFF	GpioG1DataRegs.GPCCLEAR.bit.GPIO87 = 1;
-#define ORG_LED_TGL	GpioG1DataRegs.GPCTOGGLE.bit.GPIO87 = 1;
+#define YLW_LED_ON	GpioG1DataRegs.GPCSET.bit.GPIO86 = 1
+#define YLW_LED_OFF	GpioG1DataRegs.GPCCLEAR.bit.GPIO86 = 1
+#define YLW_LED_TGL	GpioG1DataRegs.GPCTOGGLE.bit.GPIO86 = 1
+#define ORG_LED_ON	GpioG1DataRegs.GPCSET.bit.GPIO87 = 1
+#define ORG_LED_OFF	GpioG1DataRegs.GPCCLEAR.bit.GPIO87 = 1
+#define ORG_LED_TGL	GpioG1DataRegs.GPCTOGGLE.bit.GPIO87 = 1
+
+#define HALL_A_DATA (GpioG1DataRegs.GPCDAT.bit.GPIO88)
+#define HALL_B_DATA (GpioG1DataRegs.GPCDAT.bit.GPIO89)
+#define HALL_C_DATA (GpioG1DataRegs.GPCDAT.bit.GPIO90)
 
 extern void cpu_timer0_isr(void);
 extern void cpu_timer1_isr(void);

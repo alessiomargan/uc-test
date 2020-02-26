@@ -110,8 +110,8 @@ __interrupt void cpu_timer2_isr(void)
 __interrupt void xint1_isr(void)
 {
     // Insert ISR Code here
-    // To receive more interrupts from this PIE group, acknowledge this
-    // interrupt
+	c28_rw_data.hall_status = (uint16_t)(HALL_A_DATA || HALL_B_DATA << 1 || HALL_C_DATA << 2);
+    // To receive more interrupts from this PIE group, acknowledge this interrupt
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 
 

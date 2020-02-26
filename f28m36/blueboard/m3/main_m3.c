@@ -80,17 +80,17 @@ int main(void)
 
     // Disable all interrupts
     IntMasterDisable();
-/*
+
     // Sets up PLL, M3 running at 75MHz and C28 running at 150MHz
     SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xF) |
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
                          SYSCTL_XCLKDIV_4);
-*/
+/*
     // Sets up PLL, M3 running at 125MHz and C28 running at 125MHz
     SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xC) | (SYSCTL_SPLLFMULT_M & 0x2) |
                        	 SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_1 |
                          SYSCTL_XCLKDIV_4);
-
+*/
 
 
 #ifdef _FLASH
@@ -142,11 +142,17 @@ int main(void)
 	// sensor & lcd timer
 	Configure_Timer_1A();
 
-    // Enable C28 Peripherals not already enabled before in Configure_xxx functions
+	// Enable C28 Peripherals not already enabled before in Configure_xxx functions
     SysCtlPeripheralEnable(LED_PERIPH);
+    SysCtlPeripheralEnable(HALL_PERIPH);
+    SysCtlPeripheralEnable(DRV_PERIPH);
 
-    // Give C28 control of Port L pin 5 7
+    // Port L pins 5,7
 	GPIOPinConfigureCoreSelect(LED_BASE, LED_PINS_C28, GPIO_PIN_C_CORE_SELECT);
+	// Port M pins 0,1,2
+	GPIOPinConfigureCoreSelect(HALL_BASE, HALL_PINS, GPIO_PIN_C_CORE_SELECT);
+	// Port A pins all
+	GPIOPinConfigureCoreSelect(DRV_BASE, DRV_PINS, GPIO_PIN_C_CORE_SELECT);
 
 #ifdef _BOOT_C28
     //  Send boot command to allow the C28 application to begin execution

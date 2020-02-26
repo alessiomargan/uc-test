@@ -57,10 +57,9 @@ void jump_to_bootloader(void) {
     Watchdog0Reset();
 }
 
-/**
- * This function sets up UART0 to be used for a console to display information
+/*
+ * ulPortNum is the number of UART port to use for the serial console (0-2)
  *
- * @author amargan (7/4/2014)
  */
 void Configure_UART(void)
 {
@@ -108,9 +107,8 @@ unsigned long GetTickms(void)
     return(ulRetVal * MS_PER_SYSTICK);
 }
 
-/**
+/*
  *
- * @author amargan (7/4/2014)
  */
 void Configure_EcatPDI (void)
 {
@@ -193,10 +191,8 @@ void Configure_EcatPDI (void)
 
 }
 
-/**
+/*
  *
- *
- * @author amargan (7/4/2014)
  */
 void Configure_Led(void)
 {
@@ -208,10 +204,8 @@ void Configure_Led(void)
     UARTprintf("%s\n",__FUNCTION__);
 }
 
-/**
+/*
  *
- *
- * @author amargan (7/4/2014)
  */
 void Configure_Timer_0A(void)
 {

@@ -77,7 +77,7 @@ void Timer0A_IntHandler(void) {
         // toggle
         HWREGBITB(&toggle, 0) ^= 1;
         //DPRINT("\r tmr0: %d %d", timer0_cnt, toggle);
-        DPRINT("\r %d", c28_ro_data.timer_cnt);
+        DPRINT("\r %d", c28_ro_data.hall_status);
     }
 
     GPIOPinWrite(LED_BASE, LED_RED_PIN, toggle ? LED_RED_PIN : 0 );

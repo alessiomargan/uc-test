@@ -34,7 +34,7 @@ void Configure_C28_Ipc(void)
 
 	// Enable CPU INT1 which is connected to MTOCIPC INT1-4:
 	IER |= M_INT11;
-
+	// Enable MTOCIPCINT1 e MTOCIPCINT2 in the PIE: Group 11 interrupt 1 e 2
 	PieCtrlRegs.PIEIER11.bit.INTx1 = 1; // MTOCIPC INT1
 	PieCtrlRegs.PIEIER11.bit.INTx2 = 1; // MTOCIPC INT2
 
@@ -64,32 +64,62 @@ void Configure_C28_Timer(void)
 	// To ensure precise timing, use write-only instructions to write to the entire register. Therefore, if any
 	// of the configuration bits are changed in ConfigCpuTimer and InitCpuTimers (in F28M36x_CpuTimers.h), the
 	// below settings must also be updated.
-
 	CpuTimer0Regs.TCR.all = 0x4001; // Use write-only instruction to set TSS bit = 0
 	CpuTimer1Regs.TCR.all = 0x4001; // Use write-only instruction to set TSS bit = 0
 	CpuTimer2Regs.TCR.all = 0x4001; // Use write-only instruction to set TSS bit = 0
 
-	// Enable CPU int1 which is connected to CPU-Timer 0, CPU int13
-	// which is connected to CPU-Timer 1, and CPU int 14, which is connected
-	// to CPU-Timer 2:
+	// Enable CPU int1  which is connected to CPU-Timer 0
+	//        CPU int13 which is connected to CPU-Timer 1
+	//        CPU int14 which is connected to CPU-Timer 2
 	IER |= M_INT1;
 	IER |= M_INT13;
 	IER |= M_INT14;
-
 	// Enable TINT0 in the PIE: Group 1 interrupt 7
 	PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 }
 
 void Configure_C28_Gpio(void)
 {
+	/*
+	 * LEDs
+	 */
 	EALLOW;
-	GpioG1CtrlRegs.GPCDIR.bit.GPIO86 = 1;
-	GpioG1CtrlRegs.GPCDIR.bit.GPIO87 = 1;
+	GpioG1CtrlRegs.GPCMUX2.bit.GPIO86 = 0;  // GPIO86 = GPIO	--> DEBUG YELLOW LED
+	GpioG1CtrlRegs.GPCDIR.bit.GPIO86 = 1;	// OUTPUT
+	GpioG1CtrlRegs.GPCMUX2.bit.GPIO87 = 0;  // GPIO87 = GPIO	--> DEBUG ORANGE LED
+	GpioG1CtrlRegs.GPCDIR.bit.GPIO87 = 1;	// OUTPUT
 	EDIS;
-	GpioG1CtrlRegs.GPCMUX2.bit.GPIO86 = 0;  // GPIO86 = GPIO			--> DEBUG YELLOW LED
-	GpioG1CtrlRegs.GPCMUX2.bit.GPIO87 = 0;  // GPIO87 = GPIO			--> DEBUG ORANGE LED
+
 	YLW_LED_OFF;
 	ORG_LED_OFF;
+
+	/*
+	 * HALL
+	 */
+	EALLOW;
+	GpioG1CtrlRegs.GPCMUX2.bit.GPIO88 = 0;  // GPIO88 = GPIO		--> HALL_A
+	GpioG1CtrlRegs.GPCDIR.bit.GPIO88 = 0;	// INPUT
+	GpioG1CtrlRegs.GPCQSEL2.bit.GPIO88 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
+	//GpioG1TripRegs.GPTRIP4SEL.bit.GPTRIP4SEL = 88;
+	GpioG1CtrlRegs.GPCMUX2.bit.GPIO89 = 0;  // GPIO88 = GPIO		--> HALL_B
+	GpioG1CtrlRegs.GPCDIR.bit.GPIO89 = 0;	// INPUT
+	GpioG1CtrlRegs.GPCQSEL2.bit.GPIO89 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
+	//GpioG1TripRegs.GPTRIP4SEL.bit.GPTRIP4SEL = 89;
+	GpioG1CtrlRegs.GPCMUX2.bit.GPIO90 = 0;  // GPIO89 = GPIO		--> HALL_C
+	GpioG1CtrlRegs.GPCDIR.bit.GPIO90 = 0;	// INPUT
+	GpioG1CtrlRegs.GPCQSEL2.bit.GPIO90 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
+	//GpioG1TripRegs.GPTRIP4SEL.bit.GPTRIP4SEL = 90;
+	EDIS;
+
+	// Enable CPU int1  which is connected to XINT1
+	IER |= M_INT1;
+	// Enable XINT1 in the PIE: Group 1 interrupt 4
+	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;
+	// Configure XINT1
+	XIntruptRegs.XINT1CR.bit.POLARITY = 1;     // Rising edge interrupt
+	// Enable XINT1
+	XIntruptRegs.XINT1CR.bit.ENABLE = 1;
+
 }
 
 
@@ -237,11 +267,25 @@ static void init_PWM3(void)
 
 void Configure_C28_ePWM(void) {
 
-	InitEPwm1Gpio();
-	InitEPwm2Gpio();
-	InitEPwm3Gpio();
-
 	EALLOW;
+	// drv8332 PWM and IO
+	GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 1;   	// GPIO0 = EPWM1A	--> PWM_A
+	GpioG1CtrlRegs.GPADIR.bit.GPIO0 = 1;  	// OUTPUT
+	GpioCtrlRegs.GPAMUX1.bit.GPIO1 = 1;		// GPIO1 = EPWM1B	--> #RES_A
+	GpioG1CtrlRegs.GPADIR.bit.GPIO1 = 1;  	// OUTPUT
+	GpioCtrlRegs.GPAMUX1.bit.GPIO2 = 1;   	// GPIO2 = EPWM2B	--> PWM_C
+	GpioG1CtrlRegs.GPADIR.bit.GPIO2 = 1;  	// OUTPUT
+	GpioCtrlRegs.GPAMUX1.bit.GPIO3 = 1;		// GPIO3 = EPWM2B	--> #RES_B
+	GpioG1CtrlRegs.GPADIR.bit.GPIO3 = 1;  	// OUTPUT
+	GpioCtrlRegs.GPAMUX1.bit.GPIO4 = 1;   	// GPIO4 = EPWM3A	--> PWM_C
+	GpioG1CtrlRegs.GPADIR.bit.GPIO4 = 1;  	// OUTPUT
+	GpioCtrlRegs.GPAMUX1.bit.GPIO5 = 1;		// GPIO5 = EPWM3B	--> #RES_C
+	GpioG1CtrlRegs.GPADIR.bit.GPIO5 = 1;  	// OUTPUT
+	GpioG1CtrlRegs.GPAMUX1.bit.GPIO6 = 0; 	// GPIO6 = GPIO		--> #OTW
+	GpioG1CtrlRegs.GPADIR.bit.GPIO6 = 0;  	// INPUT
+	GpioG1CtrlRegs.GPAMUX1.bit.GPIO7 = 0; 	// GPIO7 = GPIO		--> #FAULT
+	GpioG1CtrlRegs.GPADIR.bit.GPIO7 = 0;  	// INPUT
+
 	SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC = 0;
 	EDIS;
 
@@ -253,7 +297,7 @@ void Configure_C28_ePWM(void) {
 	SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC = 1;
 	EDIS;
 
-    // Enable CPU INT3 which is connected to EPWM1-3 INT:
+    // Enable CPU INT3 which is connected to EPWM1-3
     IER |= M_INT3;
 
     // Enable EPWM INTn in the PIE: Group 3 interrupt 1-3

@@ -52,11 +52,13 @@ void main(void)
 	// This function is found in F28M36x_PieVect.c.
 	InitPieVectTable();
 
+	/*
+	 * User application config
+	 */
 	Configure_Pie_Vector();
 	Configure_C28_Gpio();
 	Configure_C28_Timer();
-	//Configure_C28_ePWM();
-
+	Configure_C28_ePWM();
 #ifdef _FLASH
 	Configure_flashAPI();
 	Test_EraseWrite_flash(0x138000); // FLASH_D
@@ -78,7 +80,7 @@ void main(void)
 	for(;;) {
 		// loop
 		for(delay = 0; delay < 2000000; delay++) { }
-		YLW_LED_TGL
+		YLW_LED_TGL;
 	}
 }
 
