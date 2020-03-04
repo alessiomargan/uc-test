@@ -18,12 +18,17 @@
 	#endif
 #endif
 
-
+/*
+ *
+ */
 typedef struct {
 	int32_t		v_int32;
 
 } m3_to_c28_data_t;
 
+/*
+ *
+ */
 typedef struct {
 
 #ifdef _C28X

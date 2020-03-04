@@ -59,6 +59,7 @@ void main(void)
 	Configure_C28_Gpio();
 	Configure_C28_Timer();
 	Configure_C28_ePWM();
+	Configure_C28_adc();
 #ifdef _FLASH
 	Configure_flashAPI();
 	Test_EraseWrite_flash(0x138000); // FLASH_D

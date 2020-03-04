@@ -140,7 +140,7 @@ static void init_PWM1(void)
 	EPwm1Regs.TBCTL.bit.CLKDIV = TB_DIV1;				// TBCLK = SYSCLKOUT
 
 	EPwm1Regs.TBPRD = PWMPRD;
-	EPwm1Regs.CMPA.half.CMPA = 0; //(PWMPRD >> 1);
+	EPwm1Regs.CMPA.half.CMPA = (PWMPRD >> 1);
 	EPwm1Regs.CMPB = 0;									// NOT USED (ACTIVE HI COMPLEMENTARY MODE)
 
 	EPwm1Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;			// Active Hi Complementary
@@ -148,20 +148,25 @@ static void init_PWM1(void)
 	EPwm1Regs.DBFED = DEAD_BAND_GAP;					// Set dead band gap up
 	EPwm1Regs.DBRED = DEAD_BAND_GAP;					// Set dead band gap down
 
-	EPwm1Regs.ETSEL.bit.INTSEL = 1;         			// Select INT on Zero event
-	EPwm1Regs.ETSEL.bit.INTEN = 1;         	 			// Enable INT
-	EPwm1Regs.ETPS.bit.INTPRD = 1;          			// Generate INT on every event
+	//Set event triggers (SOCA) for ADC SOC1
+	EPwm1Regs.ETSEL.bit.SOCAEN  = 1;      				// Enable SOC on A group
+	EPwm1Regs.ETSEL.bit.SOCASEL = ET_CTR_ZERO;			// Generate SOCA when counter == 0
+	EPwm1Regs.ETPS.bit.SOCAPRD  = 3;      				// Generate pulse on every 3rd event
+	//EPwm1Regs.ETSEL.bit.INTSEL = 1;         			// Select INT on Zero event
+	//EPwm1Regs.ETSEL.bit.INTEN = 1;         	 		// Enable INT
+	//EPwm1Regs.ETPS.bit.INTPRD = 1;          			// Generate INT on every event
 
+	// Setup shadow register load on ZERO
 	EPwm1Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;			// CNTRA Shadow Mode Enabled
 	EPwm1Regs.CMPCTL.bit.SHDWBMODE = CC_SHADOW;			// CNTRB Shadow Mode Enabled
 	EPwm1Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;		// load on CTR=Zero
 	EPwm1Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;		// load on CTR=Zero
 
+	// Set actions
 	EPwm1Regs.AQCTLA.bit.ZRO = AQ_NO_ACTION;
 	EPwm1Regs.AQCTLA.bit.PRD = AQ_NO_ACTION;
 	EPwm1Regs.AQCTLA.bit.CAU = AQ_SET;
 	EPwm1Regs.AQCTLA.bit.CAD = AQ_CLEAR;
-
 	EPwm1Regs.AQCTLA.bit.CBU = AQ_NO_ACTION;
 	EPwm1Regs.AQCTLA.bit.CBD = AQ_NO_ACTION;
 
@@ -186,7 +191,7 @@ static void init_PWM2(void)
 	EPwm2Regs.TBCTL.bit.CLKDIV = TB_DIV1;				// TBCLK = SYSCLKOUT
 
 	EPwm2Regs.TBPRD = PWMPRD;
-	EPwm2Regs.CMPA.half.CMPA = 0; //(PWMPRD >> 1);
+	EPwm2Regs.CMPA.half.CMPA = (PWMPRD >> 1);
 	EPwm2Regs.CMPB = 0;	// NOT USED (ACTIVE HI COMPLEMENTARY MODE)
 
 	EPwm2Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;			// Active Hi Complementary
@@ -232,7 +237,7 @@ static void init_PWM3(void)
 	EPwm3Regs.TBCTL.bit.CLKDIV = TB_DIV1;				// TBCLK = SYSCLKOUT
 
 	EPwm3Regs.TBPRD = PWMPRD;
-	EPwm3Regs.CMPA.half.CMPA = 0; //(PWMPRD >> 1);
+	EPwm3Regs.CMPA.half.CMPA = (PWMPRD >> 1);
 	EPwm3Regs.CMPB = 0;	// NOT USED (ACTIVE HI COMPLEMENTARY MODE)
 
 	EPwm3Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;			// Active Hi Complementary
@@ -309,3 +314,48 @@ void Configure_C28_ePWM(void) {
 }
 
 
+/*
+ * The term SOC is the configuration set defining the single conversion of a single channel.
+ * In that set there are three configurations:
+ *  - the trigger source that starts the conversion
+ *  - the channel to convert
+ *  - the acquisition (sample) window size
+ *
+ */
+void Configure_C28_adc(void) {
+
+	InitAdc1();
+
+	// Configure ADC
+	EALLOW;
+
+	Adc1Regs.ADCCTL2.bit.ADCNONOVERLAP = 1;     // Set ADC to non-overlap mode
+	Adc1Regs.ADCCTL1.bit.INTPULSEPOS   = 1;     // EOC trips after conversion result is latched
+
+	Adc1Regs.INTSEL1N2.bit.INT1E       = 1;     // Enabled ADCINT1
+	Adc1Regs.INTSEL1N2.bit.INT1CONT    = 0;     // Disable ADCINT1 Continuous mode
+	Adc1Regs.INTSEL1N2.bit.INT1SEL     = 3;     // setup EOC3 to trigger ADCINT1
+
+	// trigger source
+	Adc1Regs.ADCSOC0CTL.bit.TRIGSEL    = 5;     // Assign EPWM1SOCA to SOC0 TRIGSEL
+	Adc1Regs.ADCSOC1CTL.bit.TRIGSEL    = 5;    	// Assign EPWM1SOCA to SOC1 TRIGSEL
+	Adc1Regs.ADCSOC2CTL.bit.TRIGSEL    = 5;    	// Assign EPWM1SOCA to SOC2 TRIGSEL
+	Adc1Regs.ADCSOC3CTL.bit.TRIGSEL    = 5;    	// Assign EPWM1SOCA to SOC3 TRIGSEL
+
+	// ADC input channels
+	Adc1Regs.ADCSOC0CTL.bit.CHSEL      = 0;     // set SOC0 channel select to ADC1A0
+	Adc1Regs.ADCSOC1CTL.bit.CHSEL      = 2;     // set SOC1 channel select to ADC1A2
+	Adc1Regs.ADCSOC2CTL.bit.CHSEL      = 3;     // set SOC2 channel select to ADC1A3
+	Adc1Regs.ADCSOC3CTL.bit.CHSEL      = 4;     // set SOC3 channel select to ADC1A4
+
+	// Set S/H window of 7 ADC clock cycles
+	Adc1Regs.ADCSOC0CTL.bit.ACQPS      = 6;     // S/H = ACQPS + 1
+	Adc1Regs.ADCSOC1CTL.bit.ACQPS      = 6;
+	Adc1Regs.ADCSOC2CTL.bit.ACQPS      = 6;
+	Adc1Regs.ADCSOC3CTL.bit.ACQPS      = 6;
+
+	// Selecting triggers for SOCs
+	AnalogSysctrlRegs.TRIG1SEL.all     = 5;     // Assigning EPWM1SOCA to TRIGGER 1 of analog subsystem
+
+	EDIS;
+}

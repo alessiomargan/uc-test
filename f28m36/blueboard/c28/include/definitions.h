@@ -47,6 +47,7 @@ extern void Configure_Pie_Vector(void);
 extern void Configure_C28_Timer(void);
 extern void Configure_C28_Gpio(void);
 extern void Configure_C28_ePWM(void);
+extern void Configure_C28_adc(void);
 extern void Configure_C28_Ipc(void);
 extern void Configure_flashAPI(void);
 
@@ -62,6 +63,8 @@ extern volatile tIpcController  	g_sIpcController2;
 extern Uint32 *pulMsgRam;
 extern volatile Uint16 foe_buffer[128];
 
+#define MAX_AIN_SAMPLES		32
+extern uint16_t ain_raw[4][MAX_AIN_SAMPLES];
 
 #ifdef __cplusplus
 }
