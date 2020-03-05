@@ -1,6 +1,13 @@
 #include "globals.h"
 #include "params.h"
 
+// map to RAM S1
+#pragma DATA_SECTION(m3_rw_data,"RAM_S1");
+m3_to_c28_data_t	m3_rw_data;
+// map to RAM S5
+#pragma DATA_SECTION(c28_ro_data,"RAM_S5");
+c28_to_m3_data_t	c28_ro_data;
+
 /************************************************************************************
  * Ethercat PDOs SDOs
  */

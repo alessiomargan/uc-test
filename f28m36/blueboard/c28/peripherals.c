@@ -18,6 +18,8 @@ void Configure_Pie_Vector(void)
     //PieVectTable.EPWM2_INT = &epwm2_isr;
     //PieVectTable.EPWM3_INT = &epwm3_isr;
 
+    PieVectTable.ADCINT1 = &adc1_isr;
+
     PieVectTable.XINT1 = &xint1_isr;
 
     PieVectTable.MTOCIPC_INT1 = &MtoC_ipc1_isr;
@@ -93,32 +95,34 @@ void Configure_C28_Gpio(void)
 	YLW_LED_OFF;
 	ORG_LED_OFF;
 
+#ifdef HALL
 	/*
 	 * HALL
 	 */
 	EALLOW;
 	GpioG1CtrlRegs.GPCMUX2.bit.GPIO88 = 0;  // GPIO88 = GPIO		--> HALL_A
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO88 = 0;	// INPUT
-	GpioG1CtrlRegs.GPCQSEL2.bit.GPIO88 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
+	//GpioG1CtrlRegs.GPCQSEL2.bit.GPIO88 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
 	//GpioG1TripRegs.GPTRIP4SEL.bit.GPTRIP4SEL = 88;
 	GpioG1CtrlRegs.GPCMUX2.bit.GPIO89 = 0;  // GPIO88 = GPIO		--> HALL_B
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO89 = 0;	// INPUT
-	GpioG1CtrlRegs.GPCQSEL2.bit.GPIO89 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
+	//GpioG1CtrlRegs.GPCQSEL2.bit.GPIO89 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
 	//GpioG1TripRegs.GPTRIP4SEL.bit.GPTRIP4SEL = 89;
 	GpioG1CtrlRegs.GPCMUX2.bit.GPIO90 = 0;  // GPIO89 = GPIO		--> HALL_C
 	GpioG1CtrlRegs.GPCDIR.bit.GPIO90 = 0;	// INPUT
-	GpioG1CtrlRegs.GPCQSEL2.bit.GPIO90 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
+	//GpioG1CtrlRegs.GPCQSEL2.bit.GPIO90 = 0;	// XINT1 Synch to SYSCLKOUT  see 4.2.5.2 of TRM
 	//GpioG1TripRegs.GPTRIP4SEL.bit.GPTRIP4SEL = 90;
 	EDIS;
 
-	// Enable CPU int1  which is connected to XINT1
-	IER |= M_INT1;
+	// Enable CPU INT1  which is connected to XINT1
+	//IER |= M_INT1;
 	// Enable XINT1 in the PIE: Group 1 interrupt 4
-	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;
+	//PieCtrlRegs.PIEIER1.bit.INTx4 = 1;
 	// Configure XINT1
-	XIntruptRegs.XINT1CR.bit.POLARITY = 1;     // Rising edge interrupt
+	//XIntruptRegs.XINT1CR.bit.POLARITY = 1;     // Rising edge interrupt
 	// Enable XINT1
-	XIntruptRegs.XINT1CR.bit.ENABLE = 1;
+	//XIntruptRegs.XINT1CR.bit.ENABLE = 1;
+#endif
 
 }
 
@@ -152,6 +156,7 @@ static void init_PWM1(void)
 	EPwm1Regs.ETSEL.bit.SOCAEN  = 1;      				// Enable SOC on A group
 	EPwm1Regs.ETSEL.bit.SOCASEL = ET_CTR_ZERO;			// Generate SOCA when counter == 0
 	EPwm1Regs.ETPS.bit.SOCAPRD  = 3;      				// Generate pulse on every 3rd event
+	//
 	//EPwm1Regs.ETSEL.bit.INTSEL = 1;         			// Select INT on Zero event
 	//EPwm1Regs.ETSEL.bit.INTEN = 1;         	 		// Enable INT
 	//EPwm1Regs.ETPS.bit.INTPRD = 1;          			// Generate INT on every event
@@ -358,4 +363,9 @@ void Configure_C28_adc(void) {
 	AnalogSysctrlRegs.TRIG1SEL.all     = 5;     // Assigning EPWM1SOCA to TRIGGER 1 of analog subsystem
 
 	EDIS;
+
+	// Enable CPU INT1
+	IER |= M_INT1;
+	// Enable XINT1 in the PIE: Group 1 interrupt 1
+	PieCtrlRegs.PIEIER1.bit.INTx1 = 1;
 }

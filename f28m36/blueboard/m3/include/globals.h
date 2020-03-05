@@ -8,6 +8,10 @@
 
 #include <soes/esc_foe.h>
 #include <soes_hook.h>
+#include <shared_ram.h>
+
+extern m3_to_c28_data_t		m3_rw_data;
+extern c28_to_m3_data_t		c28_ro_data;
 
 extern tx_pdo_t 			tx_pdo;
 extern rx_pdo_t 			rx_pdo;

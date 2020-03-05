@@ -58,8 +58,9 @@ void main(void)
 	Configure_Pie_Vector();
 	Configure_C28_Gpio();
 	Configure_C28_Timer();
-	Configure_C28_ePWM();
+	// before ePWM
 	Configure_C28_adc();
+	Configure_C28_ePWM();
 #ifdef _FLASH
 	Configure_flashAPI();
 	Test_EraseWrite_flash(0x138000); // FLASH_D

@@ -23,6 +23,7 @@
  */
 typedef struct {
 	int32_t		v_int32;
+    uint16_t	hall_status;
 
 } m3_to_c28_data_t;
 
@@ -39,7 +40,9 @@ typedef struct {
     uint32_t	ipc_irq_err_cnt;
     uint32_t	ipc_irq_error;
     uint32_t	timer_cnt;
+    uint32_t	adc_cnt;
     uint16_t	hall_status;
+
 
 } c28_to_m3_data_t;
 

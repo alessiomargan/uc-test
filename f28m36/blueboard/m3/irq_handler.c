@@ -18,7 +18,7 @@
 #include <soes_hook.h>
 
 #include <pins.h>
-#include <shared_ram.h>
+#include <globals.h>
 #include <peripherals.h>
 
 extern uint8_t ESC_SYNCactivation(void);
@@ -30,7 +30,7 @@ volatile long pwm_irq_cnt = 0;
 volatile unsigned long g_ulSysTickCount;
 volatile unsigned long g_ulLastTick;
 
-/**
+/*
  * 
  */
 #pragma CODE_SECTION(Ecat_IntHandler,ramFuncSection);
@@ -39,13 +39,19 @@ void Ecat_IntHandler(void) {
 	GPIOPinRead(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 	GPIOPinIntClear(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 	ecat_irq_cnt++;
-
-	setDAC_B(255);
+	//setDAC_B(255);
 	ecat_process_pdo();
-	setDAC_B(0);
+	//setDAC_B(0);
+}
 
+/*
+ *
+ */
+#pragma CODE_SECTION(Hall_IntHandler,ramFuncSection);
+void Hall_IntHandler(void) {
 
-    //UARTprintf("PDI irq %d\n", ecat_irq_cnt );
+	m3_rw_data.hall_status = GPIOPinRead(HALL_BASE, HALL_PINS);
+	GPIOPinIntClear(HALL_BASE, HALL_PINS);
 }
 
 /**fg
@@ -77,7 +83,7 @@ void Timer0A_IntHandler(void) {
         // toggle
         HWREGBITB(&toggle, 0) ^= 1;
         //DPRINT("\r tmr0: %d %d", timer0_cnt, toggle);
-        DPRINT("\r %d", c28_ro_data.hall_status);
+        DPRINT("\r %d %d", c28_ro_data.adc_cnt, m3_rw_data.hall_status);
     }
 
     GPIOPinWrite(LED_BASE, LED_RED_PIN, toggle ? LED_RED_PIN : 0 );

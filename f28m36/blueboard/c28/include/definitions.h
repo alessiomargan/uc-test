@@ -39,6 +39,7 @@ extern void cpu_timer0_isr(void);
 extern void cpu_timer1_isr(void);
 extern void cpu_timer2_isr(void);
 extern void epwm1_isr(void);
+extern void adc1_isr(void);
 extern void xint1_isr(void);
 extern void MtoC_ipc1_isr(void);
 extern void MtoC_ipc2_isr(void);

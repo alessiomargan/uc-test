@@ -33,6 +33,7 @@
 #include <peripherals.h>
 
 extern void Ecat_IntHandler(void);
+extern void Hall_IntHandler(void);
 extern void Timer0A_IntHandler(void);
 extern void Timer1A_IntHandler(void);
 extern void SysTick_IntHandler(void);
@@ -255,6 +256,19 @@ void Configure_Gpio(void) {
 	GPIOPinTypeGPIOOutput(GPIO_DBG_BASE, dacPins);
 	GPIOPinWrite(GPIO_DBG_BASE, dacPins, 0);
 #endif
+	UARTprintf("%s\n",__FUNCTION__);
+}
+
+void Configure_HallGpio(void) {
+
+	SysCtlPeripheralEnable(HALL_PERIPH);
+	GPIOPinTypeGPIOInput(HALL_BASE, HALL_PINS);
+	//GPIOPadConfigSet(HALL_BASE, HALL_PINS, GPIO_PIN_TYPE_STD_WPU);
+
+	GPIOIntTypeSet(HALL_BASE, HALL_PINS, GPIO_RISING_EDGE);
+	GPIOPinIntEnable(HALL_BASE, HALL_PINS);
+	IntRegister(INT_GPIOM, Hall_IntHandler);
+	IntEnable(INT_GPIOM);
 	UARTprintf("%s\n",__FUNCTION__);
 }
 

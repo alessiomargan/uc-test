@@ -5,6 +5,7 @@ void Configure_UART(void);
 void Configure_EcatPDI(void);
 void Configure_Led(void);
 void Configure_Gpio(void);
+void Configure_HallGpio(void);
 void Configure_Timer_0A(void);
 void Configure_Timer_1A(void);
 void Watchdog0Reset(void);

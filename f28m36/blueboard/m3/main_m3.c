@@ -61,15 +61,7 @@ __error__(char *pcFilename, unsigned long ulLine)
 const char fw_ver[8] = "xXx/\\xXx";
 char lcd_print_buff[128];
 
-m3_to_c28_data_t	m3_rw_data;
-c28_to_m3_data_t	c28_ro_data;
-
 extern esc_cfg_t config;
-
-// map to RAM S1
-#pragma DATA_SECTION(m3_rw_data,"RAM_S1");
-// map to RAM S5
-#pragma DATA_SECTION(c28_ro_data,"RAM_S5");
 
 int main(void)
 {
@@ -141,7 +133,9 @@ int main(void)
 	Configure_Timer_0A();
 	// sensor & lcd timer
 	Configure_Timer_1A();
-
+#ifdef HALL
+	Configure_HallGpio();
+#endif
 	// Enable C28 Peripherals not already enabled before in Configure_xxx functions
     SysCtlPeripheralEnable(LED_PERIPH);
     SysCtlPeripheralEnable(HALL_PERIPH);
@@ -149,8 +143,10 @@ int main(void)
 
     // Port L pins 5,7
 	GPIOPinConfigureCoreSelect(LED_BASE, LED_PINS_C28, GPIO_PIN_C_CORE_SELECT);
+#ifndef HALL
 	// Port M pins 0,1,2
 	GPIOPinConfigureCoreSelect(HALL_BASE, HALL_PINS, GPIO_PIN_C_CORE_SELECT);
+#endif
 	// Port A pins all
 	GPIOPinConfigureCoreSelect(DRV_BASE, DRV_PINS, GPIO_PIN_C_CORE_SELECT);
 
@@ -167,6 +163,7 @@ int main(void)
 
     //The hardware priority mechanism will only look at the upper N bits of the priority level
     //where N is 3 for the Concerto family
+    IntPrioritySet(INT_GPIOM,   (char)(1)<<5); // highest prio
     IntPrioritySet(INT_TIMER0A, (char)(3)<<5); // middle prio soes loop
     IntPrioritySet(INT_TIMER1A, (char)(2)<<5); // higher prio sensor
     IntPrioritySet(INT_GPIOK,   (char)(3)<<5); // middle prio pdi ecat irq
