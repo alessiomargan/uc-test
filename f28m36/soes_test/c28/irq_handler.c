@@ -36,8 +36,7 @@ __interrupt void MtoC_ipc1_isr(void)
         }
     }
 
-    // Acknowledge IPC INT1 Flag and PIE to receive more interrupts from group
-    // 11
+    // Acknowledge IPC INT1 Flag and PIE to receive more interrupts from group 11
     CtoMIpcRegs.MTOCIPCACK.bit.IPC1 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
@@ -64,8 +63,7 @@ __interrupt void MtoC_ipc2_isr (void)
         }
     }
 
-    // Acknowledge IPC INT2 Flag and PIE to receive more interrupts from group
-    // 11
+    // Acknowledge IPC INT2 Flag and PIE to receive more interrupts from group 11
     CtoMIpcRegs.MTOCIPCACK.bit.IPC2 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
@@ -97,7 +95,7 @@ __interrupt void cpu_timer2_isr(void)
 {
 	EALLOW;
 	CpuTimer2.InterruptCount++;
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
 	LED_0_TOGGLE;
 #else
 	DEBUG_ORG_LED_TGL;

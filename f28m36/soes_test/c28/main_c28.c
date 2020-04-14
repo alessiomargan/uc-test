@@ -49,8 +49,9 @@ void main(void)
 	// This function is found in F28M36x_PieVect.c.
 	InitPieVectTable();
 
-	/* User application conf */
-
+	/*
+	 * User application conf
+	 */
 	Configure_Pie_Vector();
 	Configure_C28_Gpio();
 	Configure_C28_Timer();
@@ -60,7 +61,7 @@ void main(void)
 	Configure_flashAPI();
 	Test_EraseWrite_flash(0x100000); // FLASH_B
 #endif
-	Configure_C28_Ipc();
+	//Configure_C28_Ipc();
 
 	// Enable global Interrupts and higher priority real-time debug events:
 	EINT;  // Enable Global interrupt INTM
