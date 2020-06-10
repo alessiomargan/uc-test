@@ -5,6 +5,8 @@
  */
 rx_pdo_t    	rx_pdo;
 tx_pdo_t    	tx_pdo;
+uint8_t *       rxpdo = (uint8_t*)&rx_pdo;
+uint8_t *       txpdo = (uint8_t*)&tx_pdo;
 aux_pdo_rx_t	aux_pdo_rx;
 aux_pdo_tx_t	aux_pdo_tx;
 fault_t			glob_fault;

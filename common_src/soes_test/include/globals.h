@@ -1,7 +1,7 @@
 #ifndef __GLOBALS_H__
 #define __GLOBALS_H__
 
-#ifdef __MSP432P401R__
+#if defined(__MSP432P401R__) || defined(__MSP432P4111__)
 /* msp432 DriverLib Includes */
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #endif
@@ -31,6 +31,8 @@
 
 extern tx_pdo_t 			tx_pdo;
 extern rx_pdo_t 			rx_pdo;
+extern uint8_t *            rxpdo;
+extern uint8_t *            txpdo;
 extern aux_pdo_rx_t			aux_pdo_rx;
 extern aux_pdo_tx_t			aux_pdo_tx;
 extern fault_t				glob_fault;
@@ -47,7 +49,7 @@ extern uint16_t raw_adc[SMPL_NUM][16];
 extern uint16_t raw_adc_count[16];
 extern float conv_adc[16];
 
-#ifdef __MSP432P401R__
+#if defined(__MSP432P401R__) || defined(__MSP432P4111__)
 extern Timer_A_PWMConfig pwmConfig;
 #endif
 extern foe_cfg_t 	gFOE_config;

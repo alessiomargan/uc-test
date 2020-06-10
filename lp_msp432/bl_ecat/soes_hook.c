@@ -26,6 +26,8 @@ uint16_t  	et1100_boot_pin;
 // dummy pdo
 rx_pdo_t	rx_pdo;
 tx_pdo_t	tx_pdo;
+uint8_t *   rxpdo = (uint8_t*)&rx_pdo;
+uint8_t *   txpdo = (uint8_t*)&tx_pdo;
 
 extern uint16_t 			crc_ok;
 extern foe_writefile_cfg_t  gFOE_firmware_files[];

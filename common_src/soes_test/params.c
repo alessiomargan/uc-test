@@ -1,5 +1,5 @@
 /* DriverLib Includes */
-#ifdef __MSP432P4111__
+#if defined(__MSP432P401R__) || defined(__MSP432P4111__)
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 // should go in globals.h
 // TODO put in globals_priv.h
@@ -72,7 +72,7 @@ void Handle_0x8000(uint8_t subidx) {
 	switch(subidx) {
 
 	case 3 :
-#ifdef __MSP432P4111__
+#if defined(__MSP432P401R__) || defined(__MSP432P4111__)
 		MAP_Interrupt_disableMaster();
 		pwmConfig.timerPeriod = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq);
 	    pwmConfig.dutyCycle   = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq) * 0.75;	// 25% duty cycle
