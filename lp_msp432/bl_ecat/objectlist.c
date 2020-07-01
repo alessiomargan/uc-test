@@ -9,8 +9,8 @@ extern uint16_t 	flash_cmd_ack;
 extern uint16_t   	crc_ok;
 extern uint16_t   	et1100_boot_pin;
 
-extern uint32_t 	CRC_App;
-extern uint8_t 		BLDR_Version[];
+extern const uint32_t 	CRC_App;
+extern const uint8_t 	BLDR_Version[];
 
 static const char Number_of_elements[] = "Number of Elements";
 //static const char mapped_obj[] = "Mapped Object";

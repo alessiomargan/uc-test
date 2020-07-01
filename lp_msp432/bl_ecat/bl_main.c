@@ -60,6 +60,15 @@ void jump2app(void) {
 	__asm(" ldr r0, [r0, #4]\n"
 	      " blx r0\n");
 }
+
+static uint32_t read_user_RAM( void ) {
+
+    uint32_t value;
+    ESC_read(0xF80, &value, sizeof(value));
+    DPRINT ("user_RAM 0x%X\n", value);
+    return value;
+}
+
 /*
  * return > 0 will jump to app
  */
@@ -74,6 +83,8 @@ static uint8_t test_jump2app(void) {
 #endif
 #ifdef HAVE_BOOT_PIN
 	ecat_boot = MAP_GPIO_getInputPinValue(PORT_ECAT_BOOT, PIN_ECAT_BOOT);
+#else
+    ecat_boot = (read_user_RAM()==0xB007B007);
 #endif
 	ret = sw1 && (!ecat_boot) && crc_ok;
 	DPRINT("%s : %d = %d !%d %d\n", __FUNCTION__, ret, sw1, ecat_boot, crc_ok);
@@ -192,19 +203,19 @@ void main(uint32_t bslParams)
 
     gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
     crc_ok = (gCalc_crc==CRC_App) ? 1 : 0;
-    DPRINT("bldr ver %s HW ver 0x02X%\n", BLDR_Version, HW_VER);
+    DPRINT("bldr ver %s HW ver 0x%02X\n", BLDR_Version, HW_VER);
     DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, CRC_App);
+
+    /*
+     * ecat init before test jumps
+     */
+    soes_init(&config);
 
     test_jump = test_jump2app();
     if ( test_jump ) {
     	DPRINT(">>>\n");
     	jump2app();
     }
-
-    /*
-     * Init soes
-     */
-    soes_init(&config);
 
     while(1)
     {
