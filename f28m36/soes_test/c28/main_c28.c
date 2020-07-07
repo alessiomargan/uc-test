@@ -60,7 +60,7 @@ void main(void)
 	Configure_flashAPI();
 	Test_EraseWrite_flash(0x100000); // FLASH_B
 #endif
-	Configure_C28_Ipc();
+	//Configure_C28_Ipc();
 
 	// Enable global Interrupts and higher priority real-time debug events:
 	EINT;  // Enable Global interrupt INTM
