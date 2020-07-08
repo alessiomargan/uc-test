@@ -43,11 +43,17 @@
 
 MEMORY
 {
-    MAIN_APP   (RX) : origin = APP_START, length = 0x00010000   // BANK_1 SECTOR_0
+    // Info memory 16 Kb
     INFO       (RX) : origin = 0x00200000, length = 0x00004000
-
-    PAR_APP    (RW) : origin = 0x003F000, length = 0x00001000   // BANK_1 SECTOR_31
-    CALIB      (RW) : origin = 0x003E000, length = 0x00001000   // BANK_1 SECTOR_30
+    // Main memory 256 Kb :
+    // bank_0
+    MAIN_BL     (RX) : origin = 0x00000000, length = 0x00010000
+    BLDR_VERSION (R) : origin = 0x0010000,  length = 0x00000008   // BANK_0 SECTOR_16
+    CRC_APP      (R) : origin = 0x0011000,  length = 0x00000004   // BANK_0 SECTOR_17
+    // bank_1
+    MAIN_APP   (RX) : origin = 0x00020000, length = 0x00010000
+    PAR_APP    (RW) : origin = 0x003F000,  length = 0x00001000   // BANK_1 SECTOR_31
+    CALIB      (RW) : origin = 0x003E000,  length = 0x00001000   // BANK_1 SECTOR_30
 
     ALIAS
     {
@@ -55,6 +61,7 @@ MEMORY
         SRAM_DATA  (RW) : origin = 0x20000000
     } length = 0x00010000
 }
+
 
 /* The following command line options are set as part of the CCS project.    */
 /* If you are building using the command line, or for some reason want to    */
@@ -81,22 +88,12 @@ SECTIONS
     .init_array   :     > MAIN_APP
     .binit        : {}  > MAIN_APP
 
-    /* The following sections show the usage of the INFO flash memory        */
-    /* INFO flash memory is intended to be used for the following            */
-    /* device specific purposes:                                             */
-    /* Flash mailbox for device security operations                          */
-    .flashMailbox : > 0x00200000
-    /* TLV table for device identification and characterization              */
-    .tlvTable     : > 0x00201000
-    /* BSL area for device bootstrap loader                                  */
-    .bslArea      : > 0x00202000
-
     /* flash parameters */
     .PAR_APP    : > PAR_APP
     /* flash parameters */
     .CALIB      : > CALIB
 
-    .vtable :   > 0x20000000
+    .vtable :   > SRAM_DATA
     .data   :   > SRAM_DATA
     .bss    :   > SRAM_DATA
     .sysmem :   > SRAM_DATA
