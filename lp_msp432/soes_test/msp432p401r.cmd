@@ -96,7 +96,7 @@ SECTIONS
     /* flash parameters */
     .CALIB      : > CALIB
 
-    .vtable :   > 0x20000000
+    .vtable :   > SRAM_DATA
     .data   :   > SRAM_DATA
     .bss    :   > SRAM_DATA
     .sysmem :   > SRAM_DATA
