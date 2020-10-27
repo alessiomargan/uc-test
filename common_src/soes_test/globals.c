@@ -25,14 +25,23 @@ const flash_sdo_t	dflt_flash_sdo = {
 	.board_id = 696,
 	.analog_sample_freq = DFLT_SAMPLE_FREQ,
 	.module_params = 0,
+	.blob = {'c','a','z','z','o',' ','d','i',' ','c','a','n','e',0},
+	//.blob = {0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,
+	//         0x8,0x9,0xA,0xB,0xC,0xD,0xE,0xF},
 };
 
 void print_sdo(const flash_sdo_t *s) {
 
+    int i=0;
 	DPRINT("sdo.flash._signature_=0x%04X\n", s->_signature_);
     DPRINT("sdo.flash.board_id=%d\n", s->board_id);
     DPRINT("sdo.flash.analog_sample_freq=%d\n", s->analog_sample_freq);
     DPRINT("sdo.flash.module_params=%d\n", s->module_params);
+    DPRINT("sdo.flash.blob=");
+    for (i=0;i<sizeof(s->blob);i++) {
+        printf("0x%02X ", s->blob[i]);
+    }
+    printf("\n");
 }
 
 /************************************************************************************

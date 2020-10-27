@@ -53,6 +53,7 @@ typedef IAR_PACKED struct {
 	uint32_t 	board_id;
 	uint32_t	analog_sample_freq;
 	uint32_t 	module_params;
+	uint8_t     blob[16];
 
 } CCS_PACKED flash_sdo_t;
 
