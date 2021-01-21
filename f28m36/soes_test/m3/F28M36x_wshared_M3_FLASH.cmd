@@ -66,8 +66,8 @@ MEMORY
     FLASH_APP (RX)    : origin = 0x002C2000, length = 0x1DFFF  /* Application */
     //FLASH_D (RX)    : origin = 0x002E0000, length = 0x8000
     //FLASH_C (RX)    : origin = 0x002E8000, length = 0x8000
-    //FLASH_B (RX)    : origin = 0x002F0000, length = 0x8000
-    //FLASH_A (RX)    : origin = 0x002F8000, length = 0x7E00
+    FLASH_B (RX)    : origin = 0x002F0000, length = 0x8000
+    FLASH_A (RX)    : origin = 0x002F8000, length = 0x7E00
     
     /* Flash Block 0, Sector 13 Z2 CSM*/
     //CSM_RSVD_Z2     : origin = 0x002FFE00, length = 0x01DC
@@ -133,6 +133,9 @@ SECTIONS
 
     .fonts  :   >> C4C8
     .pics   :   >> C4C8
+
+	.CALIB  :   	> FLASH_A
+	.PAR_APP:   	> FLASH_B
 
     //.z1secvalues  :   >  CSM_ECSL_Z1, ALIGN(8)
     //.z1_csm_rsvd  :   >  CSM_RSVD_Z1, ALIGN(8)

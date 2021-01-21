@@ -12,7 +12,6 @@ void Configure_LCD(void);
 void Configure_USB_host(void);
 void Watchdog0Reset(void);
 unsigned long GetTickms(void);
-void disable_peripheral_irq(void);
 void read_sensors(void);
 
 #endif
