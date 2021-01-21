@@ -49,8 +49,9 @@ void main(void)
 	// This function is found in F28M36x_PieVect.c.
 	InitPieVectTable();
 
-	/* User application conf */
-
+	/*
+	 * User application conf
+	 */
 	Configure_Pie_Vector();
 	Configure_C28_Gpio();
 	Configure_C28_Timer();

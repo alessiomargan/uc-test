@@ -4,6 +4,7 @@
 #include "DSP28x_Project.h"
 #include "F28M36x_Ipc_drivers.h"
 
+#include "common/include/pins.h"
 #include "common/include/shared_ram.h"
 
 #ifdef __cplusplus
@@ -24,7 +25,7 @@ extern "C" {
 	#error CPU_FREQ
 #endif
 
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
 
 #define DEBUG_PIN_ON		GpioDataRegs.GPCSET.bit.GPIO70 = 1;
 #define DEBUG_PIN_OFF		GpioDataRegs.GPCCLEAR.bit.GPIO70 = 1;

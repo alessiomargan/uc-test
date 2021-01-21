@@ -39,10 +39,13 @@ extern volatile unsigned long g_ulSysTickCount;
 extern volatile unsigned long g_ulLastTick;
 
 
-void disable_peripheral_irq(void)
-{
-	IntDisable(INT_TIMER0A);
-    //IntDisable(INT_GPIOB);
+void Disable_interrupt(void) {
+    // Disable all interrupts
+    IntMasterDisable();
+}
+void Enable_interrupt(void) {
+    // Enable all interrupts
+    IntMasterEnable();
 }
 
 void jump_to_bootloader(void) {
@@ -59,7 +62,7 @@ void jump_to_bootloader(void) {
  */
 void Configure_UART(void)
 {
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     GPIOPinConfigure(GPIO_PE4_U0RX);
     GPIOPinConfigure(GPIO_PE5_U0TX);
@@ -75,8 +78,8 @@ void Configure_UART(void)
     for(int i=0;i<10;i++) {
     	UARTprintf("************************");
     }
-	UARTprintf("\n");
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("\n");
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 #define TICKS_PER_SECOND 100
@@ -126,7 +129,7 @@ void Configure_EcatPDI (void)
 	GPIOPinTypeGPIOOutput(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS);
     GPIOPinWrite(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS, ECAT_SSI_CS);
     // Configure the pin muxing for SSI functions on port
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
     GPIOPinConfigure(GPIO_PD2_SSI0CLK);
     GPIOPinConfigure(GPIO_PD1_SSI0RX); // MISO
     GPIOPinConfigure(GPIO_PD0_SSI0TX); // MOSI
@@ -156,14 +159,14 @@ void Configure_EcatPDI (void)
 	GPIOPinTypeGPIOInput(ECAT_GPIO_PORTBASE, ECAT_BOOT);
 
     GPIOPinIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
     IntRegister(INT_GPIOG, EcatIntHandler);
     IntEnable(INT_GPIOG);
 #else
     IntRegister(INT_GPIOK, EcatIntHandler);
     IntEnable(INT_GPIOK);
 #endif
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 
 }
 
@@ -176,7 +179,7 @@ void Configure_LCD (void)
 	SysCtlPeripheralEnable(LCD_GPIO_SYSCTL_PERIPH);
 
     // Configure the pin muxing for SSI functions on port
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
 	GPIOPinConfigure(GPIO_PE2_SSI1CLK);
     GPIOPinConfigure(GPIO_PE0_SSI1TX); // MOSI
 #else
@@ -210,7 +213,7 @@ void Configure_LCD (void)
     lcd_init(BOOSTER_ON);
 #endif
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 void Configure_Link_Enc_BissC (void)
@@ -235,7 +238,7 @@ void Configure_Link_Enc_BissC (void)
     // Enable the SSI module.
     SSIEnable(LINK_ENC_SSI_BASE);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 void Configure_AD7680 (void)
@@ -263,7 +266,7 @@ void Configure_AD7680 (void)
     // Enable the SSI module.
     SSIEnable(LINK_ENC_SSI_BASE);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /**
@@ -274,7 +277,7 @@ void Configure_AD7680 (void)
 void Configure_Led(void)
 {
     // Enable the GPIO port that is used for the on-board LED.
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
     // Enable the GPIO port that is used for the on-board LED.
     SysCtlPeripheralEnable(LED_1_PERIPH);
     SysCtlPeripheralEnable(LED_0_PERIPH);
@@ -303,7 +306,7 @@ void Configure_Led(void)
 
 #endif
 
-    UARTprintf("%s\n",__FUNCTION__);
+	DPRINT("%s\n",__FUNCTION__);
 }
 
 /**
@@ -326,7 +329,7 @@ void Configure_Timer_0A(void)
     // Enable the timer.
     TimerEnable(TIMER0_BASE, TIMER_A);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 void Configure_Timer_1A(void)
@@ -343,7 +346,7 @@ void Configure_Timer_1A(void)
     // Enable the timer.
     TimerEnable(TIMER1_BASE, TIMER_A);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 void Watchdog0Reset(void)

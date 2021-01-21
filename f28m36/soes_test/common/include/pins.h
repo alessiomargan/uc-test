@@ -1,7 +1,13 @@
 #ifndef __PINS_H__
 #define __PINS_H__
 
-#ifdef _CONTROL_CARD
+#define CONTROL_CARD    0xCC
+#define MOTOR_BOARD     0x01
+#define POWER_BOARD     0x03
+#define BLUE_BOARD      0xBB
+
+
+#if HW_TYPE == CONTROL_CARD
 
 //*****************************************************************************
 // GPIO for the user LEDs

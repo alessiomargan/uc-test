@@ -38,6 +38,8 @@
 #include <pins.h>
 #include <shared_ram.h>
 #include "peripherals.h"
+#include "params.h"
+#include "globals.h"
 #ifdef _LCD
 	#if 0
 		#include <dog_LCD/DogLcd_test.h>
@@ -127,8 +129,26 @@ int main(void)
 
     Configure_flashAPI();
     if ( Test_EraseWrite_flash(0x002F0000) == Fapi_Status_Success ) {
-    	UARTprintf("Test_EraseWrite_flash(0x002F0000)\n");
+        DPRINT("Test_EraseWrite_flash(0x002F0000)\n");
     }
+
+    if ( Read_Flash_Params() == PARAMS_CMD_ERROR) {
+        //
+        glob_fault.bit.warn_read_flash = 1;
+        DPRINT("Read_Flash_Params FAIL\n");
+        if ( Load_Default_Params() == PARAMS_CMD_ERROR) {
+            // FATAL EROR
+            while (1) {}
+        }
+    }
+
+    DPRINT("sdo.ram.fw_ver=%s\n", sdo.ram.fw_ver);
+    DPRINT("FLASH_SDO\n");
+    print_sdo(&flash_sdo);
+    DPRINT("DFLT_FLASH_SDO\n");
+    print_sdo(&dflt_flash_sdo);
+    DPRINT("SDO\n");
+    print_sdo(&sdo.flash);
 
 #ifdef _LCD
     Configure_LCD();
@@ -146,7 +166,7 @@ int main(void)
 	//Configure_Link_Enc_BissC();
     //Configure_AD7680();
 
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
     // Enable C28 Peripherals
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA); // ePWM
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC); //
@@ -177,15 +197,18 @@ int main(void)
     //  Send boot command to allow the C28 application to begin execution
     IPCMtoCBootControlSystem(CBROM_MTOC_BOOTMODE_BOOT_FROM_FLASH);
     //IpcSync(IPC_FLAG18);
-    //	Wait for CTOM IPC Flag
+    //  Wait for CTOM IPC Flag
     while((HWREG(MTOCIPC_BASE + IPC_O_CTOMIPCSTS) & IPC_FLAG18) == 0) {}
+    DPRINT("C28 is running\n");
+#else
+    DPRINT("C28 is NOT running\n");
 #endif
 
     //The hardware priority mechanism will only look at the upper N bits of the priority level
     //where N is 3 for the Concerto family
     IntPrioritySet(INT_TIMER0A, (char)(3)<<5); // middle prio soes loop
     IntPrioritySet(INT_TIMER1A, (char)(2)<<5); // higher prio sensor
-#ifdef _CONTROL_CARD
+#if HW_TYPE == CONTROL_CARD
     IntPrioritySet(INT_GPIOG,   (char)(3)<<5); // middle prio pdi ecat irq
 #else
     IntPrioritySet(INT_GPIOK,   (char)(3)<<5); // middle prio pdi ecat irq
