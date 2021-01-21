@@ -15,7 +15,7 @@
 
 #include <soes/esc.h>
 #include <soes/hal/advr_esc/soes.h>
-#include <soes_test/include/soes_hook.h>
+#include <soes_hook.h>
 
 #include <pins.h>
 #include <shared_ram.h>

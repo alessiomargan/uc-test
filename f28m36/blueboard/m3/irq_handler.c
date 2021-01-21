@@ -18,7 +18,7 @@
 #include <soes_hook.h>
 
 #include <pins.h>
-#include <globals.h>
+#include <shared_ram.h>
 #include <peripherals.h>
 
 extern uint8_t ESC_SYNCactivation(void);

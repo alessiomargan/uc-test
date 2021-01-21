@@ -61,6 +61,9 @@ __error__(char *pcFilename, unsigned long ulLine)
 const char fw_ver[8] = "xXx/\\xXx";
 char lcd_print_buff[128];
 
+m3_to_c28_data_t    m3_rw_data;
+c28_to_m3_data_t    c28_ro_data;
+
 extern esc_cfg_t config;
 
 int main(void)

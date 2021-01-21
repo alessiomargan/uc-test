@@ -22,7 +22,7 @@
  *
  */
 typedef struct {
-	int32_t		v_int32;
+    int32_t		v_int32;
     uint16_t	hall_status;
 
 } m3_to_c28_data_t;
