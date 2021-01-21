@@ -38,9 +38,9 @@ void Configure_flashAPI(void);
 Fapi_StatusType Erase_flash_sector(uint32_t address);
 
 #ifdef _C28X
-Fapi_StatusType Write_Flash(uint32_t ui32FlashAddr, uint16_t * dataBuffer, uint32_t dataBufferSize);
+Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint16_t * dataBuffer, uint32_t dataBufferSize);
 #else
-Fapi_StatusType Write_Flash(uint32_t ui32FlashAddr, uint8_t * dataBuffer, uint32_t dataBufferSize);
+Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint8_t * dataBuffer, uint32_t dataBufferSize);
 #endif
 
 Fapi_StatusType Test_EraseWrite_flash(uint32_t sectorAddr);

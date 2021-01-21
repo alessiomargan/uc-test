@@ -40,7 +40,7 @@ uint16_t Write_Flash_Params(void) {
 
 	bool ret;
 	sdo.flash._signature_ = FLASH_SIGN_VALID;
-	ret = Write_Flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo_t));
+	ret = Write_flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo_t));
 	return (ret ? PARAMS_CMD_DONE : PARAMS_CMD_ERROR);
 }
 
