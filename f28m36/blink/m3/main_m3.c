@@ -1,12 +1,3 @@
-//###########################################################################
-// FILE:   blinky.c
-// TITLE:  blinky example.
-//###########################################################################
-// $TI Release: F28M36x Support Library v207 $
-// $Release Date: Mon Sep 21 16:44:39 CDT 2015 $
-// $Copyright: Copyright (C) 2012-2015 Texas Instruments Incorporated -
-//             http://www.ti.com/ ALL RIGHTS RESERVED $
-//###########################################################################
 /* Standard Includes */
 #include <stdint.h>
 #include <stdbool.h>
@@ -34,7 +25,7 @@
 
 #include <pins.h>
 #include <shared_ram.h>
-#include "globals.h"
+#include <globals.h>
 
 //*****************************************************************************
 // The error routine that is called if the driver library encounters an error.
@@ -67,25 +58,31 @@ c28_to_m3_data_t	c28_ro_data;
 
 void Configure_UART(void)
 {
+    // Enable the GPIO Peripheral used by the UART.
+#if (HW_TYPE == CONTROL_CARD) || (HW_TYPE == POWER_BOARD_CAN) || (HW_TYPE == V3_ACTUATOR)
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+    GPIOPinConfigure(GPIO_PE4_U0RX);
+    GPIOPinConfigure(GPIO_PE5_U0TX);
+    GPIOPinTypeUART(GPIO_PORTE_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+    UARTStdioInit(0);
+    //UARTStdioInitExpClk(0, 9600);
+#elif (HW_TYPE == MOTOR_BOARD) || (HW_TYPE == BLUE_BOARD)
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
     GPIOPinConfigure(GPIO_PG1_U2TX);
     GPIOPinConfigure(GPIO_PG0_U2RX);
     GPIOPinTypeUART(GPIO_PORTG_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     UARTStdioInit(2);
-
-    for(int i=0;i<10;i++) {
-    	DPRINT("************************");
-    }
-    DPRINT("\n");
+#endif
+    DPRINT("************************\n");
     DPRINT("%s\n",__FUNCTION__);
 }
 
 void Configure_Led(void)
 {
     // Enable the GPIO port that is used for the on-board LED.
-	SysCtlPeripheralEnable(LED_PERIPH);
-	GPIOPinTypeGPIOOutput(LED_BASE, LED_PINS_M3);
-	GPIOPinWrite(LED_BASE, LED_PINS_M3, 0);
+	SysCtlPeripheralEnable(LED_PERIPH_M3);
+	GPIOPinTypeGPIOOutput(LED_BASE_M3, LED_PINS_M3);
+	GPIOPinWrite(LED_BASE_M3, LED_PINS_M3, 0);
 
 	DPRINT("%s\n",__FUNCTION__);
 }
@@ -101,12 +98,6 @@ int main(void)
     SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xF) |
                          SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_2 |
                          SYSCTL_XCLKDIV_4);
-/*
-    // Sets up PLL, M3 running at 125MHz and C28 running at 125MHz
-    SysCtlClockConfigSet(SYSCTL_USE_PLL | (SYSCTL_SPLLIMULT_M & 0xC) | (SYSCTL_SPLLFMULT_M & 0x2) |
-                       	 SYSCTL_SYSDIV_1 | SYSCTL_M3SSDIV_1 |
-                         SYSCTL_XCLKDIV_4);
-*/
 #ifdef _FLASH
     // .binit copy table do the job ....
     // Copy time critical code and Flash setup code to RAM
@@ -131,9 +122,9 @@ int main(void)
 #endif
 
     // Enable C28 Peripherals not already enabled before in Configure_xxx functions
-    SysCtlPeripheralEnable(LED_PERIPH);
+    SysCtlPeripheralEnable(LED_PERIPH_C28);
     // Give C28 control of Port L pin 6 7
-	GPIOPinConfigureCoreSelect(LED_BASE, LED_PINS_C28, GPIO_PIN_C_CORE_SELECT);
+	GPIOPinConfigureCoreSelect(LED_BASE_C28, LED_PINS_C28, GPIO_PIN_C_CORE_SELECT);
 
 #ifdef _BOOT_C28
     //  Send boot command to allow the C28 application to begin execution
@@ -160,9 +151,9 @@ int main(void)
 	ulLoop = 0;
     while (1) {
     	for(ulLoop = 0; ulLoop < 2000000; ulLoop++) { }
-    	GPIOPinWrite(LED_BASE, LED_RED_PIN, LED_RED_PIN);
+    	GPIOPinWrite(LED_BASE_M3, LED_RED_PIN, LED_RED_PIN);
     	for(ulLoop = 0; ulLoop < 2000000; ulLoop++) { }
-    	GPIOPinWrite(LED_BASE, LED_RED_PIN, 0 );
+    	GPIOPinWrite(LED_BASE_M3, LED_RED_PIN, 0 );
 	}
 }
 

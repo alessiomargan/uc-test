@@ -111,7 +111,7 @@ Fapi_StatusType Erase_flash_sector(uint32_t address) {
 }
 
 
-#pragma CODE_SECTION(Write_Flash,ramFuncSection);
+#pragma CODE_SECTION(Write_flash,ramFuncSection);
 #ifdef _C28X
 Fapi_StatusType Write_flash(uint32_t ui32FlashAddr, uint16_t * dataBuffer, uint32_t dataBufferSize) {
 #else
