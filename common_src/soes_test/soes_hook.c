@@ -62,20 +62,36 @@ static void on_PREOP(void) {
 	memset((void*)&tx_pdo,0,sizeof(tx_pdo));
 }
 
+/*
+    op_idx_aux                 aux
+    -------------------------  --------------------
+    | 0 | idx_WR| 0 | idx_RD|  | WR float value   |
+    -------------------------  --------------------
+    op_id_ack                  aux
+    -------------------------  --------------------
+    |0/1| idx_WR|0/1| idx_RD|  | RD float value   |
+    -------------------------  --------------------
+*/
 //#pragma CODE_SECTION(handle_aux_pdo_rx,ramFuncSection);
 static void handle_aux_pdo_rx(void) {
 
     const 		_objd * pobjrx = SDO8003;
-    uint16_t 	idx_rx = ((rx_pdo.op_idx_aux & 0x7F00)>> 8); 	// 7 bits of write index - XWWWWWW 00000000 --> III = index write
+    uint16_t 	idx_wr = ((rx_pdo.op_idx_aux & 0x7F00)>> 8); 	// 7 bits of write index - XWWWWWW 00000000 --> III = index write
+
     //UARTprintf("%s %d %d\n", __FUNCTION__, op, idx );
+    if (idx_wr == 0) {
+        // nothing to write
+        return;
+    }
+
     // check valid idx_rx
-    if((idx_rx > pobjrx->value)||(idx_rx == 0)) {
+    if(idx_wr > pobjrx->value) {
     	// invalid idx_rx
-        tx_pdo.op_idx_ack = ((idx_rx | 0x80) << 8);
+        tx_pdo.op_idx_ack = ((idx_wr | 0x80) << 8);
     } else {
     	// valid idx_rx
-		tx_pdo.op_idx_ack = (idx_rx << 8);
-    	pobjrx += idx_rx;
+		tx_pdo.op_idx_ack = (idx_wr << 8);
+    	pobjrx += idx_wr;
     	*(float*)(pobjrx->data) = rx_pdo.aux;
     }
 }
@@ -84,19 +100,24 @@ static void handle_aux_pdo_rx(void) {
 static void handle_aux_pdo_tx(void) {
 
 	const 		_objd * pobjtx = SDO8002;
-	uint16_t 	idx_tx = (rx_pdo.op_idx_aux & 0x007F);			// 7 bits of read index  - 0000000 XRRRRRRR --> III = index read
-	//UARTprintf("%s %d %d\n", __FUNCTION__, op, idx );
-	// check valid idx_rd
-	if((idx_tx > pobjtx->value)||(idx_tx == 0)) {
-		// invalid idx_rd
-		tx_pdo.op_idx_ack |= (idx_tx | 0x80);
-		tx_pdo.aux = NAN;
-	} else {
-		// valid idx_rd
-		tx_pdo.op_idx_ack |= idx_tx;
-		pobjtx += idx_tx;
-		tx_pdo.aux = *(float*)(pobjtx->data);
+	uint16_t    idx_rd = (rx_pdo.op_idx_aux & 0x007F);          // 7 bits of read index  - 0000000 XRRRRRRR --> III = index read
+
+	//DPRINT("%s idx_rd %d\n", __FUNCTION__, idx_rd );
+    if (idx_rd == 0) {
+        // nothing to read
+        return;
 	}
+    // check valid idx_rd
+    if(idx_rd > pobjtx->value) {
+        // invalid idx_rd
+        tx_pdo.op_idx_ack |= (idx_rd | 0x80);
+        tx_pdo.aux = NAN;
+    } else {
+        // valid idx_rd
+        tx_pdo.op_idx_ack |= idx_rd;
+        pobjtx += idx_rd;
+        tx_pdo.aux = *(float*)(pobjtx->data);
+    }
 }
 
 /** Mandatory: Hook called from the slave stack SDO Download handler to act on
@@ -173,7 +194,7 @@ void ecat_process_pdo(void) {
 	}
 
 	// set RO aux
-	aux_pdo_tx.pos_ref_fb =  0;
+	aux_pdo_tx.pos_ref_fb =  rx_pdo.pos_ref;
 	aux_pdo_tx.volt_ref = 0;
 	aux_pdo_tx.vout = 0;
 	aux_pdo_tx.current = 0;

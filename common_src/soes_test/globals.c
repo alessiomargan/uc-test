@@ -16,7 +16,7 @@ fault_t			glob_fault;
 const flash_sdo_t	flash_sdo;
 
 sdo_t	sdo = {
-	.ram.fw_ver = "_(@)(@)_"
+	.ram.fw_ver = "(@)^(@)"
 };
 
 const flash_sdo_t	dflt_flash_sdo = {
