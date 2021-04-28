@@ -40,12 +40,12 @@
 
 MEMORY
 {
-    FLASH (RX) : origin = 0x00000000, length = 0x00005000
+    FLASH (RX) : origin = 0x00000000, length = 0x00040000
     SRAM (RWX) : origin = 0x20000000, length = 0x00008000
 }
 
 /* Section allocation in memory */
-
+/*
 SECTIONS
 {
     GROUP
@@ -54,8 +54,9 @@ SECTIONS
         .text
         .const
         .data
-        .cinit
-        .vtable
+        //.cinit
+        .sysmem
+        //.vtable
     } load = FLASH, run = SRAM, LOAD_START(init_load), RUN_START(init_run), SIZE(init_size)
 
     GROUP
@@ -65,3 +66,27 @@ SECTIONS
     } run = SRAM, RUN_START(bss_run), RUN_END(bss_end), SIZE(bss_size), RUN_END(__STACK_TOP)
 
 }
+
+*/
+
+SECTIONS
+{
+    .intvecs:   > 0x00000000
+    .text   :   > FLASH
+    .const  :   > FLASH
+    .cinit  :   > FLASH
+    .pinit  :   > FLASH
+    .init_array : > FLASH
+    .binit  : {}  > FLASH
+
+    .vtable :   > 0x20000000
+    .data   :   > SRAM
+    .bss    :   > SRAM
+    .sysmem :   > SRAM
+    .stack  :   > SRAM (HIGH)
+}
+
+__STACK_TOP = __stack + 512;
+
+
+

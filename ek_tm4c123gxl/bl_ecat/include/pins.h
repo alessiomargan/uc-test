@@ -1,17 +1,68 @@
+#define LP		0x00
+#define MC		0x01
+#define FT6		0x02
+#define IMU 	0x03
+#define VV_IO	0x04
 
 //*****************************************************************************
 //
 //  SPI pins for PDI EtherCAT interface
 //
 //*****************************************************************************
-#define SPI_ECAT_SSI_PORT               GPIO_PORTB_BASE
+#if HW_TYPE == LP
 
-#define SPI_ECAT_CLK_PIN                GPIO_PIN_4
-#define SPI_ECAT_CS_PIN                 GPIO_PIN_5
-#define SPI_ECAT_MISO_PIN               GPIO_PIN_6
-#define SPI_ECAT_MOSI_PIN               GPIO_PIN_7
+	#define ECAT_SSI_BASE                   SSI2_BASE
+	#define ECAT_SSI_SYSCTL_PERIPH   		SYSCTL_PERIPH_SSI2
 
-#define SPI_ECAT_IRQ_PIN                GPIO_PIN_0
-#define SPI_ECAT_EEPROM_LOADED_PIN      GPIO_PIN_1
+	#define ECAT_SSI_GPIO_PORTBASE         	GPIO_PORTB_BASE
+	#define ECAT_SSI_GPIO_SYSCTL_PERIPH  	SYSCTL_PERIPH_GPIOB
 
-#define SSI_ECAT_BASE                   SSI2_BASE
+	#define ECAT_SSI_CLK                	GPIO_PIN_4
+	#define ECAT_SSI_CS                 	GPIO_PIN_5
+	#define ECAT_SSI_RX_MISO               	GPIO_PIN_6
+	#define ECAT_SSI_TX_MOSI               	GPIO_PIN_7
+
+	#define ECAT_GPIO_PORTBASE              GPIO_PORTB_BASE
+	#define ECAT_GPIO_SYSCTL_PERIPH  		SYSCTL_PERIPH_GPIOB
+
+	#define ECAT_IRQ                		GPIO_PIN_0
+	#define ECAT_EEPROM_LOADED      		GPIO_PIN_1
+
+	#define LED_BASE      					GPIO_PORTF_BASE
+	#define LED_PERIPH      				SYSCTL_PERIPH_GPIOF
+	#define LED_PIN							GPIO_PIN_1
+
+#elif HW_TYPE == MC
+
+#elif HW_TYPE == FT6
+
+#elif HW_TYPE == IMU
+
+#elif HW_TYPE == VV_IO
+
+	#define ECAT_SSI_BASE                   SSI0_BASE
+	#define ECAT_SSI_SYSCTL_PERIPH   		SYSCTL_PERIPH_SSI0
+
+	#define ECAT_SSI_GPIO_PORTBASE         	GPIO_PORTA_BASE
+	#define ECAT_SSI_GPIO_SYSCTL_PERIPH  	SYSCTL_PERIPH_GPIOA
+
+	#define ECAT_SSI_CLK                	GPIO_PIN_2
+	#define ECAT_SSI_CS                 	GPIO_PIN_3
+	#define ECAT_SSI_RX_MISO               	GPIO_PIN_4
+	#define ECAT_SSI_TX_MOSI               	GPIO_PIN_5
+
+	#define ECAT_GPIO_PORTBASE              GPIO_PORTA_BASE
+	#define ECAT_GPIO_SYSCTL_PERIPH  		SYSCTL_PERIPH_GPIOA
+
+	#define ECAT_IRQ                		GPIO_PIN_7
+	#define ECAT_EEPROM_LOADED      		GPIO_PIN_6
+
+	#define LED_BASE      					GPIO_PORTC_BASE
+	#define LED_PERIPH      				SYSCTL_PERIPH_GPIOC
+	#define LED_PIN							GPIO_PIN_7
+
+#else
+	#error "Unknown HW_TYPE"
+#endif
+
+#define ECAT_SSI_PINS            		(ECAT_SSI_RX_MISO | ECAT_SSI_TX_MOSI | ECAT_SSI_CLK)
