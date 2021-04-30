@@ -4,18 +4,24 @@
 //  SPI pins for PDI EtherCAT interface
 //
 //*****************************************************************************
-#define SPI_ECAT_SSI_PORT               GPIO_PORTB_BASE
+#define ECAT_SSI_BASE                   SSI2_BASE
+#define ECAT_SSI_SYSCTL_PERIPH          SYSCTL_PERIPH_SSI2
 
-#define SPI_ECAT_CLK_PIN                GPIO_PIN_4
-#define SPI_ECAT_CS_PIN                 GPIO_PIN_5
-#define SPI_ECAT_MISO_PIN               GPIO_PIN_6
-#define SPI_ECAT_MOSI_PIN               GPIO_PIN_7
+#define ECAT_SSI_GPIO_PORTBASE          GPIO_PORTB_BASE
+#define ECAT_SSI_GPIO_SYSCTL_PERIPH     SYSCTL_PERIPH_GPIOB
 
-#define SPI_ECAT_IRQ_PIN                GPIO_PIN_0
-#define SPI_ECAT_EEPROM_LOADED_PIN      GPIO_PIN_1
+#define ECAT_SSI_CLK                    GPIO_PIN_4
+#define ECAT_SSI_CS                     GPIO_PIN_5
+#define ECAT_SSI_RX_MISO                GPIO_PIN_6
+#define ECAT_SSI_TX_MOSI                GPIO_PIN_7
 
-#define SSI_ECAT_BASE                   SSI2_BASE
+#define ECAT_GPIO_PORTBASE              GPIO_PORTB_BASE
+#define ECAT_GPIO_SYSCTL_PERIPH         SYSCTL_PERIPH_GPIOB
 
+#define ECAT_IRQ                        GPIO_PIN_0
+#define ECAT_EEPROM_LOADED              GPIO_PIN_1
+
+#define ECAT_SSI_PINS                   (ECAT_SSI_RX_MISO | ECAT_SSI_TX_MOSI | ECAT_SSI_CLK)
 //*****************************************************************************
 //
 //  M3 LCD EA DOGM128-6

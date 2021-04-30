@@ -5,19 +5,10 @@
 #include <ecat_options.h>
 #include <soes_hook.h>
 
-//#define ESC_DEBUG
-#ifdef ESC_DEBUG
-#undef DPRINT
-#define DPRINT(...) printf ("hook: "__VA_ARGS__)
-#define DEBUG_ASSERT(expression)    ASSERT(expression)
-#else
-    #define DPRINT(...)
-    #define DEBUG_ASSERT(expression)
-#endif  /* ESC_DEBUG */
 
-esc_cfg_t gESC_config = { 0, 0 };
+esc_cfg_t gESC_config;
 foe_cfg_t gFOE_config = { 0, 0, 0, 0 };
-uint8_t foe_buffer[0x400];
+uint8_t foe_buffer[1024];
 
 uint16_t flash_cmd;
 uint16_t flash_cmd_ack;

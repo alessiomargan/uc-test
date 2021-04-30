@@ -75,7 +75,7 @@ void main(void)
     // Set up the serial console to use for displaying messages.
     Configure_UART();
     UARTprintf("\n\nHello, world!\n");
-    UARTprintf("%s %s\n",__DATE__ , __TIME__);
+    UARTprintf("Build %s %s\n",__DATE__ , __TIME__);
     UARTprintf("SysCtlClockGet %d\n", SysCtlClockGet() );
     sdo.flash.board_id = 969;
     //

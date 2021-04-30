@@ -51,14 +51,12 @@ void jump_to_bootloader(void) {
 
     // disable periphearals irq ....
 	disable_peripheral_irq();
-
     DPRINT ("Jump to bootloader\n");
-    //
     // Return control to the boot loader.  This is a call to the SVC
     // handler in the boot loader.
-    //
-    (*((void (*)(void))(*(uint32_t *)0x2c)))();
-
+    // (*((void (*)(void))(*(uint32_t *)0x2c)))();
+    // performs a software reset of the entire device
+    SysCtlReset();
 }
 
 
@@ -88,35 +86,36 @@ void Configure_UART(void)
  */
 void Configure_EcatPDI (void)
 {
-	// SSI2 and GPIOB on PORTB
-    // peripheralsz must be enabled for use.
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI2);
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-	// CS on PORTB
-    GPIOPinTypeGPIOOutput(SPI_ECAT_SSI_PORT, SPI_ECAT_CS_PIN);
-    GPIOPinWrite(SPI_ECAT_SSI_PORT, SPI_ECAT_CS_PIN, SPI_ECAT_CS_PIN);
+    // enable SSI and GPIO periph
+    SysCtlPeripheralEnable(ECAT_SSI_SYSCTL_PERIPH);
+    SysCtlPeripheralEnable(ECAT_SSI_GPIO_SYSCTL_PERIPH);
+    SysCtlPeripheralEnable(ECAT_GPIO_SYSCTL_PERIPH);
+
+    GPIOPinTypeGPIOOutput(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS);
+    GPIOPinWrite(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_CS, ECAT_SSI_CS);
+
     // Configure the pin muxing for SSI2 functions on port
     GPIOPinConfigure(GPIO_PB4_SSI2CLK);
-    //ROM_GPIOPinConfigure(GPIO_PB5_SSI2FSS);
     GPIOPinConfigure(GPIO_PB6_SSI2RX); // MISO
     GPIOPinConfigure(GPIO_PB7_SSI2TX); // MOSI
     // Configure the GPIO settings for the SSI pins.  This function also gives
     // control of these pins to the SSI hardware.
-    GPIOPinTypeSSI(SPI_ECAT_SSI_PORT, SPI_ECAT_MOSI_PIN | SPI_ECAT_MISO_PIN | /*GPIO_PIN_5 |*/ SPI_ECAT_CLK_PIN);
+    GPIOPinTypeSSI(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_PINS);
     // Configure and enable the SSI port for SPI master mode.
-    // Use SSI2, system clock supply, idle clock level low and active low clock in
+    // Use SSI, system clock supply, idle clock level low and active low clock in
     // freescale SPI mode, master mode, 8MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(SSI_ECAT_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 7500000, 8);
-    // Enable the SSI2 module.
-    SSIEnable(SSI_ECAT_BASE);
+    SSIConfigSetExpClk(ECAT_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 7500000, 8);
+    // Enable the SSI module.
+    SSIEnable(ECAT_SSI_BASE);
+
     // Configure the SPI INT pin as an input.
     // Configure the SPI EPROM_LOADED pin as an input.
-    GPIOPinTypeGPIOInput(SPI_ECAT_SSI_PORT, SPI_ECAT_IRQ_PIN);
-    GPIOPinTypeGPIOInput(SPI_ECAT_SSI_PORT, SPI_ECAT_EEPROM_LOADED_PIN);
+    GPIOPinTypeGPIOInput(ECAT_GPIO_PORTBASE, ECAT_IRQ);
+    GPIOPinTypeGPIOInput(ECAT_GPIO_PORTBASE, ECAT_EEPROM_LOADED);
     // Configure the SPI INT pin as interrupt on falling edge.
-    GPIOIntTypeSet(SPI_ECAT_SSI_PORT, SPI_ECAT_IRQ_PIN, GPIO_FALLING_EDGE);
+    GPIOIntTypeSet(ECAT_GPIO_PORTBASE, ECAT_IRQ, GPIO_FALLING_EDGE);
+    GPIOIntEnable(ECAT_GPIO_PORTBASE, ECAT_IRQ);
 
-    GPIOIntEnable(SPI_ECAT_SSI_PORT, SPI_ECAT_IRQ_PIN);
     IntRegister(INT_GPIOB, GPIOB_IntHandler);
 	IntEnable(INT_GPIOB);
 

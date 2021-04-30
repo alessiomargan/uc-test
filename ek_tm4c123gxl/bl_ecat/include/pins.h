@@ -1,3 +1,5 @@
+//
+//
 #define LP		0x00
 #define MC		0x01
 #define FT6		0x02
@@ -31,6 +33,11 @@
 	#define LED_BASE      					GPIO_PORTF_BASE
 	#define LED_PERIPH      				SYSCTL_PERIPH_GPIOF
 	#define LED_PIN							GPIO_PIN_1
+
+    #define SWITCH_BASE                     GPIO_PORTF_BASE
+    #define SW1_PIN                         GPIO_PIN_4
+    #define SW2_PIN                         GPIO_PIN_0
+
 
 #elif HW_TYPE == MC
 
