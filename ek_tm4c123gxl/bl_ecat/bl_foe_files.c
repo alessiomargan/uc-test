@@ -1,6 +1,7 @@
 
-#include "foe_flash.h"
+#include <foe_flash.h>
 #include <soes/esc_foe.h>
+
 
 foe_writefile_cfg_t      gFOE_firmware_files[] = {
     // launchpad
@@ -29,7 +30,7 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
     },
 	// hyq valve_board
     {
-		.name =					"valve_board.bin",
+		.name =					"valve_tm4c.bin",
 		.max_data = 			FLASH_APP_SIZE,
 		.dest_start_address =	FLASH_APP_START,
 		.address_offset =		0,
@@ -52,6 +53,16 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
 		.on_foe_close =			0,
     },
     //
-    { 0 },
+    {
+    	.name = 				0,
+		.max_data = 			0,
+		.dest_start_address =	0,
+		.address_offset =		0,
+		.filepass =				0,
+		.write_function =		0,
+		.read_function =		0,
+		.on_foe_open = 			0,
+		.on_foe_close =			0,
+    },
 };
 

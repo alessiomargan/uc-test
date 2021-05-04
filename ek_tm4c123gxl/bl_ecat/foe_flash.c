@@ -19,7 +19,7 @@ extern foe_cfg_t gFOE_config;
 const uint8_t BLDR_Version[8] = "tm4c_1.0";
 
 #pragma RETAIN(CRC_App)
-#pragma DATA_SECTION(CRC_App, ".CRC_APP")
+#pragma DATA_SECTION(CRC_App, ".bldr_info")
 const uint32_t CRC_App;
 
 uint32_t gCalc_crc;

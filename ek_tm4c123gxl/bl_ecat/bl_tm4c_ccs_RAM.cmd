@@ -22,7 +22,7 @@
  *
  *****************************************************************************/
 
---retain=Vectors
+--retain=g_pfnVectors
 
 /* The following command line options are set as part of the CCS project.    */
 /* If you are building using the command line, or for some reason want to    */
@@ -40,12 +40,14 @@
 
 MEMORY
 {
-    FLASH (RX) : origin = 0x00000000, length = 0x00040000
-    SRAM (RWX) : origin = 0x20000000, length = 0x00008000
+    FLASH   (RX)  : origin = 0x00000000, length = 0x00008000
+    BLDR_VER(R)   : origin = 0x00008000, length = 0x00000008
+    CRC_APP (R)   : origin = 0x00008400, length = 0x00000004
+    SRAM    (RWX) : origin = 0x20000000, length = 0x00008000
 }
 
 /* Section allocation in memory */
-/*
+
 SECTIONS
 {
     GROUP
@@ -55,7 +57,7 @@ SECTIONS
         .const
         .data
         //.cinit
-        .sysmem
+        //.sysmem
         //.vtable
     } load = FLASH, run = SRAM, LOAD_START(init_load), RUN_START(init_run), SIZE(init_size)
 
@@ -67,26 +69,8 @@ SECTIONS
 
 }
 
-*/
 
-SECTIONS
-{
-    .intvecs:   > 0x00000000
-    .text   :   > FLASH
-    .const  :   > FLASH
-    .cinit  :   > FLASH
-    .pinit  :   > FLASH
-    .init_array : > FLASH
-    .binit  : {}  > FLASH
-
-    .vtable :   > 0x20000000
-    .data   :   > SRAM
-    .bss    :   > SRAM
-    .sysmem :   > SRAM
-    .stack  :   > SRAM (HIGH)
-}
-
-__STACK_TOP = __stack + 512;
+//__STACK_TOP = __stack + 512;
 
 
 
