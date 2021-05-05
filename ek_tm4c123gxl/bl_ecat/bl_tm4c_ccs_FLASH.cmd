@@ -1,8 +1,11 @@
 /******************************************************************************
  *
  * Linker Command file for the Texas Instruments TM4C123AH6PM
- * 32-bit Arm Cortex-M4F based MCU with 80-MHz, 256-kb Flash, 32-kb RAM
- *
+ * 32-bit Arm Cortex-M4F based MCU with 80-MHz
+ * Flash Size: 256KB
+ * RAM Size: 32KB
+ * Sector Size: 1KB
+ * Family: Blizzard
  *****************************************************************************/
 
 --retain=g_pfnVectors

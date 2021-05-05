@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 #include <soes/esc_foe.h>
+/*
+ * Flash Size: 256KB
+ * RAM Size: 32KB
+ * Sector Size: 1KB
+ * Family: Blizzard
+ */
 
 #define FLASH_SIZE 			0x40000
 #define FLASH_APP_START		0x10000
@@ -11,8 +17,14 @@
 #define FLASH_PAR_SIZE		0x01000
 #define FLASH_APP_SIZE 		FLASH_SIZE - FLASH_PAR_SIZE - FLASH_APP_START
 
+typedef struct {
+    uint32_t    crc_app;
+    uint32_t    fw_flash_cnt;
+} bldr_info_t;
+
+extern const bldr_info_t bldr_info;
+
 extern const uint8_t BLDR_Version[8];
-extern const uint32_t CRC_App;
 extern uint32_t gCalc_crc;
 extern uint16_t crc_ok;
 

@@ -8,19 +8,17 @@
 #include <driverlib/sw_crc.h>
 #include <driverlib/rom_map.h>
 
-#include "foe_flash.h"
+#include <foe_flash.h>
 #include <soes/esc_foe.h>
 
 
 extern foe_cfg_t gFOE_config;
 
-//#pragma RETAIN(BLDR_Version)
-//#pragma DATA_SECTION(BLDR_Version, ".BLDR_VERSION")
 const uint8_t BLDR_Version[8] = "tm4c_1.0";
 
-#pragma RETAIN(CRC_App)
-#pragma DATA_SECTION(CRC_App, ".bldr_info")
-const uint32_t CRC_App;
+#pragma RETAIN(bldr_info)
+#pragma DATA_SECTION(bldr_info, ".bldr_info")
+const bldr_info_t bldr_info;
 
 uint32_t gCalc_crc;
 uint16_t crc_ok;
@@ -75,13 +73,22 @@ uint32_t on_foe_close_cb(void)
 {
     // write crc
     int32_t ret;
+    bldr_info_t tmp;
 
     gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
-    ret = MAP_FlashErase((uint32_t)&CRC_App);
-    ret = MAP_FlashProgram((uint32_t*)&gCalc_crc, (uint32_t)&CRC_App, sizeof(CRC_App));
-    DPRINT("[%s] Write CRC_App 0x%04X at 0x%04X\n", __FUNCTION__, gCalc_crc, (uint32_t)&CRC_App);
 
-    crc_ok = (gCalc_crc == CRC_App) ? 1 : 0;
+    tmp.crc_app = gCalc_crc;
+    if ( bldr_info.fw_flash_cnt == 0xFFFFFFFF ) {
+        tmp.fw_flash_cnt = 1;
+    } else {
+        tmp.fw_flash_cnt = bldr_info.fw_flash_cnt+1;
+    }
+
+    ret = MAP_FlashErase((uint32_t)&bldr_info);
+    ret = MAP_FlashProgram((uint32_t*)&tmp, (uint32_t)&bldr_info, sizeof(bldr_info));
+    DPRINT("[%s] Write CRC_App 0x%04X at 0x%04X\n", __FUNCTION__, gCalc_crc, (uint32_t)&bldr_info);
+
+    crc_ok = (gCalc_crc == bldr_info.crc_app) ? 1 : 0;
 
     // 0 on success
     return (!ret);

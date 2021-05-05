@@ -26,7 +26,7 @@
 
 extern esc_cfg_t config;
 
-void jump2app(void) {
+static void jump2app(void) {
     // disable interrupts
     MAP_IntMasterDisable();
     // redirect the vector table
@@ -66,6 +66,7 @@ static uint8_t test_jump2app(void) {
     uint8_t user_ram = 0;
 #if HW_TYPE == LP
     // poll switch ... 0 pressed
+    // sw1 == 1 ==> pressed
     sw1 = ((uint8_t)(~MAP_GPIOPinRead(SWITCH_BASE, SW1_PIN))&SW1_PIN) >> 4;
 #endif
 #ifdef HAVE_BOOT_PIN
@@ -80,7 +81,7 @@ static uint8_t test_jump2app(void) {
     return ret;
 }
 
-static void try_boot(void)
+void try_boot(void)
 {
     if ( test_jump2app() ) {
         jump2app();
@@ -137,17 +138,17 @@ void main(void)
     Configure_GPIO();
     // Set up ET1100 PDI interface
     Configure_EcatPDI();
-    //
-    //ConfigureTimer();
     // Enable processor interrupts.
     MAP_IntMasterEnable();
-    //
-    soes_init(&config);
 
     gCalc_crc = calc_CRC(FLASH_APP_START, FLASH_APP_SIZE);
-    crc_ok = (gCalc_crc == CRC_App) ? 1 : 0;
+    crc_ok = (gCalc_crc == bldr_info.crc_app) ? 1 : 0;
     DPRINT("bldr ver %s HW ver 0x%02X\n", BLDR_Version, HW_TYPE);
-    DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, CRC_App);
+    DPRINT("CRC : calc 0x%04X flash 0x%04X\n", gCalc_crc, bldr_info.crc_app);
+    DPRINT("fw_flash_cnt : %u\n", bldr_info.fw_flash_cnt);
+
+    //
+    soes_init(&config);
 
     try_boot();
 

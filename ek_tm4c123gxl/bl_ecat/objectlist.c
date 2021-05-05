@@ -3,14 +3,13 @@
 
 #include <soes/esc_coe.h>
 #include <soes_hook.h>
+#include <foe_flash.h>
 
 extern uint16_t 	flash_cmd;
 extern uint16_t 	flash_cmd_ack;
 extern uint16_t   	crc_ok;
 extern uint16_t   	et1100_boot_pin;
 
-extern const uint32_t 	CRC_App;
-extern const uint8_t 	BLDR_Version[];
 
 static const char Number_of_elements[] = "Number of Elements";
 //static const char mapped_obj[] = "Mapped Object";
@@ -116,7 +115,7 @@ const _objd SDO8000[] =
   {0x0, DTYPE_UNSIGNED8,     	 8, ATYPE_RO,   Number_of_elements,   6, 0},
   {0x1, DTYPE_UNSIGNED16,   	16, ATYPE_RW, 	"flash_cmd",  	0, &flash_cmd},
   {0x2, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"flash_cmd_ack",0, &flash_cmd_ack},
-  {0x3, DTYPE_UNSIGNED32,   	32, ATYPE_RO, 	"flash_crc",  	0, &CRC_App},
+  {0x3, DTYPE_UNSIGNED32,   	32, ATYPE_RO, 	"flash_crc",  	0, &bldr_info.crc_app},
   {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "bl_ver",   	0, &BLDR_Version},
   {0x5, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"crc_ok",  		0, &crc_ok},
   {0x6, DTYPE_UNSIGNED16,   	16, ATYPE_RO, 	"et1100_boot_pin",0, &et1100_boot_pin},

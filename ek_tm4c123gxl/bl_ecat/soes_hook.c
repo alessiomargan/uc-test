@@ -23,7 +23,7 @@ uint8_t *txpdo = (uint8_t*) &tx_pdo;
 extern uint16_t crc_ok;
 extern foe_writefile_cfg_t gFOE_firmware_files[];
 
-extern void jump2app(void);
+extern void try_boot(void);
 
 void pre_state_change_hook(uint8_t *as, uint8_t *an);
 void post_state_change_hook(uint8_t *as, uint8_t *an);
@@ -96,11 +96,7 @@ void post_state_change_hook(uint8_t *as, uint8_t *an) {
 	}
 
 	if ((*as == BOOT_TO_INIT) && (*an == ESCinit)) {
-		if (crc_ok) {
-			jump2app();
-		} else {
-			DPRINT("Fail jump2app\n");
-		}
+	    try_boot();
 	}
 }
 
