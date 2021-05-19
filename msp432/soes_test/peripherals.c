@@ -361,22 +361,16 @@ void Configure_ADC(void)
     MAP_ADC14_enableInterrupt(ADC_INT8);
 
     MAP_ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
+    /* Configuring the sample trigger to be sourced from Timer_A0  and setting it
+     * to automatic iteration after it is triggered
+     * */
+    MAP_ADC14_setSampleHoldTrigger(ADC_TRIGGER_SOURCE1, false);
 #ifndef ADC_TRG_SRC_PWM
     /* Configuring Timer_A in continuous mode and sourced from ACLK */
     MAP_Timer_A_configureUpMode(TIMER_A0_BASE, &upModeConfig);
     /* Configuring Timer_A0 in CCR1 to trigger at 16000 (0.5s) */
     MAP_Timer_A_initCompare(TIMER_A0_BASE, &compareConfig);
-#endif
-    /* Configuring the sample trigger to be sourced from Timer_A0  and setting it
-     * to automatic iteration after it is triggered
-     * */
-    MAP_ADC14_setSampleHoldTrigger(ADC_TRIGGER_SOURCE1, false);
-    // Enabling Interrupts
-    MAP_Interrupt_enableInterrupt(INT_ADC14);
-    // Enable conversion
-    MAP_ADC14_enableConversion();
     // Start timer
-#ifndef ADC_TRG_SRC_PWM
     MAP_Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
 #else
     /*
@@ -387,6 +381,11 @@ void Configure_ADC(void)
 
     MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
 #endif
+    // Enabling Interrupts
+    MAP_Interrupt_enableInterrupt(INT_ADC14);
+    // Enable conversion
+    MAP_ADC14_enableConversion();
+
     DPRINT("%s\n",__FUNCTION__);
 }
 

@@ -51,9 +51,9 @@ typedef IAR_PACKED struct {
     // 0x8000 flash param
 	uint32_t	_signature_;
 	uint32_t 	board_id;
-	uint32_t	analog_sample_freq;
 	uint32_t 	module_params;
 	uint8_t     blob[16];
+	uint32_t    analog_sample_freq;
 
 } CCS_PACKED flash_sdo_t;
 

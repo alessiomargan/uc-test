@@ -146,10 +146,11 @@ const _objd SDO7000[] =
 
 const _objd SDO8000[] =
 {
-  {0x0, DTYPE_UNSIGNED8,   		8,	ATYPE_RO, "NumElem"				, 3, 0},
+  {0x0, DTYPE_UNSIGNED8,   		8,	ATYPE_RO, "NumElem"				, 4, 0},
   {0x1, DTYPE_UNSIGNED32,      32,	ATYPE_RW, "Board_id"			, 0, &sdo.flash.board_id},
   {0x2, DTYPE_UNSIGNED32,      32,	ATYPE_RW, "Module_params"		, 0, &sdo.flash.module_params},
   {0x3, DTYPE_VISIBLE_STRING, 128,  ATYPE_RW, "Blob"                , 0, &sdo.flash.blob},
+  {0x4, DTYPE_UNSIGNED32,      32,  ATYPE_RW, "Analog_sample_freq"  , 0, &sdo.flash.analog_sample_freq},
 };
 
 const _objd SDO8001[] =
@@ -209,7 +210,7 @@ const _objectlist SDOobjects[] =
   {0x1C32, OTYPE_ARRAY, 	 2,  0, "SM2(Output) Synchronisation  Parameter", SDO1C32},
   {0x6000, OTYPE_RECORD, 	 10, 0, "Inputs", SDO6000},
   {0x7000, OTYPE_RECORD, 	 12, 0, "Outputs", SDO7000},
-  {0x8000, OTYPE_RECORD, 	 3,  0, "Flash Parameters", SDO8000},
+  {0x8000, OTYPE_RECORD, 	 4,  0, "Flash Parameters", SDO8000},
   {0x8001, OTYPE_RECORD, 	 6,  0, "Ram Parameters", SDO8001},
   {0x8002, OTYPE_RECORD,     5,  0, "AuxPdo RO",   SDO8002},
   {0x8003, OTYPE_RECORD,     12, 0, "AuxPdo WR",   SDO8003},

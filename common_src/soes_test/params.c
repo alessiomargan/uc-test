@@ -40,7 +40,7 @@ uint16_t Write_Flash_Params(void) {
 
 	bool ret;
 	sdo.flash._signature_ = FLASH_SIGN_VALID;
-	ret = Write_flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo_t));
+	ret = Write_flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo));
 	return (ret ? PARAMS_CMD_DONE : PARAMS_CMD_ERROR);
 }
 
@@ -71,7 +71,7 @@ void Handle_0x8000(uint8_t subidx) {
 
 	switch(subidx) {
 
-	case 3 :
+	case 4 :
 #if defined(__MSP432P401R__) || defined(__MSP432P4111__)
 		MAP_Interrupt_disableMaster();
 		pwmConfig.timerPeriod = (SMCLK_FREQUENCY/sdo.flash.analog_sample_freq);
