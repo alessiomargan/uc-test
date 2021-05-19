@@ -104,7 +104,8 @@ void Configure_EcatPDI (void)
     // Configure and enable the SSI port for SPI master mode.
     // Use SSI, system clock supply, idle clock level low and active low clock in
     // freescale SPI mode, master mode, 8MHz SSI frequency, and 8-bit data.
-    SSIConfigSetExpClk(ECAT_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 7500000, 8);
+    SSIConfigSetExpClk(ECAT_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_3, SSI_MODE_MASTER, 10000000, 8);
+    //GPIOPadConfigSet(ECAT_SSI_GPIO_PORTBASE, ECAT_SSI_PINS|ECAT_SSI_CS, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);    // no need to increase drive current of SPI pins
     // Enable the SSI module.
     SSIEnable(ECAT_SSI_BASE);
 

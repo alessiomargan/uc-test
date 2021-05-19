@@ -387,6 +387,7 @@ void Configure_ADC(void)
 
     MAP_Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
 #endif
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /*
