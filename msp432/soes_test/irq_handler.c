@@ -73,11 +73,10 @@ void PORT5_IRQHandler(void) {
 
     if(status & PIN_ECAT_IRQ) {
 		ecat_irq_cnt++;
-		//MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN6);
-		P3->OUT |= BIT6;
+		DBG_2_ON;
+		soes_loop();
 		ecat_process_pdo();
-		//MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
-		P3->OUT &= ~BIT6;
+		DBG_2_OFF;
     }
 }
 
@@ -112,30 +111,23 @@ void T32_INT1_IRQHandler(void)
 	MAP_Timer32_clearInterruptFlag(TIMER32_0_BASE);
     timer0_cnt++;
 
-    //MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN0);
-    P6->OUT |= BIT0;
+    DBG_1_ON;
+    {
+		//conRes = ((conv_adc[adc_sample_idx][0] - cal30) * 55);
+		//tempC = (conRes / calDifference) + 30.0f;
+		avg_samples(9);
 
-    //conRes = ((conv_adc[adc_sample_idx][0] - cal30) * 55);
-    //tempC = (conRes / calDifference) + 30.0f;
-
-	MAP_Interrupt_disableMaster();
-	avg_samples(9);
-	MAP_Interrupt_enableMaster();
-
-    soes_loop();
-
-    if ( ! ESC_SYNCactivation() ) {
-        ecat_process_pdo();
+		if ( ! ESC_SYNCactivation() ) {
+			soes_loop();
+			ecat_process_pdo();
+		}
     }
-
-    //MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN0);
-    P6->OUT &= ~BIT0;
+    DBG_1_OFF;
 
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
         // Toggle P1.0 output
-    	//MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-    	P1->OUT ^= BIT0;
+    	LED_RED_TGL;
     	//DPRINT("\r tmr_cnt: %d ecat_irq_cnt: %d", timer0_cnt, ecat_irq_cnt );
     }
 
@@ -159,10 +151,10 @@ void ADC14_IRQHandler(void)
     {
     	MAP_ADC14_disableConversion();
     	//BITBAND_PERI(ADC14->CTL0, ADC14_CTL0_ENC_OFS) = 0;
-    	P6->OUT |= BIT1;
+    	PROBE_ON;
 		MAP_ADC14_getMultiSequenceResult(raw_adc[adc_sample_idx++]);
-        P6->OUT &= ~BIT1;
-        MAP_ADC14_enableConversion();
+		PROBE_OFF;
+		MAP_ADC14_enableConversion();
         //BITBAND_PERI(ADC14->CTL0, ADC14_CTL0_ENC_OFS) = 1;
 
     	if ( adc_sample_idx >= SMPL_NUM ) {

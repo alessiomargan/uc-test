@@ -255,11 +255,11 @@ void Configure_GPIO(void)
      * IO probe
      */
     // Set P3.6 to output direction
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
+    MAP_GPIO_setAsOutputPin(PORT_PROBE, PIN_PROBE);
+    MAP_GPIO_setOutputLowOnPin(PORT_PROBE, PIN_PROBE);
     // Set P6.[0,1] to output direction
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P6, GPIO_PIN0|GPIO_PIN1);
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN0|GPIO_PIN1);
+    MAP_GPIO_setAsOutputPin(PORT_DBG, DBG_PINS);
+    MAP_GPIO_setOutputLowOnPin(PORT_DBG, DBG_PINS);
     /*
      * Buttons switch
      */

@@ -1,3 +1,10 @@
+#ifndef __PINS_H__
+#define __PINS_H__
+
+#define PIN__ON(port_addr,pin)	(port_addr->OUT |=  pin)
+#define PIN_OFF(port_addr,pin)	(port_addr->OUT &= ~pin)
+#define PIN_TGL(port_addr,pin)	(port_addr->OUT ^=  pin)
+
 #ifdef LAUNCHPAD
 //*****************************************************************************
 //  LEDs
@@ -8,13 +15,44 @@
 #define PIN_LED_R		GPIO_PIN0
 #define PIN_LED_G		GPIO_PIN1
 #define PIN_LED_B		GPIO_PIN2
+#define LED_RED_ON		PIN__ON(P1,BIT0)
+#define LED_RED_OFF		PIN_OFF(P1,BIT0)
+#define LED_RED_TGL		PIN_TGL(P1,BIT0)
+#define LED_R_ON		PIN__ON(P2,BIT0)
+#define LED_R_OFF		PIN_OFF(P2,BIT0)
+#define LED_R_TGL		PIN_TGL(P2,BIT0)
+#define LED_G_ON		PIN__ON(P2,BIT1)
+#define LED_G_OFF		PIN_OFF(P2,BIT1)
+#define LED_G_TGL		PIN_TGL(P2,BIT1)
+#define LED_B_ON		PIN__ON(P2,BIT2)
+#define LED_B_OFF		PIN_OFF(P2,BIT2)
+#define LED_B_TGL		PIN_TGL(P2,BIT2)
+
 //
 //	GPOut probe
 //	P3.6
+#define PORT_PROBE		GPIO_PORT_P3
+#define PIN_PROBE		GPIO_PIN6
+#define PROBE_ON		PIN__ON(P3,BIT6)
+#define PROBE_OFF		PIN_OFF(P3,BIT6)
+#define PROBE_TGL		PIN_TGL(P3,BIT6)
+
+//	DBG
 //  P6.[0,1]
+#define PORT_DBG		GPIO_PORT_P6
+#define PIN_DBG_1		GPIO_PIN0
+#define PIN_DBG_2		GPIO_PIN1
+#define DBG_1_ON		PIN__ON(P6,BIT0)
+#define DBG_1_OFF		PIN_OFF(P6,BIT0)
+#define DBG_1_TGL		PIN_TGL(P6,BIT0)
+#define DBG_2_ON		PIN__ON(P6,BIT1)
+#define DBG_2_OFF		PIN_OFF(P6,BIT1)
+#define DBG_2_TGL		PIN_TGL(P6,BIT1)
+
 //
 //  Switch
 //  P1.[1,4]
+
 //
 //  UART
 //  P1.[2,3]
@@ -135,6 +173,7 @@
 
 
 #define LED_PINS		(PIN_LED_R|PIN_LED_G|PIN_LED_B)
-
+#define DBG_PINS		(PIN_DBG_1|PIN_DBG_2)
 #define ECAT_SPI_PINS   (PIN_ECAT_CLK|PIN_ECAT_MOSI|PIN_ECAT_MISO)
 
+#endif
