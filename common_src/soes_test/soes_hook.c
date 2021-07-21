@@ -9,6 +9,10 @@
 #include <globals.h>
 #include "math.h"
 
+#define SM2_PDO_CHECK_NUM	32
+// sync manager status register
+uint8_t sm_sr[SM2_PDO_CHECK_NUM];
+
 extern const	_objd SDO8002[];
 extern const	_objd SDO8003[];
 
@@ -161,6 +165,13 @@ void pre_state_change_hook (uint8_t * as, uint8_t * an)
     if ( (*as == INIT_TO_PREOP) && (*an & ESCerror ) == 0 ) {
     	on_PREOP();
     }
+
+    // going to OP
+	if ( (*as & 0x80) && (*an & ESCerror ) == 0 ) {
+		// if array is init'ed with zeros and first write buffer is 0
+		sm_sr[1] = 0xFF; sm_sr[2] = 0xAA;
+
+	}
 }
 
 /** Optional: Hook called AFTER state change for application
@@ -181,12 +192,54 @@ uint16_t check_dc_handler_hook(void) {
 	return 0;
 }
 
+static uint16_t RXPDO_OP_check ( void ) {
+
+	int i;
+	static uint8_t 		sm_idx;
+	uint16_t 	buffer_written;
+	uint8_t		status_reg;
+	uint8_t 	count;
+
+					// check buffer status variation, only in OP and only for SM2 !!!
+	// Buffered mode: buffer status (last written buffer)
+	// 0x800+y*8 : receive PDO SM2 ==> 0x810
+	// 0x810 + 5 ==> 0x815 status register
+	// 00 first
+	// 01 second
+	// 10 third
+	// 11 no buffer written
+	ESC_read ( 0x815, (void *) &status_reg, sizeof (status_reg));
+	sm_sr[sm_idx] = (status_reg >> 4) & 0x3;
+
+	count = 0;
+	for (i=0; i<SM2_PDO_CHECK_NUM; i++) {
+		if ( sm_sr[sm_idx] == sm_sr[i] ) {
+			count++;
+		}
+	}
+
+	if ( count != SM2_PDO_CHECK_NUM ) {
+		buffer_written = 1;
+	} else {
+		buffer_written = 0;
+	}
+
+	//DPRINT ("SM status reg %d idx %d count %d\n", sm_sr[sm_idx], sm_idx, count );
+
+	sm_idx ++;
+	if ( sm_idx >= SM2_PDO_CHECK_NUM) {
+		sm_idx = 0;
+	}
+
+	return buffer_written;
+}
 /**
  * @author amargan (7/4/2014)
  */
 void ecat_process_pdo(void) {
 
 	if ( (ESCvar.ALstatus & 0x0f) == ESCop ) {
+		RXPDO_OP_check();
 		RXPDO_update();
 		if (rx_pdo.op_idx_aux != 0 ) {
 			handle_aux_pdo_rx();

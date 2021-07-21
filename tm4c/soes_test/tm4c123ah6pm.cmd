@@ -14,7 +14,7 @@
 
 MEMORY
 {
-    FLASH   (RX) : origin = FLASH_APP, length = 0x00026000
+    FLASH   (RX) : origin = FLASH_APP, length = 0x00020000
     PAR_APP (RW) : origin = 0x0039000, length = 0x00001000
     CALIB   (RW) : origin = 0x0038000, length = 0x00001000
     EMPTY   (RW) : origin = 0x0037000, length = 0x00001000
