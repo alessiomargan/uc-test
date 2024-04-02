@@ -17,11 +17,12 @@
 #define FLASH_SIGN_VALID		0xCAFE
 #define FLASH_SIGN_DEFAULT		0xDEFA
 
+/* depend on microcontroller ... moved in flash_utils.h
 #define FLASH_PARAM_SECTOR		0x12000
 #define FLASH_PARAM_MAX_SIZE	0x1000
 #define FLASH_CALIB_SECTOR		0x13000
 #define FLASH_CALIB_MAX_SIZE	0x1000
-
+*/
 #define SMCLK_FREQUENCY		CS_24MHZ
 //#define SAMPLE_FREQUENCY	5000		//  5kHz
 #define DFLT_SAMPLE_FREQ	10000		// 10kHz

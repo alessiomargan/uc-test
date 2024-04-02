@@ -1,12 +1,12 @@
 #ifndef __SOES_HOOK_H__
 #define __SOES_HOOK_H__
 
-#ifdef ccs
-	#define IAR_PACKED
-	#define CCS_PACKED	__attribute__((__packed__))
-#else
+#ifdef IAR
 	#define IAR_PACKED 	__packed
 	#define CCS_PACKED
+#else
+	#define IAR_PACKED
+	#define CCS_PACKED	__attribute__((__packed__))
 #endif
 
 typedef struct {

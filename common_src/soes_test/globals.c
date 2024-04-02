@@ -1,4 +1,5 @@
 #include "globals.h"
+#include "flash_utils.h"
 
 /************************************************************************************
  * Ethercat PDOs SDOs
@@ -11,8 +12,9 @@ aux_pdo_rx_t	aux_pdo_rx;
 aux_pdo_tx_t	aux_pdo_tx;
 fault_t			glob_fault;
 
-#pragma RETAIN(flash_sdo)
-#pragma DATA_SECTION(flash_sdo, ".PAR_APP")
+//#pragma RETAIN(flash_sdo)
+//#pragma DATA_SECTION(flash_sdo, ".PAR_APP")
+__attribute__((section(".params")))
 const flash_sdo_t	flash_sdo;
 
 sdo_t	sdo = {
@@ -47,9 +49,10 @@ void print_sdo(const flash_sdo_t *s) {
 /************************************************************************************
  * Calib matrix
  */
-#pragma RETAIN(calib_matrix)
-#pragma DATA_SECTION(calib_matrix, ".CALIB")
-const float	calib_matrix[6][6];
+//#pragma RETAIN(calib_matrix)
+//#pragma DATA_SECTION(calib_matrix, ".CALIB")
+__attribute__((section(".calib")))
+const volatile float calib_matrix[6][6];
 
 const float	dflt_calib_matrix[6][6] = {
 		{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
@@ -92,7 +95,7 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
 	{
 			.name =					"ft6_param.bin",
 			.max_data = 			FLASH_PARAM_MAX_SIZE, 	// sector size ?!?
-			.dest_start_address =	FLASH_PARAM_SECTOR, 	//
+			.dest_start_address =	FLASH_PARAM_ADDR, 	//
 			.address_offset =		0,
 			.filepass =				0xA4A4,
 //			.write_function =		foe_write_flash,
@@ -103,7 +106,7 @@ foe_writefile_cfg_t      gFOE_firmware_files[] = {
     {
     		.name =					"cal_mat.bin",
 			.max_data = 			FLASH_CALIB_MAX_SIZE, 	// sector size ?!?
-			.dest_start_address =	FLASH_CALIB_SECTOR, 	//
+			.dest_start_address =	FLASH_CALIB_ADDR, 	//
 			.address_offset =		0,
 			.filepass =				0xCA71,
 			.write_function =		foe_write_cal_mat,

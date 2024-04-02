@@ -10,6 +10,7 @@ extern Timer_A_PWMConfig pwmConfig;
 #include "flash_utils.h"
 #include "params.h"
 
+#include <string.h>
 #include <soes_hook.h>
 
 extern void Disable_interrupt();
@@ -18,7 +19,7 @@ extern void Enable_interrupt();
 
 uint16_t Load_Default_Params(void) {
 
-	memcpy((void*)&sdo.flash, (void*)&dflt_flash_sdo, sizeof(dflt_flash_sdo));
+	memcpy((void*)&sdo.flash, (const void*)&dflt_flash_sdo, sizeof(dflt_flash_sdo));
 	if ( sdo.flash._signature_ != FLASH_SIGN_DEFAULT ) {
 		return PARAMS_CMD_ERROR;
 	}
@@ -28,10 +29,13 @@ uint16_t Load_Default_Params(void) {
 
 uint16_t Read_Flash_Params(void) {
 
-	memcpy((void*)&sdo.flash, (void*)FLASH_PARAM_SECTOR, sizeof(sdo.flash));
+	memcpy((void*)&sdo.flash, (const void*)FLASH_PARAM_ADDR, sizeof(sdo.flash));
 	if ( sdo.flash._signature_ != FLASH_SIGN_VALID ) {
 		return PARAMS_CMD_ERROR;
 	}
+//	if ( sdo.flash._crc != Calc_CRC(&sdo.flash, ) ) {
+//		return PARAMS_CMD_ERROR;
+//	}
 	return PARAMS_CMD_DONE;
 
 }

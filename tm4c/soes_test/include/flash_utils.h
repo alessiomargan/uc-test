@@ -6,8 +6,8 @@
 #define FLASH_CALIB_ADDR      0x13000
 #define FLASH_CALIB_MAX_SIZE    0x1000
 
-uint32_t calc_CRC(uint32_t addr, uint32_t length);
+//uint32_t calc_CRC(uint32_t addr, uint32_t length);
 
-bool Write_flash(uint32_t flash_addr, void * src, size_t size);
+//bool Write_flash(uint32_t flash_addr, void * src, size_t size);
 
 #endif

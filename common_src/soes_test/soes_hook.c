@@ -18,7 +18,8 @@ extern const	_objd SDO8003[];
 
 extern float	tempC;
 
-extern void jump_to_bootloader(void);
+void default_jump_to_bootloader(void) __attribute__((weak));
+extern void jump_to_bootloader(void)  __attribute__((weak, alias("default_jump_to_bootloader")));
 
 /* Forward declaration of the default fault handlers. */
 void Default_Object_Handler(uint8_t) __attribute__((weak));
@@ -53,6 +54,10 @@ const esc_cfg_t config =
 	.esc_check_dc_handler		= check_dc_handler_hook,
 };
 
+void default_jump_to_bootloader(void) {
+
+	DPRINT("%s ... weak\n", __FUNCTION__);
+}
 
 void Default_Object_Handler(uint8_t subindex) {
 
