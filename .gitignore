@@ -1,2 +1,4 @@
-
-ek_tm4c123gxl/bl_ecat/gcc/
+# since .gitignore_global has *.lib
+# I want to track lib in f28m36/libs/ 
+# so not ignore all libs in f28m36/libs/
+!f28m36/libs/**
