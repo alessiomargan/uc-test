@@ -55,7 +55,7 @@ extern Timer_A_PWMConfig pwmConfig;
 #endif
 extern foe_cfg_t 	gFOE_config;
 extern uint8_t		foe_buffer[0x400];
-extern foe_writefile_cfg_t	gFOE_firmware_files[];
+extern foe_file_cfg_t	gFOE_firmware_files[];
 
 void print_sdo(const flash_sdo_t *);
 

@@ -80,10 +80,10 @@ float		conv_adc[16];
 /************************************************************************************
  * FOE files
  */
-uint32_t foe_write_cal_mat( foe_writefile_cfg_t * writefile_cfg, uint8_t * data, size_t length ) {
+uint32_t foe_write_cal_mat( foe_file_cfg_t * writefile_cfg, uint8_t * data, size_t length ) {
 	return 1;
 }
-uint32_t foe_read_cal_mat ( foe_writefile_cfg_t * writefile_cfg, uint8_t * data, size_t length ) {
+uint32_t foe_read_cal_mat ( foe_file_cfg_t * writefile_cfg, uint8_t * data, size_t length ) {
 	return 1;
 }
 
@@ -91,7 +91,7 @@ foe_cfg_t 	gFOE_config = { 0, 0, 0 ,0 };
 uint8_t		foe_buffer[0x400];
 
 
-foe_writefile_cfg_t      gFOE_firmware_files[] = {
+foe_file_cfg_t      gFOE_firmware_files[] = {
 	{
 			.name =					"ft6_param.bin",
 			.max_data = 			FLASH_PARAM_MAX_SIZE, 	// sector size ?!?
