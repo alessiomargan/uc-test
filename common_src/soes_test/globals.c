@@ -14,7 +14,7 @@ fault_t			glob_fault;
 
 //#pragma RETAIN(flash_sdo)
 //#pragma DATA_SECTION(flash_sdo, ".PAR_APP")
-__attribute__((section(".params")))
+__attribute__((section(".PAR_APP")))
 const flash_sdo_t	flash_sdo;
 
 sdo_t	sdo = {

@@ -30,7 +30,7 @@ extern void Handle_0x8001(uint8_t) __attribute__((weak, alias("Default_Object_Ha
 
 void pre_state_change_hook (uint8_t * as, uint8_t * an);
 void post_state_change_hook (uint8_t * as, uint8_t * an);
-void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags);
+uint32_t ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags);
 uint16_t check_dc_handler_hook(void);
 
 /* Setup config hooks */
@@ -135,7 +135,7 @@ static void handle_aux_pdo_tx(void) {
  * @param[in] index      = index of SDO download request to handle
  * @param[in] sub-index  = sub-index of SDO download request to handle
  */
-void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
+uint32_t ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
 {
 	switch ( index ) {
         case 0x7000:
@@ -151,6 +151,7 @@ void ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
              DPRINT("SDO 0x%04X %d NOT Handled\n", index, subindex);
              break;
     }
+	return 0;
 }
 
 /** Mandatory: Hook called from the slave stack ESC_stopoutputs to act on state changes

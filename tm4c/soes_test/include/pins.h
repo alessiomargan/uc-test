@@ -5,9 +5,9 @@
 //
 //*****************************************************************************
 // -->!! hal_ec_tiM4.c use these defines
-#define SPI_ECAT_SSI_PORT               GPIO_PORTB_BASE
-#define SPI_ECAT_CS_PIN                 GPIO_PIN_5
-#define SSI_ECAT_BASE                   SSI2_BASE
+//#define SPI_ECAT_SSI_PORT               GPIO_PORTB_BASE
+//#define SPI_ECAT_CS_PIN                 GPIO_PIN_5
+//#define SSI_ECAT_BASE                   SSI2_BASE
 // <--!! hal_ec_tiM4.c use these defines
 
 #define ECAT_SSI_BASE                   SSI2_BASE
