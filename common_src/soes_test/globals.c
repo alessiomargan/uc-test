@@ -35,10 +35,10 @@ const flash_sdo_t	dflt_flash_sdo = {
 void print_sdo(const flash_sdo_t *s) {
 
     int i=0;
-	DPRINT("sdo.flash._signature_=0x%04X\n", s->_signature_);
-    DPRINT("sdo.flash.board_id=%d\n", s->board_id);
-    DPRINT("sdo.flash.analog_sample_freq=%d\n", s->analog_sample_freq);
-    DPRINT("sdo.flash.module_params=%d\n", s->module_params);
+	DPRINT("sdo.flash._signature_=0x%04" PRIX32 "\n", s->_signature_);
+    DPRINT("sdo.flash.board_id=%" PRIu32 "\n", s->board_id);
+    DPRINT("sdo.flash.analog_sample_freq=%" PRIu32 "\n", s->analog_sample_freq);
+    DPRINT("sdo.flash.module_params=%" PRIu32 "\n", s->module_params);
     DPRINT("sdo.flash.blob=");
     for (i=0;i<sizeof(s->blob);i++) {
         printf("0x%02X ", s->blob[i]);

@@ -26,7 +26,6 @@ const _objd SDO1008[] =
 const _objd SDO1009[] =
 {
   {0x0, DTYPE_VISIBLE_STRING, 24, ATYPE_RO, "Manufacturer Hardware Version", 0, "1.0"},
-
 };
 
 const _objd SDO100A[] =

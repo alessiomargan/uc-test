@@ -39,6 +39,7 @@ const esc_cfg_t config =
     .user_arg					= "hello_world",
     .use_interrupt				= 1,
     .watchdog_cnt				= 0,
+	.skip_default_initialization = true,
     .set_defaults_hook 			= NULL,
     .pre_state_change_hook 		= pre_state_change_hook,
     .post_state_change_hook 	= post_state_change_hook,
@@ -151,15 +152,9 @@ uint32_t ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags
              DPRINT("SDO 0x%04X %d NOT Handled\n", index, subindex);
              break;
     }
-	return 0;
-}
 
-/** Mandatory: Hook called from the slave stack ESC_stopoutputs to act on state changes
- * forcing us to stop outputs. Here we can set them to a safe state.
- */
-void APP_safeoutput (void)
-{
-    DPRINT ("APP_safeoutput\n");
+	// TODO handle sub-func returns
+	return 0;
 }
 
 /** Optional: Hook called BEFORE state change for application
@@ -206,7 +201,7 @@ static uint16_t RXPDO_OP_check ( void ) {
 	uint8_t		status_reg;
 	uint8_t 	count;
 
-					// check buffer status variation, only in OP and only for SM2 !!!
+	// check buffer status variation, only in OP and only for SM2 !!!
 	// Buffered mode: buffer status (last written buffer)
 	// 0x800+y*8 : receive PDO SM2 ==> 0x810
 	// 0x810 + 5 ==> 0x815 status register
@@ -239,18 +234,26 @@ static uint16_t RXPDO_OP_check ( void ) {
 
 	return buffer_written;
 }
-/**
- * @author amargan (7/4/2014)
+
+/*
+ * cb_set_outputs();
+ * cb_get_inputs();
+ * is equal to call ecat_process_pdo() without RXPDO_update TXPDO_update();
  */
-void ecat_process_pdo(void) {
+
+void cb_set_outputs() {
 
 	if ( (ESCvar.ALstatus & 0x0f) == ESCop ) {
 		RXPDO_OP_check();
-		RXPDO_update();
+		//RXPDO_update();
 		if (rx_pdo.op_idx_aux != 0 ) {
 			handle_aux_pdo_rx();
 		}
 	}
+
+}
+
+void cb_get_inputs() {
 
 	// set RO aux
 	aux_pdo_tx.pos_ref_fb =  rx_pdo.pos_ref;
@@ -271,9 +274,8 @@ void ecat_process_pdo(void) {
     //tx_pdo.temperature = (int16_t)(tempC*10);
     tx_pdo.rtt = rx_pdo.ts;
 
-    TXPDO_update();
+    //TXPDO_update();
 }
-
 
 void bootstrap_foe_init(void) {
 
