@@ -1,6 +1,6 @@
 #include "globals.h"
 #include "flash_utils.h"
-
+#include <stdio.h>
 /************************************************************************************
  * Ethercat PDOs SDOs
  */
@@ -14,7 +14,7 @@ fault_t			glob_fault;
 
 //#pragma RETAIN(flash_sdo)
 //#pragma DATA_SECTION(flash_sdo, ".PAR_APP")
-__attribute__((section(".PAR_APP")))
+__attribute__((section(".params")))
 const flash_sdo_t	flash_sdo;
 
 sdo_t	sdo = {
@@ -34,13 +34,13 @@ const flash_sdo_t	dflt_flash_sdo = {
 
 void print_sdo(const flash_sdo_t *s) {
 
-    int i=0;
+    //int i=0;
 	DPRINT("sdo.flash._signature_=0x%04" PRIX32 "\n", s->_signature_);
     DPRINT("sdo.flash.board_id=%" PRIu32 "\n", s->board_id);
     DPRINT("sdo.flash.analog_sample_freq=%" PRIu32 "\n", s->analog_sample_freq);
     DPRINT("sdo.flash.module_params=%" PRIu32 "\n", s->module_params);
     DPRINT("sdo.flash.blob=");
-    for (i=0;i<sizeof(s->blob);i++) {
+    for (uint32_t i=0; i<sizeof(s->blob); i++) {
         printf("0x%02X ", s->blob[i]);
     }
     printf("\n");
@@ -114,5 +114,5 @@ foe_file_cfg_t      gFOE_firmware_files[] = {
 			.on_foe_open = 			0,
 			.on_foe_close = 		0,
     },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    { 0 }
 };
