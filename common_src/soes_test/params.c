@@ -43,6 +43,7 @@ uint16_t Read_Flash_Params(void) {
 uint16_t Write_Flash_Params(void) {
 
 	bool ret;
+	DPRINT("%s 0x%08X\n", __FUNCTION__, (uint32_t)&flash_sdo);
 	sdo.flash._signature_ = FLASH_SIGN_VALID;
 	ret = Write_flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo));
 	return (ret ? PARAMS_CMD_DONE : PARAMS_CMD_ERROR);
