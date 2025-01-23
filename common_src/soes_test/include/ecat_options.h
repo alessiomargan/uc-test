@@ -30,7 +30,7 @@
 
 // should match ESI xml conf
 #define SM2_sma     0x1100
-#define SM2_smc     0x64
+#define SM2_smc     0x24
 #define SM2_act     0x01
 #define SM3_sma     0x1400
 #define SM3_smc     0x20
