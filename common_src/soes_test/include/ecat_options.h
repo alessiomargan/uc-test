@@ -29,10 +29,10 @@
 #define MBX1_smc_b  0x22
 
 // should match ESI xml conf
-#define SM2_sma     0x1100
+#define SM2_sma     0x1200
 #define SM2_smc     0x24
 #define SM2_act     0x01
-#define SM3_sma     0x1400
+#define SM3_sma     0x1600
 #define SM3_smc     0x20
 #define SM3_act     0x01
 
