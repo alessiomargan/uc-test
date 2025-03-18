@@ -19,6 +19,15 @@ extern uint32_t ESC_SYNCactivation(void);
 extern esc_cfg_t config;
 uint32_t uid[3];
 
+///////////////////////////////////////////////////////////////////////////
+// NOTE : in syscall.c comment function _write
+// the big difference seems the use of
+// 		HAL_UART_Transmit(gHuart, (uint8_t *) ptr, len, HAL_MAX_DELAY);
+// instead of a loop over "len" of
+// 		HAL_UART_Transmit(&printf_uart, (uint8_t *)&ch, 1, 0xFFFF);
+///////////////////////////////////////////////////////////////////////////
+
+#if 0
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 /**
   * @brief  Retargets the C library printf function to the USART.
@@ -32,6 +41,16 @@ PUTCHAR_PROTOTYPE
   HAL_UART_Transmit(&printf_uart, (uint8_t *)&ch, 1, 0xFFFF);
 
   return ch;
+}
+#endif
+
+int _write(int file, char *ptr, int len)
+{
+	HAL_StatusTypeDef hstatus;
+	hstatus = HAL_UART_Transmit(&printf_uart, (uint8_t *) ptr, len, HAL_MAX_DELAY);
+	if (hstatus == HAL_OK)
+		return len;
+	return -1;
 }
 
 void read_UID(void) {
@@ -70,6 +89,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 void user_code_init(void) {
+
+	/* Disable I/O buffering for STDOUT stream, so that
+	 * chars are sent out as soon as they are printed. */
+	setvbuf(stdout, NULL, _IONBF, 0);
 
 	read_UID();
 	DPRINT("+++ Start Application +++\n");
