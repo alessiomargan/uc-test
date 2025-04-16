@@ -89,9 +89,9 @@ SECTIONS
     .binit        : {}  > MAIN_APP
 
     /* flash parameters */
-    .PAR_APP    : > PAR_APP
+    .params    : > PAR_APP
     /* flash parameters */
-    .CALIB      : > CALIB
+    .calib      : > CALIB
 
     .vtable :   > SRAM_DATA
     .data   :   > SRAM_DATA

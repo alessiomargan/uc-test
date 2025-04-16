@@ -23,6 +23,14 @@ echo "#define GIT_HASH \"$(git -C $GIT_SRC_DIR rev-parse --short HEAD)\"" >> "$O
 echo "#define GIT_COMMIT_HASH \"$(git -C $GIT_SRC_DIR rev-parse HEAD)\"" >> "$OUTPUT_FILE"
 echo "#define GIT_BRANCH \"$(git -C $GIT_SRC_DIR rev-parse --abbrev-ref HEAD)\"" >> "$OUTPUT_FILE"
 
+# Get the most recent Git tag
+GIT_TAG="$(git -C $GIT_SRC_DIR describe --tags --abbrev=0 2>/dev/null)"
+if [ -z "$GIT_TAG" ]; then
+    GIT_TAG="No Tag"
+    echo "#warning \"No Git tag found in the repository!\"" >> "$OUTPUT_FILE"
+fi
+echo "#define GIT_TAG \"$GIT_TAG\"" >> "$OUTPUT_FILE"
+
 # Check if the repository is dirty
 if [ -n "$(git -C $GIT_SRC_DIR status --porcelain)" ]; then
     echo "#define GIT_DIRTY 1" >> "$OUTPUT_FILE"

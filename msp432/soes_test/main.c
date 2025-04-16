@@ -33,6 +33,9 @@
 #include "peripherals.h"
 #include "params.h"
 
+/* Auto-generated file */
+#include <build_info.h>
+
 // should go in globals.h
 // TODO put in globals_priv.h
 extern Timer_A_PWMConfig pwmConfig;
@@ -72,6 +75,21 @@ static void clock_src(void) {
 	clks[5] = CS_getDCOFrequency();
 }
 
+static inline void print_build_info(void) {
+
+	printf("\n");
+	printf("Build Timestamp: %s\n", BUILD_TIMESTAMP);
+    printf("Git Hash: %s\n", GIT_HASH);
+    printf("Git Commit Hash: %s\n", GIT_COMMIT_HASH);
+    printf("Git Branch: %s\n", GIT_BRANCH);
+    printf("Repository Dirty: %d\n", GIT_DIRTY);
+    printf("Git Repository URL: %s\n", GIT_REPO_URL);
+    printf("Build Host: %s\n", BUILD_HOST);
+    printf("Build User: %s\n", BUILD_USER);
+    printf("Build OS: %s\n", BUILD_OS);
+    printf("\n");
+
+}
 
 int main(void)
 {
@@ -112,6 +130,8 @@ int main(void)
 	 *
 	 */
     Configure_UART();
+
+    print_build_info();
 
     if ( Read_Flash_Params() == PARAMS_CMD_ERROR) {
 		//
