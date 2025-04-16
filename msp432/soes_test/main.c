@@ -25,7 +25,8 @@
 
 #include <cc.h>
 #include <soes/esc.h>
-#include <soes/hal/advr_esc/soes.h>
+//#include <soes/hal/advr_esc/soes.h>
+#include <soes/ecat_slv.h>
 
 #include "pins.h"
 #include "globals.h"
@@ -143,7 +144,8 @@ int main(void)
     /*
      * Init soes
      */
-    soes_init(&config);
+    //soes_init(&config);
+    ecat_slv_init(&config);
 
     MAP_Interrupt_setPriority(INT_PORT5,    (char)(2)<<5);
     MAP_Interrupt_setPriority(INT_T32_INT1, (char)(2)<<5);

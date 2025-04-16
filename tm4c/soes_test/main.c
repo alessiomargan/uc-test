@@ -95,7 +95,8 @@ void main(void)
     IntPrioritySet(INT_GPIOB,   0x20);
 
     //
-    soes_init(&config);
+    ecat_slv_init(&config);
+
 #ifdef USE_LCD
 #ifdef C_LCD
     lcd_test_2d ();

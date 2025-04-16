@@ -18,7 +18,7 @@
 #include <driverlib/adc.h>
 
 #include <soes/esc.h>
-#include <soes/hal/advr_esc/soes.h>
+#include <soes/ecat_slv.h>
 #include <soes_hook.h>
 
 #include <pins.h>
@@ -47,7 +47,7 @@ void GPIOB_IntHandler(void) {
 
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
 
-    ecat_process_pdo();
+    ecat_slv();
 
     //UARTprintf("PDI irq %d\n", ecat_irq_cnt );
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
@@ -64,15 +64,14 @@ void Timer0A_IntHandler(void) {
     timer0_cnt++;
 
     if ( ! ESC_SYNCactivation() ) {
-        ecat_process_pdo();
+    	ecat_slv();
     }
-	soes_loop();
 
     // every 1000 cycles
     if ( (timer0_cnt % 1000) == 0 ) {
         // toggle 
         HWREGBITB(&toggle, 0) ^= 1;
-        DPRINT("\r tmr0: %d %d\t ecat_irq_cnt :", timer0_cnt, toggle, ecat_irq_cnt );
+        //DPRINT("\r tmr0: %d %d\t ecat_irq_cnt :", timer0_cnt, toggle, ecat_irq_cnt );
     }
 
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, toggle ? GPIO_PIN_3 : 0 );

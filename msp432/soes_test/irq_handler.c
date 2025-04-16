@@ -74,8 +74,7 @@ void PORT5_IRQHandler(void) {
     if(status & PIN_ECAT_IRQ) {
 		ecat_irq_cnt++;
 		DBG_2_ON;
-		soes_loop();
-		ecat_process_pdo();
+		ecat_slv();
 		DBG_2_OFF;
     }
 }
@@ -118,8 +117,7 @@ void T32_INT1_IRQHandler(void)
 		avg_samples(9);
 
 		if ( ! ESC_SYNCactivation() ) {
-			soes_loop();
-			ecat_process_pdo();
+			ecat_slv();
 		}
     }
     DBG_1_OFF;
