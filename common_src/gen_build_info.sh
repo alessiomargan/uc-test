@@ -19,6 +19,7 @@ echo " * Auto-generated file. Do not edit manually." >> "$OUTPUT_FILE"
 echo " */" >> "$OUTPUT_FILE"
 
 echo "#define BUILD_TIMESTAMP \"$(date +"%Y-%m-%d %H:%M:%S")\"" >> "$OUTPUT_FILE"
+echo "#define BUILD_SHORT_TS \"$(date +"%y%m%d%H")\"" >> "$OUTPUT_FILE"
 echo "#define GIT_HASH \"$(git -C $GIT_SRC_DIR rev-parse --short HEAD)\"" >> "$OUTPUT_FILE"
 echo "#define GIT_COMMIT_HASH \"$(git -C $GIT_SRC_DIR rev-parse HEAD)\"" >> "$OUTPUT_FILE"
 echo "#define GIT_BRANCH \"$(git -C $GIT_SRC_DIR rev-parse --abbrev-ref HEAD)\"" >> "$OUTPUT_FILE"

@@ -6,7 +6,8 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
 #include <soes/esc.h>
-#include <soes/hal/advr_esc/soes.h>
+#include <soes/ecat_slv.h>
+//#include <soes/hal/advr_esc/soes.h>
 #include <soes_hook.h>
 
 #include "pins.h"

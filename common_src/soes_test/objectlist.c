@@ -4,11 +4,7 @@
 #include <soes/esc_coe.h>
 #include <soes_hook.h>
 
-extern tx_pdo_t tx_pdo;
-extern rx_pdo_t rx_pdo;
-extern aux_pdo_rx_t aux_pdo_rx;
-extern aux_pdo_tx_t aux_pdo_tx;
-extern sdo_t sdo;
+#include <globals.h>
 
 
 const char Number_of_elemets[] = "Number of Elements";
@@ -173,6 +169,16 @@ const _objd SDO8002[] =
   {0x5,  DTYPE_REAL32,      32, ATYPE_RO, "vout",     	0, &aux_pdo_tx.vout},
 };
 
+// build info
+const _objd SDO9009[] =
+{
+  {0x0,  DTYPE_UNSIGNED8,        8, ATYPE_RO,   "NumElem",      4, 0},
+  {0x1, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_hash",     0, &git_hash},
+  {0x2, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_branch",   0, &git_branch},
+  {0x3, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_tag",      0, &git_tag},
+  {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "build_ts",     0, &build_ts},
+};
+
 const _objd SDO8003[] =
 {
   {0x0,  DTYPE_UNSIGNED8,        8, ATYPE_RO, "NumElem",   12, 0},
@@ -213,6 +219,7 @@ const _objectlist SDOobjects[] =
   {0x8001, OTYPE_RECORD, 	 6,  0, "Ram Parameters", SDO8001},
   {0x8002, OTYPE_RECORD,     5,  0, "AuxPdo RO",   SDO8002},
   {0x8003, OTYPE_RECORD,     12, 0, "AuxPdo WR",   SDO8003},
+  {0x9009, OTYPE_RECORD,     4,  0, "Build_info",  SDO9009},
   {0xffff, 0xff, 0xff, 0xff, 0,  0}
 };
 

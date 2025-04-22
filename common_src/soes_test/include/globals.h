@@ -41,6 +41,11 @@ extern sdo_t 				sdo;
 extern const flash_sdo_t	dflt_flash_sdo;
 extern const flash_sdo_t	flash_sdo;
 
+extern const uint8_t    git_hash[];
+extern const uint8_t    git_branch[];
+extern const uint8_t    git_tag[];
+extern const uint8_t    build_ts[];
+
 extern uint32_t cal30;
 extern uint32_t cal85;
 extern float 	calDifference;
@@ -58,5 +63,6 @@ extern uint8_t		foe_buffer[0x400];
 extern foe_file_cfg_t	gFOE_firmware_files[];
 
 void print_sdo(const flash_sdo_t *);
+void print_build_info(void);
 
 #endif
