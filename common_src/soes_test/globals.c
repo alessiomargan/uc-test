@@ -43,9 +43,9 @@ void print_sdo(const flash_sdo_t *s) {
     DPRINT("sdo.flash.module_params=%" PRIu32 "\n", s->module_params);
     DPRINT("sdo.flash.blob=");
     for (uint32_t i=0; i<sizeof(s->blob); i++) {
-        printf("0x%02X ", s->blob[i]);
+    	DPRINT("0x%02X ", s->blob[i]);
     }
-    printf("\n");
+    DPRINT("\n");
 }
 
 /************************************************************************************

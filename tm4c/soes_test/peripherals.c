@@ -18,6 +18,7 @@
 #include <driverlib/interrupt.h>
 #include <driverlib/pin_map.h>
 #include <driverlib/rom.h>
+#include <driverlib/rom_map.h>
 #include <driverlib/ssi.h>
 #include <driverlib/timer.h>
 #include <driverlib/adc.h>
@@ -25,7 +26,7 @@
 #include <driverlib/i2c.h>
 #include <driverlib/uart.h>
 
-#include <utils/uartstdio.h>
+//#include <utils/uartstdio.h>
 
 #include "pins.h"
 #include "soes_hook.h"
@@ -68,17 +69,47 @@ void jump_to_bootloader(void) {
 void Configure_UART(void)
 {
     // Enable the GPIO Peripheral used by the UART.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     // Enable UART0
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
     // Configure GPIO Pins for UART mode.
-    GPIOPinConfigure(GPIO_PA0_U0RX);
-    GPIOPinConfigure(GPIO_PA1_U0TX);
-    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    MAP_GPIOPinConfigure(GPIO_PA0_U0RX);
+    MAP_GPIOPinConfigure(GPIO_PA1_U0TX);
+    MAP_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     // Use the internal 16MHz oscillator as the UART clock source.
-    UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
+    MAP_UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
     // Initialize the UART for console I/O.
-    UARTStdioConfig(0, 115200, 16000000);
+    //UARTStdioConfig(0, 115200, 16000000);
+
+    // Enable UART0
+	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+	// Configure the UART for 115200, n, 8, 1
+	MAP_UARTConfigSetExpClk(UART0_BASE, 16000000, 115200,
+							(UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
+							 UART_CONFIG_WLEN_8));
+	// Enable the UART operation.
+	MAP_UARTEnable(UART0_BASE);
+
+    DPRINT("%s\n",__FUNCTION__);
+
+}
+
+int fputc(int _c, register FILE *_fp) {
+	MAP_UARTCharPut(UART0_BASE, (unsigned char) _c);
+	return ((unsigned char) _c);
+}
+
+int fputs(const char *_ptr, register FILE *_fp) {
+	unsigned int i, len;
+
+	len = strlen(_ptr);
+
+	for (i = 0; i < len; i++) {
+		MAP_UARTCharPut(UART0_BASE, (unsigned char) _ptr[i]);
+
+	}
+
+	return len;
 }
 
 /**
@@ -120,7 +151,7 @@ void Configure_EcatPDI (void)
     IntRegister(INT_GPIOB, GPIOB_IntHandler);
 	IntEnable(INT_GPIOB);
 
-	UARTprintf("%s\n",__FUNCTION__);
+	DPRINT("%s\n",__FUNCTION__);
 
 }
 
@@ -159,7 +190,7 @@ void Configure_LCD (void)
 #ifdef USE_LCD
     lcd_init();
 #endif
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /**
@@ -176,7 +207,7 @@ void Configure_Led(void)
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 /**
@@ -197,7 +228,7 @@ void Configure_Timer_0A(void)
     // Enable the timer.
     TimerEnable(TIMER0_BASE, TIMER_A);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 void Configure_Timer_1A(void)
 {
@@ -214,7 +245,7 @@ void Configure_Timer_1A(void)
     // Enable the timer.
     TimerEnable(TIMER1_BASE, TIMER_A);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 }
 
 
@@ -236,7 +267,7 @@ void Configure_ADC(void)
     IntRegister(INT_ADC0SS2, ADC2_IntHandler);
     IntEnable(INT_ADC0SS2);
 
-    UARTprintf("%s\n",__FUNCTION__);
+    DPRINT("%s\n",__FUNCTION__);
 
 }
 

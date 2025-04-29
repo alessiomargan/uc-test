@@ -8,16 +8,15 @@
 
 --retain=g_pfnVectors
 
-#define FLASH_APP 	0x00010000
+#define FLASH_APP 	0x00020000
 //#define FLASH_APP 0x00005000
 //#define FLASH_APP 0x00000000
 
 MEMORY
 {
-    FLASH   (RX) : origin = FLASH_APP, length = 0x00020000
-    PAR_APP (RW) : origin = 0x0039000, length = 0x00001000
-    CALIB   (RW) : origin = 0x0038000, length = 0x00001000
-    EMPTY   (RW) : origin = 0x0037000, length = 0x00001000
+    FLASH   (RX) : origin = FLASH_APP, length = 0x0001E000
+    PARAM   (RW) : origin = 0x003F000, length = 0x00001000
+    CALIB   (RW) : origin = 0x003E000, length = 0x00001000
 
     SRAM (RWX) : origin = 0x20000000, length = 0x00008000
 }
@@ -57,7 +56,7 @@ SECTIONS
     .fonts   :   > SRAM
 
     /* flash parameters */
-    .PAR_APP    : > PAR_APP
+    .PAR_APP    : > PARAM
     /* calibration  */
     .CALIB      : > CALIB
 

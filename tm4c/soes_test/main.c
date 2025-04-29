@@ -37,6 +37,8 @@
 #include "peripherals.h"
 #include "params.h"
 
+/* Auto-generated file */
+#include <build_info.h>
 
 #ifdef USE_LCD
 	#ifdef C_LCD
@@ -74,9 +76,10 @@ void main(void)
 
     // Set up the serial console to use for displaying messages.
     Configure_UART();
-    UARTprintf("\n\nHello, world!\n");
-    UARTprintf("Build %s %s\n",__DATE__ , __TIME__);
-    UARTprintf("SysCtlClockGet %d\n", SysCtlClockGet() );
+    print_build_info();
+    DPRINT("Hello, world!\n");
+    DPRINT("Build %s %s\n",__DATE__ , __TIME__);
+    DPRINT("SysCtlClockGet %d\n", SysCtlClockGet() );
     sdo.flash.board_id = 969;
     //
     Configure_Led();
