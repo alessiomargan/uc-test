@@ -82,7 +82,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	} else if (GPIO_Pin == BTN_1_Pin) {
 		sdo.flash._signature_ = FLASH_SIGN_VALID;
 		ret = Write_flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo));
-		DPRINT("%s 0x%08X ret=%d\n", __FUNCTION__, (uint32_t)&flash_sdo, ret);
+		DPRINT("%s 0x%"PRIX32" ret=%d\n", __FUNCTION__, (uint32_t)&flash_sdo, ret);
 
 	}
 
@@ -96,15 +96,16 @@ void user_code_init(void) {
 
 	read_UID();
 	DPRINT("+++ Start Application +++\n");
+	print_build_info();
 	if ( Read_Flash_Params() == PARAMS_CMD_ERROR) {
-	//
-	//glob_fault.bit.warn_read_flash = 1;
-	DPRINT("Read_Flash_Params FAIL\n");
-	if ( Load_Default_Params() == PARAMS_CMD_ERROR) {
-		// FATAL ERROR
-		Error_Handler();
-	}
-	DPRINT("Load_Default_Params\n");
+		//
+		//glob_fault.bit.warn_read_flash = 1;
+		DPRINT("Read_Flash_Params FAIL\n");
+		if ( Load_Default_Params() == PARAMS_CMD_ERROR) {
+			// FATAL ERROR
+			Error_Handler();
+		}
+		DPRINT("Load_Default_Params\n");
 	}
 	DPRINT("sdo.ram.fw_ver=%s\n", sdo.ram.fw_ver);
 	DPRINT("FLASH_SDO\n");
