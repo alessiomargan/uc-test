@@ -212,7 +212,7 @@ const _objectlist SDOobjects[] =
   {0x1C00, OTYPE_ARRAY, 	 4,  0, "Sync Manager Communication Type", SDO1C00},
   {0x1C12, OTYPE_ARRAY, 	 1,  0, "Sync Manager 2 PDO Assignment", SDO1C12},
   {0x1C13, OTYPE_ARRAY, 	 1,  0, "Sync Manager 3 PDO Assignment", SDO1C13},
-  {0x1C32, OTYPE_ARRAY, 	 2,  0, "SM2(Output) Synchronisation  Parameter", SDO1C32},
+  {0x1C32, OTYPE_ARRAY, 	 2,  0, "SM2(Output) Synchronization  Parameter", SDO1C32},
   {0x6000, OTYPE_RECORD, 	 10, 0, "Inputs", SDO6000},
   {0x7000, OTYPE_RECORD, 	 12, 0, "Outputs", SDO7000},
   {0x8000, OTYPE_RECORD, 	 4,  0, "Flash Parameters", SDO8000},
