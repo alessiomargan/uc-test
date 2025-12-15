@@ -47,12 +47,15 @@ const esc_cfg_t config =
     .safeoutput_override 		= NULL,
     .pre_object_download_hook 	= NULL,
     .post_object_download_hook 	= ESC_App_objecthandler,
+	.pre_object_upload_hook		= NULL,
+	.post_object_upload_hook	= NULL,
     .rxpdo_override				= NULL,
     .txpdo_override				= NULL,
     .esc_hw_interrupt_enable	= NULL,
     .esc_hw_interrupt_disable	= NULL,
     .esc_hw_eep_handler			= NULL,
 	.esc_check_dc_handler		= check_dc_handler_hook,
+	.get_device_id				= NULL,
 };
 
 void default_jump_to_bootloader(void) {

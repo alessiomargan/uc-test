@@ -64,13 +64,17 @@ void read_UID(void)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    if (htim->Instance == TIM7) {
-        DBG_2_ON;
-        if (!ESC_SYNCactivation()) {
-            ecat_slv();
-        }
-        DBG_2_OFF;
-    }
+	//if (htim->Instance == TIM6) {
+	//	HAL_IncTick();
+	//}
+
+	if (htim->Instance == TIM7) {
+		DBG_2_ON;
+		if ( ! ESC_SYNCactivation() ) {
+			ecat_slv();
+		}
+		DBG_2_OFF;
+	}
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -118,6 +122,7 @@ void user_code_init(void)
     print_sdo(&dflt_flash_sdo);
     DPRINT("SDO\n");
     print_sdo(&sdo.flash);
+    // TODO add EEPROM_LOAD if present
     /* Init soes */
     ecat_slv_init(&config);
     /* timer initialization with interrupt mode */
