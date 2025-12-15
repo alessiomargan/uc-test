@@ -46,91 +46,97 @@ PUTCHAR_PROTOTYPE
 
 int _write(int file, char *ptr, int len)
 {
-	HAL_StatusTypeDef hstatus;
-	hstatus = HAL_UART_Transmit(&printf_uart, (uint8_t *) ptr, len, HAL_MAX_DELAY);
-	if (hstatus == HAL_OK)
-		return len;
-	return -1;
+
+    HAL_StatusTypeDef hstatus;
+    hstatus = HAL_UART_Transmit(&printf_uart, (uint8_t*) ptr, len,
+    HAL_MAX_DELAY);
+    if (hstatus == HAL_OK) return len;
+    return -1;
 }
 
-void read_UID(void) {
+void read_UID(void)
+{
 
-	uid[0] = *(uint32_t *)UID_BASE;
-	uid[1] = *(uint32_t *)(UID_BASE + 4);
-	uid[2] = *(uint32_t *)(UID_BASE + 8);
+    uid[0] = *(uint32_t*) UID_BASE;
+    uid[1] = *(uint32_t*) (UID_BASE + 4);
+    uid[2] = *(uint32_t*) (UID_BASE + 8);
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	if (htim->Instance == TIM7) {
-		DBG_2_ON;
-		if ( ! ESC_SYNCactivation() ) {
-			ecat_slv();
-		}
-		DBG_2_OFF;
-	}
+    if (htim->Instance == TIM7) {
+        DBG_2_ON;
+        if (!ESC_SYNCactivation()) {
+            ecat_slv();
+        }
+        DBG_2_OFF;
+    }
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
 
-	bool ret = false;
+    bool ret = false;
 
-	if (GPIO_Pin == ECAT_IRQ_Pin) {
-		DBG_1_ON;
-		ecat_slv();
-		DBG_1_OFF;
-	} else if (GPIO_Pin == BTN_1_Pin) {
-		sdo.flash._signature_ = FLASH_SIGN_VALID;
-		ret = Write_flash((uint32_t)&flash_sdo, (void*)&sdo.flash, sizeof(flash_sdo));
-		DPRINT("%s 0x%"PRIX32" ret=%d\n", __FUNCTION__, (uint32_t)&flash_sdo, ret);
-
-	}
-
-}
-
-void user_code_init(void) {
-
-	/* Disable I/O buffering for STDOUT stream, so that
-	 * chars are sent out as soon as they are printed. */
-	setvbuf(stdout, NULL, _IONBF, 0);
-
-	read_UID();
-	DPRINT("+++ Start Application +++\n");
-	print_build_info();
-	if ( Read_Flash_Params() == PARAMS_CMD_ERROR) {
-		//
-		//glob_fault.bit.warn_read_flash = 1;
-		DPRINT("Read_Flash_Params FAIL\n");
-		if ( Load_Default_Params() == PARAMS_CMD_ERROR) {
-			// FATAL ERROR
-			Error_Handler();
-		}
-		DPRINT("Load_Default_Params\n");
-	}
-	DPRINT("sdo.ram.fw_ver=%s\n", sdo.ram.fw_ver);
-	DPRINT("FLASH_SDO\n");
-	print_sdo(&flash_sdo);
-	DPRINT("DFLT_FLASH_SDO\n");
-	print_sdo(&dflt_flash_sdo);
-	DPRINT("SDO\n");
-	print_sdo(&sdo.flash);
-	/* Init soes */
-	ecat_slv_init(&config);
-	/* timer initialization with interrupt mode */
-	HAL_TIM_Base_Start_IT(&htim7);
+    if (GPIO_Pin == ECAT_IRQ_Pin) {
+        DBG_1_ON;
+        ecat_slv();
+        DBG_1_OFF;
+    } else if (GPIO_Pin == BTN_1_Pin) {
+        sdo.flash._signature_ = FLASH_SIGN_VALID;
+        ret = Write_flash((uint32_t) &flash_sdo, (void*) &sdo.flash, sizeof(flash_sdo));
+        DPRINT("%s %p ret=%d\n", __FUNCTION__, (uint32_t) &flash_sdo, ret);
+    }
 
 }
 
-void user_code_loop(void) {
+void user_code_init(void)
+{
 
-	HAL_Delay(500);
-	LED_1_TGL;
+    /* Disable I/O buffering for STDOUT stream, so that
+     * chars are sent out as soon as they are printed. */
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+
+    read_UID();
+    DPRINT("+++ Start Application +++\n");
+    print_build_info();
+    if (Read_Flash_Params() == PARAMS_CMD_ERROR) {
+        //
+        //glob_fault.bit.warn_read_flash = 1;
+        DPRINT("Read_Flash_Params FAIL\n");
+        if (Load_Default_Params() == PARAMS_CMD_ERROR) {
+            // FATAL ERROR
+            Error_Handler();
+        }
+        DPRINT("Load_Default_Params\n");
+    }
+    DPRINT("sdo.ram.fw_ver=%s\n", sdo.ram.fw_ver);
+    DPRINT("FLASH_SDO\n");
+    print_sdo(&flash_sdo);
+    DPRINT("DFLT_FLASH_SDO\n");
+    print_sdo(&dflt_flash_sdo);
+    DPRINT("SDO\n");
+    print_sdo(&sdo.flash);
+    /* Init soes */
+    ecat_slv_init(&config);
+    /* timer initialization with interrupt mode */
+    HAL_TIM_Base_Start_IT(&htim7);
+
+}
+
+void user_code_loop(void)
+{
+
+    HAL_Delay(500);
+    LED_1_TGL;
 
 }
 
 //extern void jump_to_bootloader(void)  __attribute__((weak, alias("default_jump_to_bootloader")));
-void jump_to_bootloader(void) {
+void jump_to_bootloader(void)
+{
 
-	HAL_TIM_Base_Stop_IT(&htim7);
-	HAL_NVIC_SystemReset();
+    HAL_TIM_Base_Stop_IT(&htim7);
+    HAL_NVIC_SystemReset();
 }
