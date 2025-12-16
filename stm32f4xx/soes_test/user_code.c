@@ -54,6 +54,20 @@ int _write(int file, char *ptr, int len)
     return -1;
 }
 
+#ifdef EE_LOAD_Pin
+/*
+ * defined weak in esc_hw_et1100.c
+ * The LAN9252 doesn't use a dedicated "EEPROM loaded" pin
+ */
+void assert_EE_LOAD(void) {
+
+	while ( HAL_GPIO_ReadPin(EE_LOAD_GPIO_Port, EE_LOAD_Pin) != GPIO_PIN_SET ) {
+		HAL_Delay(3);
+	}
+	DPRINT ("EE_LOAD pin OK\n");
+}
+#endif
+
 void read_UID(void)
 {
 
