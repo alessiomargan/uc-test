@@ -136,7 +136,6 @@ void user_code_init(void)
     print_sdo(&dflt_flash_sdo);
     DPRINT("SDO\n");
     print_sdo(&sdo.flash);
-    // TODO add EEPROM_LOAD if present
     /* Init soes */
     ecat_slv_init(&config);
     /* timer initialization with interrupt mode */

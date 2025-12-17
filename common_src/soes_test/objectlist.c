@@ -173,10 +173,10 @@ const _objd SDO8002[] =
 const _objd SDO9009[] =
 {
   {0x0,  DTYPE_UNSIGNED8,        8, ATYPE_RO,   "NumElem",      4, 0},
-  {0x1, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_hash",     0, &git_hash},
-  {0x2, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_branch",   0, &git_branch},
-  {0x3, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_tag",      0, &git_tag},
-  {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "build_ts",     0, &build_ts},
+  {0x1, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_hash",     0, (void*)&git_hash},
+  {0x2, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_branch",   0, (void*)&git_branch},
+  {0x3, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "git_tag",      0, (void*)&git_tag},
+  {0x4, DTYPE_VISIBLE_STRING,   64, ATYPE_RO,   "build_ts",     0, (void*)&build_ts},
 };
 
 const _objd SDO8003[] =
