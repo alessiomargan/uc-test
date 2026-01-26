@@ -1,5 +1,3 @@
-#ifndef __objectlist__
-#define __objectlist__
 
 #include <soes/esc_coe.h>
 #include <soes_hook.h>
@@ -222,5 +220,3 @@ const _objectlist SDOobjects[] =
   {0x9009, OTYPE_RECORD,     4,  0, "Build_info",  SDO9009},
   {0xffff, 0xff, 0xff, 0xff, 0,  0}
 };
-
-#endif

@@ -20,7 +20,7 @@ extern esc_cfg_t config;
 uint32_t uid[3];
 
 ///////////////////////////////////////////////////////////////////////////
-// NOTE : in syscall.c comment function _write
+// NOTE : in syscall.c function _write is defined "weak"
 // the big difference seems the use of
 // 		HAL_UART_Transmit(gHuart, (uint8_t *) ptr, len, HAL_MAX_DELAY);
 // instead of a loop over "len" of
