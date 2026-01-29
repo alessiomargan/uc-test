@@ -138,6 +138,8 @@ void user_code_init(void)
     print_sdo(&sdo.flash);
     /* Init soes */
     ecat_slv_init(&config);
+    /* */
+    CAN_Config(&hcan1);
     /* timer initialization with interrupt mode */
     HAL_TIM_Base_Start_IT(&htim7);
 

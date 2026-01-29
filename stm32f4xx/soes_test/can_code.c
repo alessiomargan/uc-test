@@ -8,6 +8,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
+#include <cc.h>
+
 /* Private variables ---------------------------------------------------------*/
 CAN_TxHeaderTypeDef txHeader;
 CAN_RxHeaderTypeDef rxHeader;
@@ -19,18 +21,18 @@ void CAN_Config(CAN_HandleTypeDef *hcan)
 {
 
     CAN_FilterTypeDef sFilterConfig;
-    /*## Configure the CAN Filter ###########################################*/
-    sFilterConfig.FilterBank = 0;
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0000;
-    sFilterConfig.FilterMaskIdLow = 0x0000;
-    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
-    sFilterConfig.FilterActivation = ENABLE;
-    sFilterConfig.SlaveStartFilterBank = 14;
-    if (HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK) {
+	/*## Configure the CAN Filter ###########################################*/
+	sFilterConfig.FilterBank = 0;  // Use bank 14 for CAN2 (0-13 for CAN1)
+	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+	sFilterConfig.FilterIdHigh = 0x0000;
+	sFilterConfig.FilterIdLow = 0x0000;
+	sFilterConfig.FilterMaskIdHigh = 0x0000;  // Accept all IDs
+	sFilterConfig.FilterMaskIdLow = 0x0000;   // Accept all IDs
+	sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+	sFilterConfig.FilterActivation = ENABLE;
+	sFilterConfig.SlaveStartFilterBank = 0;
+	if (HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK) {
         /* Filter configuration Error */
         Error_Handler();
     }
@@ -52,6 +54,12 @@ void CAN_Config(CAN_HandleTypeDef *hcan)
     txHeader.IDE = CAN_ID_STD;
     txHeader.DLC = 8;
     txHeader.TransmitGlobalTime = DISABLE;
+
+    txData[0] = 0xC0;
+    txData[1] = 0xCA;
+    txData[2] = 0xC0;
+    txData[3] = 0x7A;
+    HAL_CAN_AddTxMessage(hcan, &txHeader, txData, &txMailbox);
 }
 
 /**
@@ -62,7 +70,8 @@ void CAN_Config(CAN_HandleTypeDef *hcan)
  */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-    /* Get RX message */
+
+	/* Get RX message */
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxHeader, rxData) != HAL_OK) {
         /* Reception Error */
         Error_Handler();
@@ -71,8 +80,15 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     /*  */
     if ((rxHeader.StdId == 0x123) && (rxHeader.IDE == CAN_ID_STD) && (rxHeader.DLC == 2)) {
 
+    	txData[0] = 0xF0;
+    	txData[1] = 0xCA;
+    	txData[2] = 0xCC;
+    	txData[3] = 0x1A;
+        HAL_CAN_AddTxMessage(hcan, &txHeader, txData, &txMailbox);
+
     } else if ((rxHeader.StdId == 0x5) && (rxHeader.IDE == CAN_ID_STD) && (rxHeader.RTR == CAN_RTR_REMOTE)) {
-        txData[0] = 0xDE;
+
+    	txData[0] = 0xDE;
         txData[1] = 0xAD;
         txData[2] = 0xBE;
         txData[3] = 0xEF;
