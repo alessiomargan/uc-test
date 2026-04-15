@@ -15,6 +15,7 @@
 #include <main.h>
 #include <stm32f4xx_hal.h>
 
+extern void CAN_Config(CAN_HandleTypeDef *hcan);
 extern uint32_t ESC_SYNCactivation(void);
 extern esc_cfg_t config;
 uint32_t uid[3];

@@ -10,6 +10,8 @@
 
 #include <cc.h>
 
+extern void Error_Handler(void);
+
 /* Private variables ---------------------------------------------------------*/
 CAN_TxHeaderTypeDef txHeader;
 CAN_RxHeaderTypeDef rxHeader;
