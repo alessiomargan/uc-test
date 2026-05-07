@@ -49,8 +49,7 @@ int _write(int file, char *ptr, int len)
 {
 
     HAL_StatusTypeDef hstatus;
-    hstatus = HAL_UART_Transmit(&printf_uart, (uint8_t*) ptr, len,
-    HAL_MAX_DELAY);
+    hstatus = HAL_UART_Transmit(&printf_uart, (uint8_t*) ptr, len, HAL_MAX_DELAY);
     if (hstatus == HAL_OK) return len;
     return -1;
 }
