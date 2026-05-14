@@ -1,5 +1,5 @@
 #include "globals.h"
-#include "flash_utils.h"
+//#include "flash_utils.h"
 #include "build_info.h"
 
 #include <stdio.h>
@@ -95,28 +95,6 @@ uint8_t		foe_buffer[0x400];
 
 
 foe_file_cfg_t      gFOE_firmware_files[] = {
-	{
-			.name =					"ft6_param.bin",
-			.max_data = 			FLASH_PARAM_MAX_SIZE, 	// sector size ?!?
-			.dest_start_address =	FLASH_PARAM_ADDR, 	//
-			.address_offset =		0,
-			.filepass =				0xA4A4,
-//			.write_function =		foe_write_flash,
-//			.read_function =		foe_read_flash,
-//			.on_foe_open = 			on_foe_open_cb,
-//			.on_foe_close = 		on_foe_close_cb,
-	},
-    {
-    		.name =					"cal_mat.bin",
-			.max_data = 			FLASH_CALIB_MAX_SIZE, 	// sector size ?!?
-			.dest_start_address =	FLASH_CALIB_ADDR, 	//
-			.address_offset =		0,
-			.filepass =				0xCA71,
-			.write_function =		foe_write_cal_mat,
-			.read_function =		foe_read_cal_mat,
-			.on_foe_open = 			0,
-			.on_foe_close = 		0,
-    },
     { 0 }
 };
 
