@@ -143,13 +143,13 @@ uint32_t ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags
 {
 	switch ( index ) {
         case 0x7000:
-        	//Handle_0x7000(subindex);
+        	Handle_0x7000(subindex);
 			break;
          case 0x8000:
- 			//Handle_0x8000(subindex);
+ 			Handle_0x8000(subindex);
 			break;
  		case 0x8001:
- 			//Handle_0x8001(subindex);
+ 			Handle_0x8001(subindex);
  			break;
          default:
              DPRINT("SDO 0x%04X %d NOT Handled\n", index, subindex);
