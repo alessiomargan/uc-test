@@ -101,11 +101,11 @@ foe_file_cfg_t      gFOE_firmware_files[] = {
 /*
  *
  */
-const uint8_t git_hash[] = GIT_HASH;
-const uint8_t git_branch[] = GIT_BRANCH;
-const uint8_t git_tag[] = GIT_TAG;
-const uint8_t build_ts[] = BUILD_TIMESTAMP;
-const uint8_t build_short_ts[] = BUILD_SHORT_TS;
+const char git_hash[] = GIT_HASH;
+const char git_branch[] = GIT_BRANCH;
+const char git_tag[] = GIT_TAG;
+const char build_ts[] = BUILD_TIMESTAMP;
+const char build_short_ts[] = BUILD_SHORT_TS;
 
 void print_build_info(void) {
 
