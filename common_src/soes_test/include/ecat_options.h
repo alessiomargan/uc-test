@@ -39,7 +39,13 @@
 #define MAX_RXPDO_SIZE   64
 #define MAX_TXPDO_SIZE   64
 
+/* C28x chars are 16 bits, so it must use object-dictionary PDO mapping. */
+#if defined(__TMS320C28XX__)
+#define MAX_MAPPINGS_SM2 12
+#define MAX_MAPPINGS_SM3 10
+#else
 #define MAX_MAPPINGS_SM2 0
 #define MAX_MAPPINGS_SM3 0
+#endif
 
 #endif /* __ECAT_OPTIONS_H__ */
