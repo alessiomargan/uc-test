@@ -52,11 +52,15 @@ void scia_init(void)
     freopen("scia:", "w", stdout);
     setvbuf(stdout, NULL, _IONBF, 0);
     print_ascii_banner();
-
+    // printf full_support need a big stack of about 0x800 size
     printf("%s %d\n",__FUNCTION__, 1234);
     DPRINT("Hello world 0x%04X !!\n", 0xBEEF);
+    DPRINT("%ld\n", 314159L);
     float pi = 3.14159265;
-    DPRINT("%f %f\n", pi, pi/2);
+    float piDIV2 = pi/2;
+
+    DPRINT("%f\n", pi);
+    DPRINT("%f\n", piDIV2);
 
 
     return;
