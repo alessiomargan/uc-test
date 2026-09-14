@@ -55,6 +55,7 @@ extern "C" {
 // 
 // Function prototypes
 //
+void sci_stdio_init(void);
 int SCI_open(const char * path, unsigned flags, int llv_fd);
 int SCI_close(int dev_fd);
 int SCI_read(int dev_fd, char * buf, unsigned count);

@@ -55,6 +55,8 @@
 #include "driverlib.h"
 #include "device.h"
 
+#include <ti_ascii.h>
+#include <cc.h>
 //
 // Defines
 //
@@ -67,6 +69,38 @@ uint16_t deviceOpen = 0;
 //
 // Functions
 //
+void sci_stdio_init(void)
+{
+     int status;
+
+    status = add_device("scia", _SSA,
+                        SCI_open, SCI_close,
+                        SCI_read, SCI_write,
+                        SCI_lseek, SCI_unlink, SCI_rename);
+
+    if (status < 0) {
+        ESTOP0;
+    }
+
+    if (freopen("scia:", "w", stdout) == NULL) {
+        ESTOP0;
+    }
+    
+    setvbuf(stdout, NULL, _IONBF, 0);
+    
+    print_ascii_banner();
+    // printf full_support need a big stack of about 0x800 size
+    printf("%s %d\n",__FUNCTION__, 1234);
+    DPRINT("Hello world 0x%04X !!\n", 0xBEEF);
+    DPRINT("%ld\n", 314159L);
+    float pi = 3.14159265;
+    float piDIV2 = pi/2;
+
+    DPRINT("%f\n", pi);
+    DPRINT("%f\n", piDIV2);
+
+    return;
+}
 
 //
 // SCI_open -
@@ -145,7 +179,7 @@ int SCI_write(int dev_fd, const char * buf, unsigned count)
     
     while(writeCount < count)
     {
-        SCI_writeCharBlockingNonFIFO(SCIA_BASE, *bufPtr);
+        SCI_writeCharBlockingFIFO(SCIA_BASE, *bufPtr);
         writeCount++;
         bufPtr++;
     }
