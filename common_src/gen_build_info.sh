@@ -7,7 +7,7 @@ else
     TARGET_DIR="$(dirname "$(realpath "$0")")"
 fi
 
-echo "TARGET_DIR: $TARGET_DIR"
+printf 'TARGET_DIR: %s\n' "$TARGET_DIR"
 
 # Define the output file
 OUTPUT_FILE="$TARGET_DIR/include/build_info.h"
@@ -15,109 +15,165 @@ OUTPUT_FILE="$TARGET_DIR/include/build_info.h"
 # Create directory if it doesn't exist
 mkdir -p "$(dirname "$OUTPUT_FILE")"
 
-# Start with a fresh file
-echo "/* Auto-generated build information */" > "$OUTPUT_FILE"
-echo "#ifndef __BUILD_INFO_H__" >> "$OUTPUT_FILE"
-echo "#define __BUILD_INFO_H__" >> "$OUTPUT_FILE"
-echo "" >> "$OUTPUT_FILE"
-echo "#include <stdio.h>" >> "$OUTPUT_FILE"
-echo "#include <stdint.h>" >> "$OUTPUT_FILE"
-echo "" >> "$OUTPUT_FILE"
+# Append one complete line without interpreting backslash escapes.
+append_line() {
+    printf '%s\n' "$1" >> "$OUTPUT_FILE"
+}
+
+# Start with a fresh file.
+: > "$OUTPUT_FILE"
+append_line "/* Auto-generated build information */"
+append_line "#ifndef __BUILD_INFO_H__"
+append_line "#define __BUILD_INFO_H__"
+append_line ""
+append_line "#include <stdio.h>"
+append_line "#include <stdint.h>"
+append_line ""
 
 # Add build timestamp
-echo "#define BUILD_TIMESTAMP \"$(date '+%Y-%m-%d %H:%M:%S')\"" >> "$OUTPUT_FILE"
-echo "#define BUILD_SHORT_TS \"$(date '+%y%m%d%H')\"" >> "$OUTPUT_FILE"
+append_line "#define BUILD_TIMESTAMP \"$(date '+%Y-%m-%d %H:%M:%S')\""
+append_line "#define BUILD_SHORT_TS \"$(date '+%y%m%d%H')\""
 
 # Find git repository root directory
 GIT_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 
+# Escape text before placing it in a generated C string literal.
+c_escape() {
+    local value="$1"
+    value=${value//\\/\\\\}
+    value=${value//\"/\\\"}
+    printf '%s' "$value"
+}
+
+GIT_SUBMODULE_COUNT=0
+GIT_SUBMODULE_INFO=""
+
 # Add Git information if available
 if [ -n "$GIT_ROOT_DIR" ] && [ -d "$GIT_ROOT_DIR/.git" ]; then
     # We're in a git repository, use the root directory for git commands
-    echo "#define GIT_HASH \"$(git rev-parse --short HEAD)\"" >> "$OUTPUT_FILE"
-    echo "#define GIT_COMMIT_HASH \"$(git rev-parse HEAD)\"" >> "$OUTPUT_FILE"
-    echo "#define GIT_BRANCH \"$(git rev-parse --abbrev-ref HEAD)\"" >> "$OUTPUT_FILE"
+    append_line "#define GIT_HASH \"$(git rev-parse --short HEAD)\""
+    append_line "#define GIT_COMMIT_HASH \"$(git rev-parse HEAD)\""
+    append_line "#define GIT_BRANCH \"$(git rev-parse --abbrev-ref HEAD)\""
     
     # Get tag if available
-    GIT_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
+    GIT_TAG=$(git describe --tags --exact-match 2>/dev/null || printf '')
     if [ -n "$GIT_TAG" ]; then
-        echo "#define GIT_TAG \"$GIT_TAG\"" >> "$OUTPUT_FILE"
+        append_line "#define GIT_TAG \"$GIT_TAG\""
     else
-        echo "#warning \"No Git tag found in the repository!\"" >> "$OUTPUT_FILE"
-        echo "#define GIT_TAG \"No Tag\"" >> "$OUTPUT_FILE"
+        append_line "#define GIT_TAG \"No Tag\""
     fi
     
     # Check for dirty working tree
     if [ -n "$(git status --porcelain)" ]; then
-        echo "#define GIT_DIRTY 1" >> "$OUTPUT_FILE"
+        append_line "#define GIT_DIRTY 1"
     else
-        echo "#define GIT_DIRTY 0" >> "$OUTPUT_FILE"
+        append_line "#define GIT_DIRTY 0"
     fi
     
     # Get repo URL - check for any remote, not just origin
-    GIT_REPO_URL=$(git remote -v | grep fetch | head -1 | awk '{print $2}' 2>/dev/null || echo "Unknown")
-    echo "#define GIT_REPO_URL \"$GIT_REPO_URL\"" >> "$OUTPUT_FILE"
+    GIT_REPO_URL=$(git remote -v | grep fetch | head -1 | awk '{print $2}' 2>/dev/null || printf 'Unknown')
+    append_line "#define GIT_REPO_URL \"$GIT_REPO_URL\""
+
+    # Record configured submodules, including ones not initialized locally.
+    if [ -f "$GIT_ROOT_DIR/.gitmodules" ]; then
+        while read -r config_key submodule_path; do
+            [ -n "$submodule_path" ] || continue
+
+            submodule_key=${config_key%.path}
+            submodule_url=$(git config -f "$GIT_ROOT_DIR/.gitmodules" \
+                --get "$submodule_key.url" 2>/dev/null || printf 'Unknown')
+            submodule_dir="$GIT_ROOT_DIR/$submodule_path"
+
+            if git -C "$submodule_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+                submodule_hash=$(git -C "$submodule_dir" rev-parse --short HEAD)
+                submodule_branch=$(git -C "$submodule_dir" symbolic-ref --quiet --short HEAD 2>/dev/null || printf 'detached')
+                submodule_tag=$(git -C "$submodule_dir" describe --tags --exact-match 2>/dev/null || printf 'No Tag')
+                if [ -n "$(git -C "$submodule_dir" status --porcelain)" ]; then
+                    submodule_dirty=1
+                else
+                    submodule_dirty=0
+                fi
+            else
+                submodule_hash="not initialized"
+                submodule_branch="unknown"
+                submodule_tag="No Tag"
+                submodule_dirty=0
+            fi
+
+            GIT_SUBMODULE_INFO+="  $(c_escape "$submodule_path"): commit=$(c_escape "$submodule_hash"), branch=$(c_escape "$submodule_branch"), tag=$(c_escape "$submodule_tag"), dirty=$submodule_dirty, url=$(c_escape "$submodule_url")\\n"
+            GIT_SUBMODULE_COUNT=$((GIT_SUBMODULE_COUNT + 1))
+        done < <(git config -f "$GIT_ROOT_DIR/.gitmodules" \
+            --get-regexp '^submodule\..*\.path$' 2>/dev/null)
+    fi
 else
-    echo "#define GIT_HASH \"\"" >> "$OUTPUT_FILE"
-    echo "#define GIT_COMMIT_HASH \"\"" >> "$OUTPUT_FILE"
-    echo "#define GIT_BRANCH \"\"" >> "$OUTPUT_FILE"
-    echo "#warning \"No Git tag found in the repository!\"" >> "$OUTPUT_FILE"
-    echo "#define GIT_TAG \"No Tag\"" >> "$OUTPUT_FILE"
-    echo "#define GIT_DIRTY 0" >> "$OUTPUT_FILE"
-    echo "#define GIT_REPO_URL \"Unknown\"" >> "$OUTPUT_FILE"
+    append_line "#define GIT_HASH \"\""
+    append_line "#define GIT_COMMIT_HASH \"\""
+    append_line "#define GIT_BRANCH \"\""
+    append_line "#define GIT_TAG \"No Tag\""
+    append_line "#define GIT_DIRTY 0"
+    append_line "#define GIT_REPO_URL \"Unknown\""
 fi
 
+if [ "$GIT_SUBMODULE_COUNT" -eq 0 ]; then
+    GIT_SUBMODULE_INFO="  None\\n"
+fi
+append_line "#define GIT_SUBMODULE_COUNT $GIT_SUBMODULE_COUNT"
+printf '#define GIT_SUBMODULE_INFO "%s"\n' "$GIT_SUBMODULE_INFO" >> "$OUTPUT_FILE"
+
 # Add build environment info
-echo "#define BUILD_HOST \"$(hostname)\"" >> "$OUTPUT_FILE"
-echo "#define BUILD_USER \"$(whoami)\"" >> "$OUTPUT_FILE"
-echo "#define BUILD_OS \"$(uname -sr)\"" >> "$OUTPUT_FILE"
+append_line "#define BUILD_HOST \"$(hostname)\""
+append_line "#define BUILD_USER \"$(whoami)\""
+append_line "#define BUILD_OS \"$(uname -sr)\""
 
 # Add const arrays for easy binary inclusion
-echo "" >> "$OUTPUT_FILE"
-echo "// Const arrays for binary inclusion in firmware" >> "$OUTPUT_FILE"
-echo "#ifdef BUILD_INFO_IMPLEMENTATION" >> "$OUTPUT_FILE"
-echo "// These are defined only once in the file that defines BUILD_INFO_IMPLEMENTATION" >> "$OUTPUT_FILE"
-echo "const uint8_t git_hash[] = GIT_HASH;" >> "$OUTPUT_FILE"
-echo "const uint8_t git_branch[] = GIT_BRANCH;" >> "$OUTPUT_FILE"
-echo "const uint8_t git_tag[] = GIT_TAG;" >> "$OUTPUT_FILE"
-echo "const uint8_t build_ts[] = BUILD_TIMESTAMP;" >> "$OUTPUT_FILE"
-echo "const uint8_t build_short_ts[] = BUILD_SHORT_TS;" >> "$OUTPUT_FILE"
-echo "#else" >> "$OUTPUT_FILE"
-echo "// In all other files, just declare them as extern" >> "$OUTPUT_FILE"
-echo "extern const uint8_t git_hash[];" >> "$OUTPUT_FILE"
-echo "extern const uint8_t git_branch[];" >> "$OUTPUT_FILE"
-echo "extern const uint8_t git_tag[];" >> "$OUTPUT_FILE"
-echo "extern const uint8_t build_ts[];" >> "$OUTPUT_FILE"
-echo "extern const uint8_t build_short_ts[];" >> "$OUTPUT_FILE"
-echo "#endif // BUILD_INFO_IMPLEMENTATION" >> "$OUTPUT_FILE"
+append_line ""
+append_line "// Const arrays for binary inclusion in firmware"
+append_line "#ifdef BUILD_INFO_IMPLEMENTATION"
+append_line "// These are defined only once in the file that defines BUILD_INFO_IMPLEMENTATION"
+append_line "const uint8_t git_hash[] = GIT_HASH;"
+append_line "const uint8_t git_branch[] = GIT_BRANCH;"
+append_line "const uint8_t git_tag[] = GIT_TAG;"
+append_line "const uint8_t git_submodules[] = GIT_SUBMODULE_INFO;"
+append_line "const uint8_t build_ts[] = BUILD_TIMESTAMP;"
+append_line "const uint8_t build_short_ts[] = BUILD_SHORT_TS;"
+append_line "#else"
+append_line "// In all other files, just declare them as extern"
+append_line "extern const uint8_t git_hash[];"
+append_line "extern const uint8_t git_branch[];"
+append_line "extern const uint8_t git_tag[];"
+append_line "extern const uint8_t git_submodules[];"
+append_line "extern const uint8_t build_ts[];"
+append_line "extern const uint8_t build_short_ts[];"
+append_line "#endif // BUILD_INFO_IMPLEMENTATION"
 
 # Add the declaration
-echo "" >> "$OUTPUT_FILE"
-echo "// Helper function to print build information" >> "$OUTPUT_FILE"
-echo "void print_build_info(void);" >> "$OUTPUT_FILE"
+append_line ""
+append_line "// Helper function to print build information"
+append_line "void print_build_info(void);"
 
 # Add the definition with inline
-echo "" >> "$OUTPUT_FILE"
-echo "// Implementation of the print function" >> "$OUTPUT_FILE"
-echo "#ifdef BUILD_INFO_IMPLEMENTATION" >> "$OUTPUT_FILE"
-echo "void print_build_info(void) {" >> "$OUTPUT_FILE"
-echo "	printf(\"\\n\");" >> "$OUTPUT_FILE"
-echo "	printf(\"Build Timestamp: %s\\n\", BUILD_TIMESTAMP);" >> "$OUTPUT_FILE"
-echo "	printf(\"Build short Timestamp: %s\\n\", BUILD_SHORT_TS);" >> "$OUTPUT_FILE"
-echo "	printf(\"Git Hash: %s\\n\", GIT_HASH);" >> "$OUTPUT_FILE"
-echo "	printf(\"Git Commit Hash: %s\\n\", GIT_COMMIT_HASH);" >> "$OUTPUT_FILE"
-echo "	printf(\"Git Branch: %s\\n\", GIT_BRANCH);" >> "$OUTPUT_FILE"
-echo "	printf(\"Git Tag: %s\\n\", GIT_TAG);" >> "$OUTPUT_FILE"
-echo "	printf(\"Repository Dirty: %d\\n\", GIT_DIRTY);" >> "$OUTPUT_FILE"
-echo "	printf(\"Git Repository URL: %s\\n\", GIT_REPO_URL);" >> "$OUTPUT_FILE"
-echo "	printf(\"Build Host: %s\\n\", BUILD_HOST);" >> "$OUTPUT_FILE"
-echo "	printf(\"Build User: %s\\n\", BUILD_USER);" >> "$OUTPUT_FILE"
-echo "	printf(\"Build OS: %s\\n\", BUILD_OS);" >> "$OUTPUT_FILE"
-echo "	printf(\"\\n\");" >> "$OUTPUT_FILE"
-echo "}" >> "$OUTPUT_FILE"
-echo "#endif // BUILD_INFO_IMPLEMENTATION" >> "$OUTPUT_FILE"
+append_line ""
+append_line "// Implementation of the print function"
+append_line "#ifdef BUILD_INFO_IMPLEMENTATION"
+append_line "void print_build_info(void) {"
+append_line $'\tprintf("\\n");'
+append_line $'\tprintf("Build Timestamp: %s\\n", BUILD_TIMESTAMP);'
+append_line $'\tprintf("Build short Timestamp: %s\\n", BUILD_SHORT_TS);'
+append_line $'\tprintf("Git Repository URL: %s\\n", GIT_REPO_URL);'
+append_line $'\tprintf("Git Branch: %s\\n", GIT_BRANCH);'
+append_line $'\tprintf("Git Tag: %s\\n", GIT_TAG);'
+append_line $'\tprintf("Git Commit Hash: %s\\n", GIT_COMMIT_HASH);'
+append_line $'\tprintf("Git Hash: %s\\n", GIT_HASH);'
+append_line $'\tprintf("Repository Dirty: %d\\n", GIT_DIRTY);'
+append_line $'\tprintf("Git Submodules (%d):\\n%s", GIT_SUBMODULE_COUNT, GIT_SUBMODULE_INFO);'
+append_line $'\tprintf("Build Host: %s\\n", BUILD_HOST);'
+append_line $'\tprintf("Build User: %s\\n", BUILD_USER);'
+append_line $'\tprintf("Build OS: %s\\n", BUILD_OS);'
+append_line $'\tprintf("\\n");'
+append_line "}"
+append_line "#endif // BUILD_INFO_IMPLEMENTATION"
 
 # Close the header guard
-echo "#endif /* __BUILD_INFO_H__ */" >> "$OUTPUT_FILE"
+append_line "#endif /* __BUILD_INFO_H__ */"
 
-echo "Build info generated at $OUTPUT_FILE"
+printf 'Build info generated at %s\n' "$OUTPUT_FILE"

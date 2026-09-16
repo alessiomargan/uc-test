@@ -104,7 +104,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     } else if (GPIO_Pin == BTN_1_Pin) {
         sdo.flash._signature_ = FLASH_SIGN_VALID;
         ret = Write_flash((uint32_t) &flash_sdo, (void*) &sdo.flash, sizeof(flash_sdo));
-        DPRINT("%s %p ret=%d\n", __FUNCTION__, (uint32_t) &flash_sdo, ret);
+        DPRINT("%s %p ret=%d\n", __FUNCTION__, (void *) &flash_sdo, ret);
     }
 
 }
