@@ -33,6 +33,11 @@ void post_state_change_hook (uint8_t * as, uint8_t * an);
 uint32_t ESC_App_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags);
 uint16_t check_dc_handler_hook(void);
 
+#if defined(__TMS320C28XX__)
+void f28p65x_rxpdo_override(void);
+void f28p65x_txpdo_override(void);
+#endif
+
 /* Setup config hooks */
 const esc_cfg_t config =
 {
@@ -49,8 +54,13 @@ const esc_cfg_t config =
     .post_object_download_hook 	= ESC_App_objecthandler,
 	.pre_object_upload_hook		= NULL,
 	.post_object_upload_hook	= NULL,
+#if defined(__TMS320C28XX__)
+    .rxpdo_override				= f28p65x_rxpdo_override,
+    .txpdo_override				= f28p65x_txpdo_override,
+#else
     .rxpdo_override				= NULL,
     .txpdo_override				= NULL,
+#endif
     .esc_hw_interrupt_enable	= NULL,
     .esc_hw_interrupt_disable	= NULL,
     .esc_hw_eep_handler			= NULL,
