@@ -1,27 +1,22 @@
 #ifndef _FLASH_UTILS_H_
 #define _FLASH_UTILS_H_
 
-#include <cc.h>
+#include "flash.h"
+#include "FlashTech_F28P65x_C28x.h"
+#include "flash_programming_f28p65x.h"
 
-#define FLASH_APP_SECTOR		FLASH_SECTOR_0
-#define FLASH_APP_ADDR			0x8000000 // sector 0
-#define FLASH_APP_MAX_SIZE		48 // sector 0 1 2
+#define FLASH_PARAM_ADDR    FlashBank2StartAddress
 
-#define FLASH_NXT_SECTOR		FLASH_SECTOR_5
-#define FLASH_NXT_ADDR			0x8020000 // sector 0
-#define FLASH_NXT_MAX_SIZE		384 // sector 5 6 7
-
-
-#define FLASH_PARAM_SECTOR		FLASH_SECTOR_3
-#define FLASH_PARAM_ADDR		0x800C000 // sector 3
-#define FLASH_PARAM_MAX_SIZE	16
-
-#define FLASH_CALIB_SECTOR		FLASH_SECTOR_4
-#define FLASH_CALIB_ADDR		0x8010000 // sector 4
-#define FLASH_CALIB_MAX_SIZE	64
+// C28 Flash addresses and sizeof() use 16-bit addressable words.
+#define DATA_FLASH_SECTOR_SIZE_WORDS   Sector2KB_u16length
+#define DATA_FLASH_PROGRAM_SIZE_WORDS  8U
+#define DATA_FLASH_ALIGNMENT_WORDS     4U
 
 uint32_t calc_CRC(uint32_t addr, uint32_t length);
 
-uint8_t Write_flash(uint32_t flash_addr, void * src, size_t size);
+Fapi_StatusType Configure_flashAPI(void);
+Fapi_StatusType Erase_dataFlashSector(uint32_t address, uint32_t size);
+Fapi_StatusType Program_dataFlashSector(const uint16_t *src, uint32_t address, uint32_t size);
+bool Write_flash(uint32_t flash_addr, const void *src, uint32_t size);
 
 #endif
