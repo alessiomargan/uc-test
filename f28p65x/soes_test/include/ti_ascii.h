@@ -93,7 +93,7 @@ const unsigned char ti_ascii[45][81] = {
 
 inline void print_ascii_banner() {
     for (int i = 0; i < 45; i++) {
-        printf("%s\n", ti_ascii[i]);
+        printf("%s\r\n", ti_ascii[i]);
     }
 }
 

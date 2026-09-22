@@ -99,7 +99,7 @@ if [ -n "$GIT_ROOT_DIR" ] && [ -d "$GIT_ROOT_DIR/.git" ]; then
                 submodule_dirty=0
             fi
 
-            GIT_SUBMODULE_INFO+="  $(c_escape "$submodule_path"): commit=$(c_escape "$submodule_hash"), branch=$(c_escape "$submodule_branch"), tag=$(c_escape "$submodule_tag"), dirty=$submodule_dirty, url=$(c_escape "$submodule_url")\\n"
+            GIT_SUBMODULE_INFO+="  $(c_escape "$submodule_path"): commit=$(c_escape "$submodule_hash"), branch=$(c_escape "$submodule_branch"), tag=$(c_escape "$submodule_tag"), dirty=$submodule_dirty, url=$(c_escape "$submodule_url")\\r\\n"
             GIT_SUBMODULE_COUNT=$((GIT_SUBMODULE_COUNT + 1))
         done < <(git config -f "$GIT_ROOT_DIR/.gitmodules" \
             --get-regexp '^submodule\..*\.path$' 2>/dev/null)
@@ -114,7 +114,7 @@ else
 fi
 
 if [ "$GIT_SUBMODULE_COUNT" -eq 0 ]; then
-    GIT_SUBMODULE_INFO="  None\\n"
+    GIT_SUBMODULE_INFO="  None\\r\\n"
 fi
 append_line "#define GIT_SUBMODULE_COUNT $GIT_SUBMODULE_COUNT"
 printf '#define GIT_SUBMODULE_INFO "%s"\n' "$GIT_SUBMODULE_INFO" >> "$OUTPUT_FILE"
@@ -155,20 +155,20 @@ append_line ""
 append_line "// Implementation of the print function"
 append_line "#ifdef BUILD_INFO_IMPLEMENTATION"
 append_line "void print_build_info(void) {"
-append_line $'\tprintf("\\n");'
-append_line $'\tprintf("Build Timestamp: %s\\n", BUILD_TIMESTAMP);'
-append_line $'\tprintf("Build short Timestamp: %s\\n", BUILD_SHORT_TS);'
-append_line $'\tprintf("Git Repository URL: %s\\n", GIT_REPO_URL);'
-append_line $'\tprintf("Git Branch: %s\\n", GIT_BRANCH);'
-append_line $'\tprintf("Git Tag: %s\\n", GIT_TAG);'
-append_line $'\tprintf("Git Commit Hash: %s\\n", GIT_COMMIT_HASH);'
-append_line $'\tprintf("Git Hash: %s\\n", GIT_HASH);'
-append_line $'\tprintf("Repository Dirty: %d\\n", GIT_DIRTY);'
-append_line $'\tprintf("Git Submodules (%d):\\n%s", GIT_SUBMODULE_COUNT, GIT_SUBMODULE_INFO);'
-append_line $'\tprintf("Build Host: %s\\n", BUILD_HOST);'
-append_line $'\tprintf("Build User: %s\\n", BUILD_USER);'
-append_line $'\tprintf("Build OS: %s\\n", BUILD_OS);'
-append_line $'\tprintf("\\n");'
+append_line $'\tprintf("\\r\\n");'
+append_line $'\tprintf("Build Timestamp: %s\\r\\n", BUILD_TIMESTAMP);'
+append_line $'\tprintf("Build short Timestamp: %s\\r\\n", BUILD_SHORT_TS);'
+append_line $'\tprintf("Git Repository URL: %s\\r\\n", GIT_REPO_URL);'
+append_line $'\tprintf("Git Branch: %s\\r\\n", GIT_BRANCH);'
+append_line $'\tprintf("Git Tag: %s\\r\\n", GIT_TAG);'
+append_line $'\tprintf("Git Commit Hash: %s\\r\\n", GIT_COMMIT_HASH);'
+append_line $'\tprintf("Git Hash: %s\\r\\n", GIT_HASH);'
+append_line $'\tprintf("Repository Dirty: %d\\r\\n", GIT_DIRTY);'
+append_line $'\tprintf("Git Submodules (%d):\\r\\n%s", GIT_SUBMODULE_COUNT, GIT_SUBMODULE_INFO);'
+append_line $'\tprintf("Build Host: %s\\r\\n", BUILD_HOST);'
+append_line $'\tprintf("Build User: %s\\r\\n", BUILD_USER);'
+append_line $'\tprintf("Build OS: %s\\r\\n", BUILD_OS);'
+append_line $'\tprintf("\\r\\n");'
 append_line "}"
 append_line "#endif // BUILD_INFO_IMPLEMENTATION"
 
