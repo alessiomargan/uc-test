@@ -166,32 +166,29 @@ int SCI_read(int dev_fd, char * buf, unsigned count)
 //
 // SCI_write - 
 //
-int SCI_write(int dev_fd, const char * buf, unsigned count)
+int SCI_write(int dev_fd, const char *buf, unsigned count)
 {
-    uint16_t writeCount = 0;
-    uint16_t * bufPtr = (uint16_t *) buf;
-    
-    if(count == 0)
-    {
-        return (0);
-    }
-    
-    while(writeCount < count)
-    {
-        SCI_writeCharBlockingFIFO(SCIA_BASE, *bufPtr);
-        writeCount++;
-        bufPtr++;
-    }
-    
-//    while(writeCount < count)
-//    {
-//        while(!SciaRegs.SCICTL2.bit.TXRDY);
-//        SciaRegs.SCITXBUF.all = *bufPtr;
-//        writeCount++;
-//        bufPtr++;
-//    }
+    static uint16_t previousChar = 0U;
+    const uint16_t *bufPtr = (const uint16_t *)buf;
+    uint16_t writeCount = 0U;
 
-    return (writeCount);
+    while (writeCount < count)
+    {
+        uint16_t currentChar = *bufPtr++;
+
+        // Convert LF to CRLF, but preserve an existing CRLF sequence.
+        if ((currentChar == '\n') && (previousChar != '\r'))
+        {
+            SCI_writeCharBlockingFIFO(SCIA_BASE, '\r');
+        }
+
+        SCI_writeCharBlockingFIFO(SCIA_BASE, currentChar);
+
+        previousChar = currentChar;
+        writeCount++;
+    }
+
+    return writeCount;
 }
 
 //
